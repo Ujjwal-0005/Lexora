@@ -152,7 +152,7 @@ const Landing = () => {
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
+      <section className="relative min-h-screen flex items-center pt-[112px] overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-dark-900 via-dark-800 to-navy-900">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop')] bg-cover bg-center opacity-10" />
@@ -519,7 +519,10 @@ const Landing = () => {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="bg-[#0f172a] p-12 md:p-20 text-center relative overflow-hidden shadow-[0_30px_70px_rgba(10,20,40,0.45)] rounded-md border border-[#a1804a]/30 group transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_50px_100px_rgba(161,128,74,0.35)]"
           >
-            <div className="absolute inset-0 bg-[url('image2.png')] bg-no-repeat bg-center bg-cover opacity-30 dark:opacity-20 transform transition-transform duration-700 ease-out group-hover:scale-110"></div>
+            <div
+              className="absolute inset-0 bg-no-repeat bg-center bg-cover opacity-30 dark:opacity-20 transform transition-transform duration-700 ease-out group-hover:scale-110"
+              style={{ backgroundImage: "url('/image2.png')" }}
+            ></div>
             <div className="absolute inset-0 bg-gradient-to-r from-[#0b1220]/88 via-[#0f172a]/78 to-[#0b1220]/92"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(161,128,74,0.35),transparent_38%),radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.12),transparent_35%)]"></div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#a1804a]/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 transform transition-all duration-500 ease-out group-hover:scale-125 group-hover:opacity-80"></div>
