@@ -1,0 +1,54 @@
+# Composer / Laravel
+/vendor/
+.env
+.env.*
+!.env.example
+/.phpunit.result.cache
+storage/*.key
+storage/logs/*.log
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/public/*
+public/storage
+
+# Frontend / Node
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.vite/
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/pnpm-debug.log*
+
+# Build / cache
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+.temp/
+
+# IDE / OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.code-workspace
+
+# Logs and dumps
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+
+# Environment and secrets
+*.pem
+*.key
+*.crt
+
+# Misc
+*.tmp
+*.swp
+*.swo
