@@ -103,14 +103,7 @@ npm run dev
 
 The frontend will run at http://localhost:5173
 
-### Default Test Accounts
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@legalconnect.com | password |
-| Client | client@test.com | password |
-| Lawyer | lawyer1@test.com | password |
-| Lawyer | lawyer2@test.com | password |
 
 ## API Endpoints
 
