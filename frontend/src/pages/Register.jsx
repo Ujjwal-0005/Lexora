@@ -534,7 +534,7 @@ const Register = () => {
                             <Sparkles size={18} strokeWidth={2} />
                         </div>
                         <h1 className="text-[0.72rem] font-bold tracking-[0.28em] text-white/95 uppercase">
-                            Royal Onboarding
+                            Lexora Onboarding
                         </h1>
                     </div>
 

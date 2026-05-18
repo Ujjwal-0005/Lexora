@@ -164,7 +164,7 @@ const ChatWidget = ({ consultation, onClose, openSignal, minimizeToLauncher = tr
             </div>
             <p className="text-gray-500 dark:text-gray-400 font-serif text-lg">Secure Session</p>
             <p className="text-gray-400 dark:text-gray-500 text-xs max-w-[200px] leading-relaxed">
-              Your messages are protected by Royal Protocol encryption.
+              Your messages are protected by Lexora Protocol encryption.
             </p>
           </div>
         )}

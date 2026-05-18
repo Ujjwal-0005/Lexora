@@ -119,7 +119,7 @@ const Navbar = () => {
         {/* Left Area: Logo & Links */}
         <div className="dd-nav-left">
           <Link to="/" className="dd-nav-logo">
-            Royal Law
+            Lexora
           </Link>
 
           {/* Desktop Links */}

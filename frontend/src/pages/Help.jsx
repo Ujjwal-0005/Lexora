@@ -44,8 +44,8 @@ const Help = () => {
             setSubmitting(true)
             const res = await api.post('/help', { subject, message, type })
             navigate(`/help/${res.data.ticket.id}`)
-        } catch (err) { 
-            console.error(err) 
+        } catch (err) {
+            console.error(err)
         } finally {
             setSubmitting(false)
         }
@@ -88,7 +88,7 @@ const Help = () => {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.05 }}
-                                        key={t.id} 
+                                        key={t.id}
                                         className="group p-5 border border-gray-100 dark:border-gray-800 hover:border-[#a1804a] dark:hover:border-[#a1804a] transition-all cursor-pointer bg-gray-50 dark:bg-[#151f32]"
                                         onClick={() => navigate(`/help/${t.id}`)}
                                     >
@@ -110,11 +110,10 @@ const Help = () => {
                                                 </div>
                                             </div>
                                             <div className="flex flex-col items-end gap-3">
-                                                <span className={`text-[0.65rem] font-bold uppercase tracking-wider px-2 py-1 rounded-sm ${
-                                                    t.status === 'open' 
-                                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                                                <span className={`text-[0.65rem] font-bold uppercase tracking-wider px-2 py-1 rounded-sm ${t.status === 'open'
+                                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                                                         : 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-                                                }`}>
+                                                    }`}>
                                                     {t.status}
                                                 </span>
                                                 <ChevronRight size={16} className="text-gray-400 group-hover:text-[#a1804a] transition-colors" />
@@ -153,7 +152,7 @@ const Help = () => {
                         <div className="bg-[#0f172a] text-white p-8 shadow-xl sticky top-6">
                             <h2 className="font-serif text-2xl font-bold text-[#d97706] mb-2">New Inquiry</h2>
                             <p className="text-xs text-gray-400 mb-6 font-medium leading-relaxed">
-                                Submit a query or complaint to our protocol administrators. We respond within 24 hours.
+                                Submit a query or complaint to our administrators. We respond within 24 hours.
                             </p>
 
                             <form onSubmit={submit} className="space-y-5">
@@ -161,23 +160,23 @@ const Help = () => {
                                     <label className="block text-[0.65rem] font-bold text-gray-400 tracking-widest uppercase mb-2">
                                         Subject
                                     </label>
-                                    <input 
-                                        value={subject} 
-                                        onChange={e => setSubject(e.target.value)} 
-                                        placeholder="Brief summary" 
-                                        className="w-full bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white focus:ring-0 focus:border-[#a1804a] transition-colors placeholder-gray-600 outline-none rounded-sm" 
-                                        required 
+                                    <input
+                                        value={subject}
+                                        onChange={e => setSubject(e.target.value)}
+                                        placeholder="Brief summary"
+                                        className="w-full bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white focus:ring-0 focus:border-[#a1804a] transition-colors placeholder-gray-600 outline-none rounded-sm"
+                                        required
                                     />
                                 </div>
-                                
+
                                 <div>
                                     <label className="block text-[0.65rem] font-bold text-gray-400 tracking-widest uppercase mb-2">
                                         Category
                                     </label>
                                     <div className="relative">
-                                        <select 
-                                            value={type} 
-                                            onChange={e => setType(e.target.value)} 
+                                        <select
+                                            value={type}
+                                            onChange={e => setType(e.target.value)}
                                             className="w-full bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white focus:ring-0 focus:border-[#a1804a] transition-colors outline-none rounded-sm appearance-none"
                                         >
                                             <option value="query" className="bg-[#0f172a]">Query</option>
@@ -190,17 +189,17 @@ const Help = () => {
                                     <label className="block text-[0.65rem] font-bold text-gray-400 tracking-widest uppercase mb-2">
                                         Message details
                                     </label>
-                                    <textarea 
-                                        value={message} 
-                                        onChange={e => setMessage(e.target.value)} 
-                                        rows={5} 
+                                    <textarea
+                                        value={message}
+                                        onChange={e => setMessage(e.target.value)}
+                                        rows={5}
                                         placeholder="Describe your issue..."
-                                        className="w-full bg-white/5 border border-white/10 px-4 py-3 text-sm text-white focus:ring-0 focus:border-[#a1804a] transition-colors placeholder-gray-600 outline-none rounded-sm resize-none" 
-                                        required 
+                                        className="w-full bg-white/5 border border-white/10 px-4 py-3 text-sm text-white focus:ring-0 focus:border-[#a1804a] transition-colors placeholder-gray-600 outline-none rounded-sm resize-none"
+                                        required
                                     />
                                 </div>
 
-                                <button 
+                                <button
                                     disabled={submitting}
                                     className="w-full bg-[#a1804a] hover:bg-[#8e703e] text-white text-[0.75rem] font-bold tracking-[0.1em] uppercase py-3 mt-2 transition-colors disabled:opacity-50 flex justify-center items-center gap-2 shadow-md hover:shadow-lg rounded-sm"
                                 >

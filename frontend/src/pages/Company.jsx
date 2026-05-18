@@ -60,7 +60,7 @@ const Company = () => {
     const pressItems = [
         {
             outlet: 'Legal Tech Review',
-            title: 'How Royal Law is simplifying premium legal access',
+            title: 'How Lexora Law is simplifying premium legal access',
             date: 'May 2026',
         },
         {
@@ -70,7 +70,7 @@ const Company = () => {
         },
         {
             outlet: 'Startup Weekly',
-            title: 'Royal Law expands its legal marketplace with new service layers',
+            title: ' Lexora expands its legal marketplace with new service layers',
             date: 'March 2026',
         },
     ]
@@ -92,10 +92,10 @@ const Company = () => {
                             <Landmark className="w-4 h-4" /> Company
                         </span>
                         <h1 className="font-serif text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
-                            About Royal Law, our careers, and what the press is saying
+                            About Lexora, our careers, and what the press is saying
                         </h1>
                         <p className="text-gray-300 text-base md:text-lg leading-relaxed max-w-2xl">
-                            Royal Law combines premium legal access with a modern digital experience. This page brings together who we are, how we hire, and the latest media coverage in one place.
+                            Lexora combines premium legal access with a modern digital experience. This page brings together who we are, how we hire, and the latest media coverage in one place.
                         </p>
                         <div className="flex flex-wrap gap-4 mt-8">
                             <Link to="#about" className="inline-flex items-center gap-2 px-5 py-3 rounded-sm bg-[#a1804a] text-white text-sm font-semibold hover:bg-[#8f703d] transition-colors">

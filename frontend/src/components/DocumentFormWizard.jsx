@@ -207,7 +207,7 @@ export default function DocumentFormWizard() {
                         <ShieldCheck className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Royal Protocol</p>
+                        <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Lexora Protocol</p>
                         <p className="font-serif font-bold text-[#0f172a] dark:text-white text-sm">Secure Generation</p>
                     </div>
                 </div>

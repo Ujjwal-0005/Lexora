@@ -66,7 +66,7 @@ const DashboardLayout = ({ children }) => {
       <div className="lg:hidden bg-[#f4f5f7] dark:bg-dark-800 border-b border-gray-200 dark:border-dark-600 p-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Scale className="w-8 h-8 text-[#0f172a] dark:text-white" />
-          <span className="font-serif text-xl font-bold text-gray-900 dark:text-white">Royal Law</span>
+          <span className="font-serif text-xl font-bold text-gray-900 dark:text-white">Lexora</span>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -99,7 +99,7 @@ const DashboardLayout = ({ children }) => {
           {/* Logo Section */}
           <Link to="/" className="block p-8 pb-10 hover:opacity-80 transition-opacity">
             <h1 className="font-serif text-xl font-bold text-[#0f172a] dark:text-white tracking-wide mb-1">
-              Royal Law
+              Lexora
             </h1>
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-snug">
               Premium Legal<br />Access
