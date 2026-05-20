@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { User, Mail, Phone, Lock, Bell, Shield, Save, Eye, EyeOff, AlertTriangle, Trash2 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
@@ -8,6 +9,8 @@ import DeleteAccountModal from '../../components/DeleteAccountModal'
 
 const ClientSettings = () => {
   const { user, updateUser } = useAuthStore()
+  const navigate = useNavigate()
+  const isSocialUser = !!(user?.auth_provider || user?.google_id)
   const [showPassword, setShowPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -20,6 +23,8 @@ const ClientSettings = () => {
     confirmPassword: '',
   })
   const [loading, setLoading] = useState(false)
+  const [awaitingSetPasswordOtp, setAwaitingSetPasswordOtp] = useState(false)
+  const [setPasswordOtp, setSetPasswordOtp] = useState('')
   const [deleting, setDeleting] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deletePassword, setDeletePassword] = useState('')
@@ -100,6 +105,11 @@ const ClientSettings = () => {
   const handlePasswordUpdate = async (e) => {
     e.preventDefault()
 
+    // If social user, call set-password endpoint
+    if (isSocialUser) {
+      return handleSetPassword(e)
+    }
+
     if (!formData.currentPassword?.trim()) {
       toast.error('Current password is required')
       return
@@ -153,26 +163,110 @@ const ClientSettings = () => {
     }
   }
 
+  const handleSetPassword = async (e) => {
+    e.preventDefault()
+    // If we haven't initiated OTP, request one first
+    if (!awaitingSetPasswordOtp) {
+      // Basic client-side checks before sending OTP
+      if (!formData.newPassword?.trim()) {
+        toast.error('New password is required')
+        return
+      }
+
+      if (!formData.confirmPassword?.trim()) {
+        toast.error('Confirm password is required')
+        return
+      }
+
+      if (formData.newPassword !== formData.confirmPassword) {
+        toast.error('Passwords do not match')
+        return
+      }
+
+      const rules = [
+        { ok: formData.newPassword.length >= 8 },
+        { ok: /[A-Z]/.test(formData.newPassword) },
+        { ok: /[a-z]/.test(formData.newPassword) },
+        { ok: /\d/.test(formData.newPassword) },
+        { ok: /[^A-Za-z0-9]/.test(formData.newPassword) },
+      ]
+      const strength = rules.filter(r => r.ok).length
+      if (strength < 3) {
+        toast.error('Password is too weak. It must contain uppercase, lowercase, number, and special character')
+        return
+      }
+
+      setLoading(true)
+      try {
+        const resp = await api.post('/auth/set-password', {})
+        if (resp.data?.otp_sent) {
+          setAwaitingSetPasswordOtp(true)
+          toast.success('OTP sent to your email. Enter it below to complete setting your password.')
+        } else {
+          toast.error(resp.data?.message || 'Unable to initiate set-password flow')
+        }
+      } catch (error) {
+        const message = error.response?.data?.message || 'Failed to initiate set-password'
+        toast.error(message)
+      } finally {
+        setLoading(false)
+      }
+
+      return
+    }
+
+    // If awaiting OTP, confirm OTP + set password
+    if (!setPasswordOtp || setPasswordOtp.length !== 6) {
+      toast.error('Please enter the 6-digit OTP sent to your email')
+      return
+    }
+
+    setLoading(true)
+    try {
+      await api.post('/auth/set-password', {
+        otp: setPasswordOtp,
+        new_password: formData.newPassword,
+        new_password_confirmation: formData.confirmPassword,
+      })
+
+      toast.success('Password set successfully! You can now sign in with your password.')
+      setFormData({ ...formData, currentPassword: '', newPassword: '', confirmPassword: '' })
+      setAwaitingSetPasswordOtp(false)
+      setSetPasswordOtp('')
+      updateUser({ ...user, auth_provider: null })
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to set password'
+      toast.error(message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleDeleteAccount = async () => {
     // Determine mode: social users use OTP flow, others use password
     const isSocial = !!(user?.auth_provider || user?.google_id)
-    if (isSocial) {
-      try {
-        const resp = await api.delete('/auth/delete', { data: {}, headers: { 'X-Skip-Auth-Logout': '1' } })
-        if (resp.data?.otp_sent) {
-          setDeleteMode('otp')
-          setShowDeleteModal(true)
-          toast.success('OTP sent to your email. Enter it to confirm deletion.')
+    setDeleting(true)
+    try {
+      if (isSocial) {
+        try {
+          const resp = await api.delete('/auth/delete', { data: {}, headers: { 'X-Skip-Auth-Logout': '1' } })
+          if (resp.data?.otp_sent) {
+            setDeleteMode('otp')
+            setShowDeleteModal(true)
+            toast.success('OTP sent to your email. Enter it to confirm deletion.')
+            return
+          }
+        } catch (error) {
+          const message = error.response?.data?.message || 'Failed to initiate delete'
+          toast.error(message)
           return
         }
-      } catch (error) {
-        const message = error.response?.data?.message || 'Failed to initiate delete'
-        toast.error(message)
-        return
+      } else {
+        setDeleteMode('password')
+        setShowDeleteModal(true)
       }
-    } else {
-      setDeleteMode('password')
-      setShowDeleteModal(true)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -310,32 +404,34 @@ const ClientSettings = () => {
             <Lock className="w-6 h-6 text-[#92400e]" />
           </div>
           <div>
-            <h2 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white">Security & Password</h2>
-            <p className="text-sm text-gray-500 font-medium">Ensure your account uses a strong password</p>
+            <h2 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white">{isSocialUser ? 'Set Password' : 'Security & Password'}</h2>
+            <p className="text-sm text-gray-500 font-medium">{isSocialUser ? 'You signed in via Google. Set a password to enable password sign-in.' : 'Ensure your account uses a strong password'}</p>
           </div>
         </div>
 
         <form onSubmit={handlePasswordUpdate} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Current Password</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.currentPassword}
-                  onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
-                  className="input pl-12 pr-12 !rounded-sm bg-gray-50 border-gray-200 focus:border-[#0f172a] focus:ring-[#0f172a]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
+            {!isSocialUser && (
+              <div>
+                <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Current Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.currentPassword}
+                    onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                    className="input pl-12 pr-12 !rounded-sm bg-gray-50 border-gray-200 focus:border-[#0f172a] focus:ring-[#0f172a]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
             <div>
               <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">New Password</label>
               <div className="relative">
@@ -408,72 +504,178 @@ const ClientSettings = () => {
             {loading ? 'Updating...' : 'Update Password'}
           </button>
         </form>
+        {/* If awaiting OTP show the OTP input */}
+        {awaitingSetPasswordOtp && (
+          <div className="mt-4 p-4 border border-gray-100 dark:border-dark-600 rounded-sm bg-gray-50 dark:bg-dark-700">
+            <label className="block text-sm font-semibold mb-2">Enter OTP sent to your email</label>
+            <div className="flex gap-2 items-center">
+              <input type="text" value={setPasswordOtp} onChange={(e) => setSetPasswordOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} className="input w-40 font-mono text-lg text-center" placeholder="000000" />
+              <button onClick={() => setAwaitingSetPasswordOtp(false)} className="py-2 px-3 border rounded-sm">Cancel</button>
+              <button onClick={handleSetPassword} disabled={loading} className="py-2 px-3 bg-[#0f172a] text-white rounded-sm">{loading ? 'Processing...' : 'Confirm & Set Password'}</button>
+              <button onClick={async () => {
+                try {
+                  const resp = await api.post('/auth/set-password', {})
+                  if (resp.data?.otp_sent) {
+                    toast.success('OTP resent to your email')
+                  } else {
+                    toast.error('Unable to resend OTP')
+                  }
+                } catch (err) { toast.error(err.response?.data?.message || 'Unable to resend OTP') }
+              }} className="py-2 px-3 border rounded-sm">Resend</button>
+            </div>
+          </div>
+        )}
       </motion.div>
 
-      {/* Delete Account Section */}
+      {/* Delete Account Section (improved) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white dark:bg-dark-800 border border-red-200 dark:border-red-900/30 rounded-sm shadow-sm p-8"
+        className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm shadow-sm p-8"
       >
-        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-red-100 dark:border-red-900/20">
-          <div className="w-12 h-12 rounded-sm bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 rounded-sm bg-red-100 dark:bg-red-900/10 flex items-center justify-center mt-1">
             <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
           </div>
-          <div>
-            <h2 className="font-serif font-bold text-xl text-red-600 dark:text-red-400">Delete Account</h2>
-            <p className="text-sm text-gray-500 font-medium">Permanently remove your account and all associated data</p>
-          </div>
-        </div>
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white">Delete Account</h2>
+                <p className="text-sm text-gray-500">Permanently remove your account and all associated data.</p>
+              </div>
+              <div className="text-sm text-gray-500">Account: <span className="font-medium text-gray-700">{user?.email}</span></div>
+            </div>
 
-        <div className="space-y-6">
-          {/* Warning Message */}
-          <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-sm p-4">
-            <p className="text-sm text-red-800 dark:text-red-300">
-              <span className="font-semibold block mb-2">⚠️ Warning: This action cannot be undone</span>
-              Deleting your account will permanently remove all your data including:
-            </p>
-            <ul className="text-sm text-red-800 dark:text-red-300 mt-3 ml-4 space-y-1 list-disc">
-              <li>Your profile information and personal details</li>
-              <li>All consultations and consultation history</li>
-              <li>Document requests and submissions</li>
-              <li>Messages and communications</li>
-              <li>Ratings and reviews</li>
-              <li>All account activity and preferences</li>
-            </ul>
-          </div>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-sm p-4">
+                  <p className="text-sm text-red-800 dark:text-red-300 font-medium">Important</p>
+                  <p className="text-xs text-red-700 dark:text-red-300 mt-2">This will permanently delete your profile, consultations, documents, messages, ratings and all related data. This action cannot be undone.</p>
+                </div>
 
-          {/* Confirmation Message */}
-          <div className="bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-dark-600 rounded-sm p-4">
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              Once deleted, there is no way to recover your account. Please make sure you are absolutely certain before proceeding.
-            </p>
-          </div>
+                {/* Expanded confirmation area */}
+                <div className="mt-4 p-4 border border-gray-100 dark:border-dark-600 rounded-sm bg-gray-50 dark:bg-dark-700">
+                  {!showDeleteModal && (
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-700 dark:text-gray-300">To proceed, click the button below. You will be asked to confirm with a password or a one-time code depending on how you signed up.</p>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleDeleteAccount}
+                          disabled={deleting}
+                          className={`py-2 px-4 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-sm font-semibold flex items-center gap-2 ${deleting ? 'cursor-wait' : ''}`}
+                        >
+                          {deleting ? (
+                            <>
+                              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                              </svg>
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <Trash2 className="w-4 h-4" />
+                              Delete Account
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => navigate('/client/documents')}
+                          className="py-2 px-4 border rounded-sm text-sm text-gray-700 dark:text-gray-300"
+                        >
+                          Export Data
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-          {/* Delete Button */}
-          <button
-            onClick={handleDeleteAccount}
-            disabled={deleting}
-            className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 px-6 rounded-sm shadow-md font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
-          >
-            <Trash2 className="w-5 h-5" />
-            {deleting ? 'Processing...' : 'Delete My Account Permanently'}
-          </button>
+                  {showDeleteModal && (
+                    <div className="mt-2 space-y-3">
+                      {/* Show method */}
+                      <p className="text-sm text-gray-600">Confirmation method: <span className="font-medium">{deleteMode === 'password' ? 'Password' : 'Email OTP'}</span></p>
+
+                      {deleteMode === 'password' ? (
+                        <div className="space-y-2">
+                          <label className="text-sm text-gray-700">Current Password</label>
+                          <input
+                            type="password"
+                            value={deletePassword}
+                            onChange={(e) => setDeletePassword(e.target.value)}
+                            className="input w-full bg-white dark:bg-dark-700 border-gray-200"
+                            placeholder="Enter current password"
+                          />
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <label className="text-sm text-gray-700">Enter OTP</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={deleteOtp}
+                              onChange={(e) => setDeleteOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                              className="input flex-1 bg-white dark:bg-dark-700 border-gray-200 font-mono text-lg text-center"
+                              placeholder="000000"
+                            />
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await api.delete('/auth/delete', { data: {}, headers: { 'X-Skip-Auth-Logout': '1' } })
+                                  toast.success('OTP resent to your email')
+                                } catch (err) {
+                                  toast.error(err.response?.data?.message || 'Unable to resend OTP')
+                                }
+                              }}
+                              className="py-2 px-3 border rounded-sm text-sm"
+                            >Resend</button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="pt-2">
+                        <label className="text-sm text-gray-700">Type <span className="font-semibold">DELETE</span> to confirm</label>
+                        <input
+                          type="text"
+                          value={typeof window !== 'undefined' ? window.localStorage.getItem('delete-confirm') || '' : ''}
+                          onChange={(e) => {
+                            if (typeof window !== 'undefined') window.localStorage.setItem('delete-confirm', e.target.value)
+                          }}
+                          placeholder="Type DELETE to enable"
+                          className="input w-full bg-white dark:bg-dark-700 border-gray-200 mt-1"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-end gap-3 pt-2">
+                        <button onClick={() => { setShowDeleteModal(false); setDeletePassword(''); setDeleteOtp(''); if (typeof window !== 'undefined') window.localStorage.removeItem('delete-confirm') }} className="py-2 px-4 border rounded-sm">Cancel</button>
+                        <button
+                          onClick={async () => {
+                            const confirmText = typeof window !== 'undefined' ? window.localStorage.getItem('delete-confirm') || '' : ''
+                            if (confirmText !== 'DELETE') { toast.error('Type DELETE to confirm'); return }
+                            await confirmDelete()
+                          }}
+                          disabled={deleting}
+                          className="py-2 px-4 bg-red-600 text-white rounded-sm disabled:opacity-50"
+                        >{deleting ? 'Processing...' : 'Confirm Delete'}</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="md:col-span-1">
+                <div className="bg-gray-50 dark:bg-dark-700 border border-gray-100 dark:border-dark-600 rounded-sm p-4">
+                  <p className="text-sm font-semibold">Before you delete</p>
+                  <ul className="text-xs mt-2 space-y-2 list-disc ml-4 text-gray-600">
+                    <li>Export any documents you need.</li>
+                    <li>Notify contacts if required.</li>
+                    <li>Deleting is permanent.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </motion.div>
-
-      <DeleteAccountModal
-        open={showDeleteModal}
-        onClose={() => { setShowDeleteModal(false); setDeletePassword(''); setDeleteOtp('') }}
-        mode={deleteMode}
-        password={deletePassword}
-        setPassword={setDeletePassword}
-        otp={deleteOtp}
-        setOtp={setDeleteOtp}
-        onConfirm={confirmDelete}
-        loading={deleting}
-      />
 
     </div>
   )

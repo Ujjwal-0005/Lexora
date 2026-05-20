@@ -62,7 +62,7 @@ const Landing = () => {
     {
       name: 'Sarah Johnson',
       role: 'Business Owner',
-      content: 'LegalConnect helped me find a fantastic corporate lawyer for my startup. The document generator saved me thousands!',
+      content: 'Lexora helped me find a fantastic corporate lawyer for my startup. The document generator saved me thousands!',
       rating: 5,
     },
     {
@@ -86,7 +86,7 @@ const Landing = () => {
     {
       name: 'Nadia Khan',
       role: 'Real Estate Developer',
-      content: 'The property lawyer I found through LegalConnect handled a complex transaction with complete professionalism.',
+      content: 'The property lawyer I found through Lexora handled a complex transaction with complete professionalism.',
       rating: 5,
     },
     {
@@ -160,7 +160,7 @@ const Landing = () => {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url(/imagel19.png)',
+            backgroundImage: 'url(/image1.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
@@ -193,6 +193,9 @@ const Landing = () => {
                 background: i % 2 === 0
                   ? 'radial-gradient(circle, rgba(161,128,74,0.12) 0%, rgba(161,128,74,0.04) 40%, transparent 70%)'
                   : 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 40%, transparent 70%)'
+                ,
+                left: `${i * 20}%`,
+                top: `${(i % 2) * 30}%`,
               }}
               animate={{
                 x: [0, 120, -50, 0],
@@ -202,10 +205,6 @@ const Landing = () => {
                 duration: 14 + i * 2.5,
                 repeat: Infinity,
                 ease: 'easeInOut',
-              }}
-              style={{
-                left: `${i * 20}%`,
-                top: `${(i % 2) * 30}%`,
               }}
             />
           ))}
@@ -266,7 +265,7 @@ const Landing = () => {
                   </Link>
                 </MagneticButton>
                 <MagneticButton>
-                  <Link to="/register" className="relative inline-flex items-center justify-center px-8 py-4 text-sm font-bold uppercase tracking-[0.16em] rounded-xl border-2 border-[#d8c5e8]/60 bg-gradient-to-r from-white/95 via-[#faf6f0]/92 to-white/95 text-[#0f172a] shadow-[0_12px_40px_rgba(161,128,74,0.12),inset_0_1px_0_rgba(255,255,255,0.9)] transition-all duration-300 hover:-translate-y-1.5 hover:from-white hover:to-[#faf3e7] hover:shadow-[0_20px_60px_rgba(161,128,74,0.18),inset_0_1px_0_rgba(255,255,255,0.95)] dark:hover:text-white overflow-hidden group hover:text-yellow-700">
+                  <Link to="/register" className="relative inline-flex items-center justify-center px-8 py-4 text-sm font-bold uppercase tracking-[0.16em] rounded-xl border-2 border-[#d8c5e8]/60 bg-gradient-to-r from-white/95 via-[#faf6f0]/92 to-white/95 text-[#0f172a] shadow-[0_12px_40px_rgba(161,128,74,0.12),inset_0_1px_0_rgba(255,255,255,0.9)] transition-all duration-300 hover:-translate-y-1.5 hover:from-white hover:to-[#faf3e7] hover:shadow-[0_20px_60px_rgba(161,128,74,0.18),inset_0_1px_0_rgba(255,255,255,0.95)] dark:hover:text-yellow-700 overflow-hidden group hover:text-yellow-700">
                     <div className="absolute inset-0 bg-gradient-to-r from-[#a1804a]/0 via-[#a1804a]/8 to-[#a1804a]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     Get Started Free
                   </Link>
@@ -341,7 +340,7 @@ const Landing = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 dark:bg-[#0f172a] border-y border-[#a1804a]/20 relative overflow-hidden">
+      <section className="py-20  dark:bg-[#0f172a] border-y border-[#a1804a]/20 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 mix-blend-overlay"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8 divide-x-0 md:divide-x divide-[#a1804a]/20">

@@ -145,8 +145,8 @@ const Navbar = () => {
         </div>
         {/* Left Area: Logo & Links */}
         <div className="dd-nav-left">
-          <Link to="/" className="dd-nav-logo">
-            Lexora
+          <Link to="/" className="dd-nav-logo " aria-label="Lexora homepage">
+            <span className="font-serif text-2xl md:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-900 via-amber-800 to-amber-700  dark:text-yellow-200 drop-shadow-[0_6px_18px_rgba(16,24,40,0.25)]">Lexora</span>
           </Link>
 
           {/* Desktop Links */}

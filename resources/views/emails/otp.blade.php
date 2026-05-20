@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification - LegalConnect</title>
+    <title>Email Verification - Lexora</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -94,7 +94,7 @@
     <div class="container">
         <div class="card">
             <div class="header">
-                <div class="logo">LegalConnect</div>
+                <div class="logo">Lexorat</div>
                 <h1 class="title">Email Verification</h1>
                 <p class="subtitle">Complete your registration</p>
             </div>
@@ -108,14 +108,14 @@
                 </div>
 
                 <div class="warning">
-                    <strong>Important:</strong> Never share this code with anyone. LegalConnect will never ask for it via email or message.
+                    <strong>Important:</strong> Never share this code with anyone. Lexora will never ask for it via email or message.
                 </div>
 
                 <p class="message">If you didn't request this code, you can safely ignore this email.</p>
             </div>
 
             <div class="footer">
-                <p>&copy; {{ date('Y') }} LegalConnect. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} Lexora. All rights reserved.</p>
                 <p>This is an automated message, please do not reply to this email.</p>
             </div>
         </div>

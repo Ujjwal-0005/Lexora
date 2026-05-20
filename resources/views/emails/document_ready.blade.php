@@ -22,7 +22,7 @@
 <body>
     <div class="wrap">
         <div class="card">
-            <div class="brand">LegalConnect</div>
+            <div class="brand">Lexora</div>
             <h1 class="title">Your document is ready to download</h1>
             <p class="muted">The lawyer has completed your document request and the file is now available in your account.</p>
 
