@@ -267,12 +267,6 @@ The system includes pre-configured templates for:
 - Magnetic button effects
 - Hover animations
 
-## Testing
-
-Use Postman to test the API endpoints. Default credentials:
-- **Client**: client@test.com / password
-- **Lawyer**: lawyer1@test.com / password (verified)
-- **Admin**: admin@legalconnect.com / password
 
 ## License
 
