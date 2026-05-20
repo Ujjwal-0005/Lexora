@@ -62,32 +62,6 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] dark:bg-dark-900 font-sans">
-      {/* Mobile Header */}
-      <div className="lg:hidden bg-[#f4f5f7] dark:bg-dark-800 border-b border-gray-200 dark:border-dark-600 p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Scale className="w-8 h-8 text-[#0f172a] dark:text-white" />
-          <span className="font-serif text-xl font-bold text-gray-900 dark:text-white">Royal Law</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={toggleDarkMode}
-            className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-700 transition-colors"
-          >
-            {darkMode ? (
-              <Sun className="w-5 h-5 text-[#0f172a] dark:text-white" />
-            ) : (
-              <Moon className="w-5 h-5 text-gray-600" />
-            )}
-          </button>
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-700 transition-colors"
-          >
-            {sidebarOpen ? <X className="w-6 h-6 dark:text-white" /> : <Menu className="w-6 h-6 dark:text-white" />}
-          </button>
-        </div>
-      </div>
-
       <div className="flex">
         {/* Sidebar */}
         <motion.aside
@@ -99,7 +73,7 @@ const DashboardLayout = ({ children }) => {
           {/* Logo Section */}
           <Link to="/" className="block p-8 pb-10 hover:opacity-80 transition-opacity">
             <h1 className="font-serif text-xl font-bold text-[#0f172a] dark:text-white tracking-wide mb-1">
-              Royal Law
+              Lexora
             </h1>
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-snug">
               Premium Legal<br />Access

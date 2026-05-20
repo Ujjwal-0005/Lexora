@@ -285,7 +285,7 @@ const LawyerList = () => {
             type="text"
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1) }}
-            placeholder="Search by name, expertise, or legal matter..."
+            placeholder="Search by name..."
             className="dd-search-input"
           />
         </motion.div>
@@ -363,7 +363,7 @@ const LawyerList = () => {
               </div>
             </div>
 
-            {/* AVAILABILITY */}
+            {/* AVAILABILITY
             <div className="dd-filter-block">
               <p className="dd-section-label">Availability</p>
               <ul className="dd-radio-list">
@@ -385,7 +385,7 @@ const LawyerList = () => {
                   </li>
                 ))}
               </ul>
-            </div>
+            </div> */}
 
             {/* MIN RATING */}
             <div className="dd-filter-block">

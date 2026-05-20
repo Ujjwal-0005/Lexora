@@ -90,7 +90,7 @@ const Login = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden font-sans transition-colors duration-300"
+      className="min-h-screen flex items-center justify-center py-12 px-4 pt-[112px] relative overflow-hidden font-sans transition-colors duration-300"
       style={{
         background: darkMode
           ? 'linear-gradient(135deg, #030810 0%, #0a1220 15%, #1a2a4a 35%, #2a4a7a 50%, #1a2a5a 65%, #0a1220 85%, #030810 100%)'
@@ -144,7 +144,7 @@ const Login = () => {
               <Sparkles size={18} strokeWidth={2} />
             </div>
             <h1 className="text-[0.72rem] font-bold tracking-[0.28em] text-white/95 uppercase">
-              Royal Sign In
+              Lexora Sign In
             </h1>
           </div>
 

@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { User, Mail, Phone, Lock, Bell, Shield, Save, Eye, EyeOff } from 'lucide-react'
+import { User, Mail, Phone, Lock, Bell, Shield, Save, Eye, EyeOff, AlertTriangle, Trash2 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import api from '../../api/axios'
 import toast from 'react-hot-toast'
+import DeleteAccountModal from '../../components/DeleteAccountModal'
 
 const ClientSettings = () => {
   const { user, updateUser } = useAuthStore()
@@ -20,6 +20,11 @@ const ClientSettings = () => {
     confirmPassword: '',
   })
   const [loading, setLoading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deletePassword, setDeletePassword] = useState('')
+  const [deleteOtp, setDeleteOtp] = useState('')
+  const [deleteMode, setDeleteMode] = useState('password') // 'password' or 'otp'
   const [savingNotifications, setSavingNotifications] = useState(false)
   const [notifications, setNotifications] = useState({
     email: true,
@@ -145,6 +150,69 @@ const ClientSettings = () => {
       toast.error(message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    // Determine mode: social users use OTP flow, others use password
+    const isSocial = !!(user?.auth_provider || user?.google_id)
+    if (isSocial) {
+      try {
+        const resp = await api.delete('/auth/delete', { data: {}, headers: { 'X-Skip-Auth-Logout': '1' } })
+        if (resp.data?.otp_sent) {
+          setDeleteMode('otp')
+          setShowDeleteModal(true)
+          toast.success('OTP sent to your email. Enter it to confirm deletion.')
+          return
+        }
+      } catch (error) {
+        const message = error.response?.data?.message || 'Failed to initiate delete'
+        toast.error(message)
+        return
+      }
+    } else {
+      setDeleteMode('password')
+      setShowDeleteModal(true)
+    }
+  }
+
+  const confirmDelete = async () => {
+    setDeleting(true)
+    try {
+      if (deleteMode === 'password') {
+        if (!deletePassword) {
+          toast.error('Please enter your current password')
+          setDeleting(false)
+          return
+        }
+
+        await api.delete('/auth/delete', { data: { current_password: deletePassword }, headers: { 'X-Skip-Auth-Logout': '1' } })
+      } else {
+        if (!deleteOtp) {
+          toast.error('Please enter the OTP sent to your email')
+          setDeleting(false)
+          return
+        }
+
+        await api.delete('/auth/delete', { data: { otp: deleteOtp }, headers: { 'X-Skip-Auth-Logout': '1' } })
+      }
+
+      toast.success('Account deleted successfully')
+      setShowDeleteModal(false)
+      // clear local auth state and redirect to home
+      useAuthStore.getState().logout()
+      window.location.href = '/'
+    } catch (error) {
+      const validationErrors = error.response?.data?.errors
+      const message = validationErrors
+        ? Object.values(validationErrors).flat()[0]
+        : (error.response?.data?.message || 'Failed to delete account')
+      toast.error(message)
+    } finally {
+      setDeleting(false)
+      setDeletePassword('')
+      setDeleteOtp('')
+      setDeleteMode('password')
     }
   }
 
@@ -324,135 +392,89 @@ const ClientSettings = () => {
                 )
               })()}
             </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Confirm New Password</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="input pl-12 pr-12 !rounded-sm bg-gray-50 border-gray-200 focus:border-[#0f172a] focus:ring-[#0f172a]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Confirm Password</label>
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                className="input !rounded-sm bg-gray-50 border-gray-200"
+              />
             </div>
           </div>
-          <button type="submit" disabled={loading} className="border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 py-3 px-6 rounded-sm shadow-sm font-semibold text-sm flex items-center gap-2 transition-colors">
-            <Lock className="w-4 h-4" />
+
+          <button type="submit" disabled={loading} className="bg-[#0f172a] text-white hover:bg-black disabled:opacity-50 py-3 px-6 rounded-sm shadow-md font-semibold text-sm flex items-center gap-2 transition-colors">
             {loading ? 'Updating...' : 'Update Password'}
           </button>
         </form>
       </motion.div>
 
-      {/* Notification Settings */}
+      {/* Delete Account Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm shadow-sm p-8"
+        className="bg-white dark:bg-dark-800 border border-red-200 dark:border-red-900/30 rounded-sm shadow-sm p-8"
       >
-        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-gray-100 dark:border-dark-600">
-          <div className="w-12 h-12 rounded-sm bg-gray-100 dark:bg-dark-700 flex items-center justify-center">
-            <Bell className="w-6 h-6 text-[#0f172a] dark:text-white" />
+        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-red-100 dark:border-red-900/20">
+          <div className="w-12 h-12 rounded-sm bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+            <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
           </div>
           <div>
-            <h2 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white">Communication Preferences</h2>
-            <p className="text-sm text-gray-500 font-medium">Control how and when we reach out to you</p>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          {[
-            { key: 'email', label: 'Email Notifications', description: 'Receive updates via email' },
-            { key: 'sms', label: 'SMS Notifications', description: 'Receive updates via text message' },
-            { key: 'consultation_reminders', label: 'Consultation Reminders', description: 'Get reminded before scheduled consultations' },
-            { key: 'document_updates', label: 'Document Updates', description: 'Notifications about document status changes' },
-          ].map((item) => (
-            <div
-              key={item.key}
-              className="flex items-center justify-between py-4 border-b border-gray-100 dark:border-dark-600 last:border-0"
-            >
-              <div>
-                <p className="font-bold text-[#0f172a] dark:text-white text-sm mb-1">{item.label}</p>
-                <p className="text-sm text-gray-500 font-medium">{item.description}</p>
-              </div>
-              <button
-                disabled={item.key !== 'email' && !notifications.email}
-                onClick={() => {
-                  const nextValue = !notifications[item.key]
-                  setNotifications((prev) => {
-                    const updated = { ...prev, [item.key]: nextValue }
-
-                    if (item.key === 'email' && !nextValue) {
-                      updated.sms = false
-                      updated.consultation_reminders = false
-                      updated.document_updates = false
-                    }
-
-                    return updated
-                  })
-                }}
-                className={`relative w-12 h-6 rounded-full transition-colors ${notifications[item.key] ? 'bg-[#0f172a] dark:bg-white' : 'bg-gray-300 dark:bg-dark-600'} ${item.key !== 'email' && !notifications.email ? 'opacity-40 cursor-not-allowed' : ''}`}
-              >
-                <span
-                  className={`absolute top-1 w-4 h-4 rounded-full bg-white dark:bg-dark-900 transition-transform ${notifications[item.key] ? 'translate-x-7' : 'translate-x-1'
-                    }`}
-                />
-              </button>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 flex justify-end">
-          <button
-            type="button"
-            onClick={saveNotifications}
-            disabled={savingNotifications}
-            className="bg-[#0f172a] text-white hover:bg-black disabled:opacity-50 py-3 px-6 rounded-sm shadow-md font-semibold text-sm flex items-center gap-2 transition-colors"
-          >
-            <Save className="w-4 h-4" />
-            {savingNotifications ? 'Saving...' : 'Save Communication Preferences'}
-          </button>
-        </div>
-      </motion.div>
-
-      {/* Privacy & Security */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm shadow-sm p-8"
-      >
-        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-gray-100 dark:border-dark-600">
-          <div className="w-12 h-12 rounded-sm bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
-            <Shield className="w-6 h-6 text-red-600" />
-          </div>
-          <div>
-            <h2 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white">Account Data & Deletion</h2>
-            <p className="text-sm text-gray-500 font-medium">Manage your data privacy or close your account</p>
+            <h2 className="font-serif font-bold text-xl text-red-600 dark:text-red-400">Delete Account</h2>
+            <p className="text-sm text-gray-500 font-medium">Permanently remove your account and all associated data</p>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="p-6 bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-dark-600 rounded-sm">
-            <p className="text-[#0f172a] dark:text-white font-bold mb-2">Data Privacy Commitment</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 font-medium leading-relaxed">
-              Your data is stored securely and never shared with third parties without your explicit consent.
-              As part of our premium commitment, you retain full sovereignty over your information.
+          {/* Warning Message */}
+          <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-sm p-4">
+            <p className="text-sm text-red-800 dark:text-red-300">
+              <span className="font-semibold block mb-2">⚠️ Warning: This action cannot be undone</span>
+              Deleting your account will permanently remove all your data including:
+            </p>
+            <ul className="text-sm text-red-800 dark:text-red-300 mt-3 ml-4 space-y-1 list-disc">
+              <li>Your profile information and personal details</li>
+              <li>All consultations and consultation history</li>
+              <li>Document requests and submissions</li>
+              <li>Messages and communications</li>
+              <li>Ratings and reviews</li>
+              <li>All account activity and preferences</li>
+            </ul>
+          </div>
+
+          {/* Confirmation Message */}
+          <div className="bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-dark-600 rounded-sm p-4">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              Once deleted, there is no way to recover your account. Please make sure you are absolutely certain before proceeding.
             </p>
           </div>
-          <button className="text-red-600 hover:text-red-800 font-bold text-sm transition-colors border-b border-transparent hover:border-red-600">
-            Permanently Delete My Account
+
+          {/* Delete Button */}
+          <button
+            onClick={handleDeleteAccount}
+            disabled={deleting}
+            className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 px-6 rounded-sm shadow-md font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
+          >
+            <Trash2 className="w-5 h-5" />
+            {deleting ? 'Processing...' : 'Delete My Account Permanently'}
           </button>
         </div>
       </motion.div>
+
+      <DeleteAccountModal
+        open={showDeleteModal}
+        onClose={() => { setShowDeleteModal(false); setDeletePassword(''); setDeleteOtp('') }}
+        mode={deleteMode}
+        password={deletePassword}
+        setPassword={setDeletePassword}
+        otp={deleteOtp}
+        setOtp={setDeleteOtp}
+        onConfirm={confirmDelete}
+        loading={deleting}
+      />
+
     </div>
   )
 }

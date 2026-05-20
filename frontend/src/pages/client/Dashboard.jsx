@@ -464,7 +464,7 @@ const ClientDashboard = () => {
       {/* Footer */}
       <footer className="pt-12 mt-16 flex flex-col md:flex-row justify-between gap-12">
         <div className="max-w-md">
-          <h4 className="font-serif font-bold text-[#0f172a] dark:text-white mb-4 text-lg">Royal Law</h4>
+          <h4 className="font-serif font-bold text-[#0f172a] dark:text-white mb-4 text-lg">Lexora</h4>
           <p className="text-sm text-gray-500 leading-relaxed font-medium">
             Institutional Authority & Digital Speed. We provide the world's elite with unparalleled legal frameworks and secure sovereign counsel.
           </p>
@@ -491,7 +491,7 @@ const ClientDashboard = () => {
         </div>
       </footer>
       <div className="pt-8 pb-4 flex flex-col md:flex-row justify-between items-center text-xs font-medium text-gray-400 border-t border-gray-100 dark:border-dark-600">
-        <p className="italic">© 2026 Royal Law. All Rights Reserved. Institutional Authority & Digital Speed.</p>
+        <p className="italic">© 2026 Lexora. All Rights Reserved. Institutional Authority & Digital Speed.</p>
         <div className="flex gap-6 mt-4 md:mt-0">
           <Scale className="w-4 h-4 opacity-40 hover:opacity-100 transition-opacity cursor-pointer" />
           <Scale className="w-4 h-4 opacity-40 hover:opacity-100 transition-opacity cursor-pointer" />

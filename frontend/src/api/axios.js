@@ -39,7 +39,10 @@ api.interceptors.response.use(
     const status = error.response?.status
     const token = useAuthStore.getState().token
 
-    if (status === 401 && token) {
+    // Allow certain requests to opt-out of the global 401 auto-logout behavior
+    const skipAutoLogout = error.config?.headers?.['X-Skip-Auth-Logout'] || error.config?.headers?.['x-skip-auth-logout']
+
+    if (status === 401 && token && !skipAutoLogout) {
       useAuthStore.getState().logout()
       window.location.href = '/login'
     }

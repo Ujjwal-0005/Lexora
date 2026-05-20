@@ -21,9 +21,23 @@ const GoogleAuthCallback = () => {
                     email_missing: 'Your Google account does not provide an email address.',
                     lawyer_pending_verification: 'Your lawyer account is pending admin verification.',
                     account_exists: 'An account with this email already exists. Please sign in.',
+                    account_not_found: 'No account found for this Google account. Please register to continue.',
                 }
 
                 toast.error(errorMessages[error] || 'Unable to authenticate with Google.')
+
+                if (error === 'account_not_found') {
+                    // If backend included email/role, prefill register page.
+                    const email = searchParams.get('email')
+                    const role = searchParams.get('role') || 'client'
+                    const query = new URLSearchParams()
+                    if (email) query.set('email', email)
+                    if (role) query.set('role', role)
+
+                    navigate(`/register?${query.toString()}`, { replace: true })
+                    return
+                }
+
                 navigate('/login', { replace: true })
                 return
             }

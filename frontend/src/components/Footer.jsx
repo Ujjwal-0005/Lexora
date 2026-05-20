@@ -47,7 +47,7 @@ const Footer = () => {
                 <Scale className="w-5 h-5 text-[#a1804a]" />
               </div>
               <span className="font-serif text-2xl font-bold text-white tracking-wide">
-                Royal Law
+                Lexora
               </span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-sm">
@@ -127,7 +127,7 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="pt-8 border-t border-[#3c557a] flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-[0.7rem] text-gray-500 font-medium tracking-wide">
-            &copy; {currentYear} Royal Law Protocol. All rights reserved.
+            &copy; {currentYear} Lexora. All rights reserved.
           </p>
           <div className="flex items-center gap-3">
             {socialLinks.map((social, index) => {

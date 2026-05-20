@@ -151,11 +151,36 @@ const Landing = () => {
 
   return (
     <div className="overflow-hidden">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-dark-900 via-dark-800 to-navy-900">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop')] bg-cover bg-center opacity-10" />
+      {/* Hero Section - Premium Royal Extraordinary */}
+      <section className="relative min-h-screen flex items-center pt-[112px] overflow-hidden">
+        {/* Premium Background - Clean Luxury */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#151f35] to-[#0d1525]" />
+
+        {/* Extraordinary Legal/Courtroom Background */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(/imagel19.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+            opacity: 0.75,
+            filter: 'brightness(0.9) contrast(1.1)'
+          }}
+        />
+
+        {/* Sophisticated overlay for contrast and readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a]/30 via-[#0f172a]/20 to-[#0f172a]/40" />
+
+        {/* Premium top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#a1804a]/50 to-transparent" />
+
+        {/* Layered premium gradients for depth */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_100%_0%,rgba(161,128,74,0.15),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_100%,rgba(161,128,74,0.12),transparent_45%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.04),transparent_70%)]" />
         </div>
 
         {/* Animated Background Elements */}
@@ -163,13 +188,18 @@ const Landing = () => {
           {[...Array(5)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-96 h-96 bg-primary-500/5 rounded-full blur-3xl"
+              className="absolute w-96 h-96 rounded-full blur-3xl"
+              style={{
+                background: i % 2 === 0
+                  ? 'radial-gradient(circle, rgba(161,128,74,0.12) 0%, rgba(161,128,74,0.04) 40%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 40%, transparent 70%)'
+              }}
               animate={{
-                x: [0, 100, 0],
-                y: [0, -50, 0],
+                x: [0, 120, -50, 0],
+                y: [0, -80, 40, 0],
               }}
               transition={{
-                duration: 10 + i * 2,
+                duration: 14 + i * 2.5,
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
@@ -190,14 +220,18 @@ const Landing = () => {
               transition={{ duration: 0.8 }}
               className="text-center lg:text-left"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 mb-6">
-                <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
-                <span className="text-primary-500 text-sm font-medium">
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-[#a1804a]/15 to-[#a1804a]/8 border border-[#a1804a]/40 mb-6 shadow-[0_8px_24px_rgba(161,128,74,0.12),inset_0_1px_0_rgba(255,255,255,0.08)]">
+                <span className="w-2 h-2 rounded-full bg-[#a1804a] animate-pulse shadow-[0_0_8px_rgba(161,128,74,0.6)]" />
+                <span className="text-[#f3d59b] text-sm font-semibold tracking-wide">
                   Trusted by 10,000+ clients
                 </span>
-              </div>
+              </motion.div>
 
-              <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-black bg-gradient-to-r from-white via-[#f0e8ff] to-white bg-clip-text text-transparent mb-8 leading-[1.15] drop-shadow-lg">
                 Your Legal Solution{' '}
                 <span className="gradient-text">
                   <TypeAnimation
@@ -216,33 +250,46 @@ const Landing = () => {
                 </span>
               </h1>
 
-              <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto lg:mx-0">
+              <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto lg:mx-0 font-light leading-relaxed">
                 Connect with expert lawyers, book consultations, and generate legal documents
                 — all in one secure platform.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start mb-10">
                 <MagneticButton>
-                  <Link to="/lawyers" className="btn-primary hover:bg-transparent dark:text-yellow-100 flex items-center justify-center gap-2">
+                  <Link to="/lawyers" className="relative inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] rounded-xl border border-[#f3d59b]/70 bg-gradient-to-r from-[#7b5a2b] via-[#b88b46] to-[#f3d59b] text-[#fffaf0] shadow-[0_22px_70px_rgba(161,128,74,0.5),inset_0_1px_0_rgba(255,255,255,0.38),inset_0_-10px_18px_rgba(87,54,12,0.28)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_34px_95px_rgba(161,128,74,0.6),0_0_34px_rgba(227,194,118,0.3),inset_0_1px_0_rgba(255,255,255,0.48)] dark:text-[#fff8e7] overflow-hidden group hover:text-white">
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/35 to-white/0 opacity-0 transition-all duration-500 -translate-x-full group-hover:translate-x-full group-hover:opacity-100" />
+                    <div className="absolute inset-0 rounded-xl ring-1 ring-white/20" />
+                    <div className="absolute inset-0 rounded-xl bg-[linear-gradient(135deg,rgba(255,255,255,0.18),transparent_35%,rgba(255,255,255,0.06)_65%,transparent)] opacity-80" />
                     Find a Lawyer
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight className="relative w-5 h-5 text-[#fff3cf] group-hover:translate-x-0.5 transition-transform duration-300" />
                   </Link>
                 </MagneticButton>
                 <MagneticButton>
-                  <Link to="/register" className="btn-secondary dark:hover:text-white flex items-center justify-center">
+                  <Link to="/register" className="relative inline-flex items-center justify-center px-8 py-4 text-sm font-bold uppercase tracking-[0.16em] rounded-xl border-2 border-[#d8c5e8]/60 bg-gradient-to-r from-white/95 via-[#faf6f0]/92 to-white/95 text-[#0f172a] shadow-[0_12px_40px_rgba(161,128,74,0.12),inset_0_1px_0_rgba(255,255,255,0.9)] transition-all duration-300 hover:-translate-y-1.5 hover:from-white hover:to-[#faf3e7] hover:shadow-[0_20px_60px_rgba(161,128,74,0.18),inset_0_1px_0_rgba(255,255,255,0.95)] dark:hover:text-white overflow-hidden group hover:text-yellow-700">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#a1804a]/0 via-[#a1804a]/8 to-[#a1804a]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     Get Started Free
                   </Link>
                 </MagneticButton>
               </div>
 
-              <div className="mt-8 flex items-center gap-6 justify-center lg:justify-start">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="mt-12 flex items-center gap-8 justify-center lg:justify-start">
                 {['Family Law', 'Corporate', 'Property'].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 text-gray-400">
-                    <CheckCircle2 className="w-5 h-5 text-primary-500" />
-                    <span className="text-sm">{item}</span>
-                  </div>
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: 0.5 + i * 0.1 }}
+                    className="flex items-center gap-2 text-slate-300 hover:text-[#f3d59b] transition-colors duration-300">
+                    <CheckCircle2 className="w-5 h-5 text-[#a1804a]" />
+                    <span className="text-sm font-medium">{item}</span>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </motion.div>
 
             {/* Right Content - 3D Visual */}
@@ -252,28 +299,37 @@ const Landing = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
+              {/* Premium frame decoration */}
+              <div className="absolute -inset-8 rounded-[3rem] border border-[#a1804a]/25 pointer-events-none hidden lg:block" />
+              <div className="absolute -inset-6 rounded-[2.5rem] border border-[#a1804a]/15 pointer-events-none hidden lg:block" />
+              <div className="absolute -inset-10 rounded-[3.5rem] border border-[#a1804a]/8 pointer-events-none hidden lg:block" />
+
               <Tilt className="Tilt" options={{ max: 20, scale: 1.05 }}>
-                <div className="relative rounded-2xl overflow-hidden glass">
+                <div className="relative rounded-3xl overflow-hidden glass shadow-[0_40px_120px_rgba(161,128,74,0.3),0_0_80px_rgba(161,128,74,0.18),inset_0_0_0_1px_rgba(255,255,255,0.12)] border border-[#e7d7be]/60">
+                  {/* Premium gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none z-10" />
+
                   <img
                     src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800"
                     alt="Legal Consultation"
-                    className="w-full h-auto rounded-2xl"
+                    className="w-full h-auto rounded-3xl"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-dark-900/80 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/80 via-[#0f172a]/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
 
                   {/* Floating Cards */}
                   <motion.div
                     animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                    className="absolute bottom-4 left-4 right-4 p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20"
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute bottom-6 left-6 right-6 p-5 bg-gradient-to-br from-white/12 via-white/8 to-white/6 backdrop-blur-xl rounded-2xl border border-white/30 shadow-[0_16px_40px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.2)]"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-primary-500 flex items-center justify-center">
-                        <Scale className="w-6 h-6 text-dark-900" />
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#a1804a] to-[#8a6a3d] flex items-center justify-center shadow-[0_8px_24px_rgba(161,128,74,0.3)]">
+                        <Scale className="w-7 h-7 text-white" strokeWidth={1.5} />
                       </div>
                       <div>
-                        <p className="text-white font-semibold">Expert Consultation</p>
-                        <p className="text-gray-400 text-sm">Available 24/7</p>
+                        <p className="text-white font-bold tracking-wide">Expert Consultation</p>
+                        <p className="text-slate-300 text-xs font-medium">Available 24/7</p>
                       </div>
                     </div>
                   </motion.div>
@@ -285,7 +341,7 @@ const Landing = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-[#0f172a] border-y border-[#a1804a]/20 relative overflow-hidden">
+      <section className="py-20 dark:bg-[#0f172a] border-y border-[#a1804a]/20 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 mix-blend-overlay"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8 divide-x-0 md:divide-x divide-[#a1804a]/20">
@@ -509,37 +565,162 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-white dark:bg-[#151f32] transition-colors relative">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-[#0f172a] p-12 md:p-20 text-center relative overflow-hidden shadow-[0_30px_70px_rgba(10,20,40,0.45)] rounded-md border border-[#a1804a]/30 group transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_50px_100px_rgba(161,128,74,0.35)]"
-          >
-            <div className="absolute inset-0 bg-[url('image2.png')] bg-no-repeat bg-center bg-cover opacity-30 dark:opacity-20 transform transition-transform duration-700 ease-out group-hover:scale-110"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0b1220]/88 via-[#0f172a]/78 to-[#0b1220]/92"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(161,128,74,0.35),transparent_38%),radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.12),transparent_35%)]"></div>
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#a1804a]/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 transform transition-all duration-500 ease-out group-hover:scale-125 group-hover:opacity-80"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#a1804a]/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 transform transition-all duration-500 ease-out group-hover:scale-125"></div>
-            <div className="pointer-events-none absolute inset-0 border border-white/10 rounded-md"></div>
+      {/* CTA Section - Premium Extraordinary */}
+      <section className="py-32 md:py-40 bg-gradient-to-br from-white via-[#faf8f3] to-[#f3ede2] dark:bg-gradient-to-br dark:from-[#131d33] dark:via-[#131d33] dark:to-[#172440] transition-colors relative overflow-hidden">
+        {/* Clean background layers */}
+        <div className="absolute inset-0 opacity-100 dark:opacity-100">
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.42)_0%,rgba(255,255,255,0.18)_45%,rgba(255,255,255,0)_100%)] dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.35)_0%,rgba(15,23,42,0.18)_45%,rgba(15,23,42,0)_100%)]" />
+        </div>
+        <div className="absolute inset-0 opacity-40 dark:opacity-30 bg-[linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:80px_80px]" />
+        {/* Decorative border line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#a1804a]/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#a1804a]/20 to-transparent" />
 
-            <div className="relative z-10 max-w-2xl mx-auto">
-              <span className="text-[0.65rem] font-bold text-[#a1804a] tracking-[0.3em] uppercase mb-6 block">Initialize Protocol</span>
-              <h2 className="font-serif text-4xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.45)]">
-                Ready to Secure Your Heritage?
-              </h2>
-              <p className="text-gray-300 text-sm mb-10 leading-relaxed max-w-lg mx-auto">
-                Join our exclusive network and experience legal services with institutional authority and digital precision.
-              </p>
-              <MagneticButton>
-                <Link to="/register" className="bg-[#a1804a] hover:bg-[#8e703e] text-white px-9 py-4 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 inline-flex items-center justify-center gap-3 shadow-[0_10px_24px_rgba(161,128,74,0.35)] hover:shadow-[0_16px_36px_rgba(161,128,74,0.45)] rounded-sm border border-[#d0b07b]/30 hover:-translate-y-0.5">
-                  Start Consultation
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </MagneticButton>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 26 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            className="relative overflow-hidden border-l-[3px]   border-[#94773d] bg-[linear-gradient(145deg,rgba(255,255,255,0.98)_0%,rgba(253,250,244,0.97)_42%,rgba(248,243,234,0.98)_100%)] shadow-[0_24px_60px_rgba(15,23,42,0.08),inset_0_1px_0_rgba(255,255,255,0.86)] dark:border-[#b1925f] dark:bg-[linear-gradient(145deg,rgba(17,24,39,0.97)_0%,rgba(15,23,42,0.95)_42%,rgba(8,12,23,0.99)_100%)] dark:shadow-[0_24px_70px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.04)] group"
+          >
+            <div className="relative grid lg:grid-cols-[1.05fr_0.95fr] gap-0">
+              <div className="p-10 sm:p-12 md:p-16 lg:p-18 xl:p-20 relative">
+                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#e1d2b4] bg-gradient-to-r from-white via-[#fdf9f1] to-[#f6efe2] text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#a1804a] mb-8 shadow-[0_8px_24px_rgba(161,128,74,0.08)] dark:border-[#6b5230] dark:bg-gradient-to-r dark:from-[#111827] dark:via-[#0f172a] dark:to-[#1f2937] dark:text-[#f3d59b] dark:shadow-[0_8px_32px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.03)]">
+                  <Scale className="w-4 h-4" /> Private Counsel Interface
+                </span>
+
+                <h2 className="font-serif text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#0f172a] dark:from-white dark:via-[#f0e8ff] dark:to-white bg-clip-text text-transparent leading-[1.1] mb-6 max-w-2xl drop-shadow-sm">
+                  Ready to Secure Your Heritage?
+                </h2>
+
+                <p className="text-sm md:text-base text-slate-700 leading-relaxed max-w-2xl mb-12 dark:text-slate-200 font-normal">
+                  Convert high-stakes legal complexity into a disciplined, premium workflow. Verified experts, encrypted collaboration, and concierge-grade execution in one secure environment.
+                </p>
+
+                <div className="grid sm:grid-cols-3 gap-4 mb-12 max-w-2xl">
+                  {[
+                    'Private intake in minutes',
+                    'Verified specialists only',
+                    'Built for high-stakes matters',
+                  ].map((item, idx) => (
+                    <motion.div
+                      key={item}
+                      initial={{ opacity: 0, y: 16 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: idx * 0.1 }}
+                      viewport={{ once: true }}
+                      className=" border  bg-gradient-to-br from-white via-white to-[#f3f1ef] px-5 py-5 backdrop-blur-md shadow-[0_12px_32px_rgba(161,128,74,0.08),inset_0_1px_0_rgba(255,255,255,0.84)] hover:shadow-[0_16px_40px_rgba(161,128,74,0.12)] dark:border-[#1c1914] dark:bg-gradient-to-br dark:from-[#192748] dark:via-[#192748] dark:to-[#111827] dark:shadow-[0_12px_40px_rgba(0,0,0,0.3),inset_0_1px_12px_rgba(255,255,255,0.03)] dark:hover:shadow-[0_16px_50px_rgba(0,0,0,0.36)] transition-all duration-300">
+                      <CheckCircle2 className="w-5 h-5 text-[#a1804a] mb-3" />
+                      <p className="text-sm font-medium text-slate-700 leading-snug dark:text-slate-50">{item}</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-5">
+                  <MagneticButton>
+                    <Link to="/register" className="relative inline-flex items-center gap-3 rounded-xl border-2 border-[#a1804a] bg-gradient-to-r from-[#a1804a] via-[#c7a56f] to-[#e7d7be] px-9 py-4 text-sm font-semibold tracking-wide text-white shadow-[0_20px_50px_rgba(161,128,74,0.3),inset_0_-2px_6px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.28)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(161,128,74,0.4),inset_0_1px_20px_rgba(255,255,255,0.15),0_0_30px_rgba(161,128,74,0.18)] group/btn overflow-hidden dark:border-[#d7b98a]  dark:from-[#8a6a3d] dark:via-[#a9834f] dark:to-[#c7a56f] dark:shadow-[0_20px_50px_rgba(0,0,0,0.24),0_0_30px_rgba(161,128,74,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] dark:hover:shadow-[0_28px_70px_rgba(0,0,0,0.34),0_0_36px_rgba(215,185,138,0.22),inset_0_1px_20px_rgba(255,255,255,0.12)] hover:text-yellow-900">
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/15 to-white/0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 -translate-x-full group-hover/btn:translate-x-full" style={{ animation: 'none' }} />
+                      <span className="relative">Start Consultation</span>
+                      <ArrowRight className="w-4 h-4 relative" />
+                    </Link>
+                  </MagneticButton>
+
+                  <Link to="/lawyers" className="relative inline-flex items-center gap-2 rounded-xl border-2 border-[#e1d2b4] bg-gradient-to-r from-white via-[#fdf9f1] to-[#f6efe2] px-8 py-4 text-sm font-semibold tracking-wide text-[#0f172a] transition-all duration-300 hover:from-white hover:to-[#faf3e7] hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(161,128,74,0.14),inset_0_1px_0_rgba(255,255,255,0.9)] dark:border-[#5b4a2f] dark:bg-gradient-to-r dark:from-[#111827] dark:via-[#0f172a] dark:to-[#111827] dark:text-[#f8fafc] dark:shadow-[0_12px_40px_rgba(0,0,0,0.3),inset_0_1px_15px_rgba(255,255,255,0.04)] dark:hover:-translate-y-1 dark:hover:from-[#161d2d] dark:hover:to-[#111827] dark:hover:border-[#7b6745] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.36),0_0_28px_rgba(161,128,74,0.12),inset_0_1px_20px_rgba(255,255,255,0.05)] overflow-hidden group/btn2">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#a1804a]/0 via-[#a1804a]/8 to-[#a1804a]/0 opacity-0 group-hover/btn2:opacity-100 transition-opacity duration-300 dark:via-[#d7b98a]/10" />
+                    <span className="relative">Explore Experts</span>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="relative min-h-[520px] p-8 sm:p-10 lg:p-12 flex items-center justify-center">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(147,51,234,0.08),transparent_38%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(147,51,234,0.14),transparent_38%)]" />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.94, rotate: -2 }}
+                  whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative w-full max-w-[28rem] aspect-square"
+                >
+                  <div className="absolute inset-6 rounded-full border border-[#eadfca] bg-[radial-gradient(circle_at_center,rgba(255,252,246,0.92),rgba(251,246,237,0.9)_45%,transparent_70%)] backdrop-blur-sm dark:border-[#6b5230] dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05),rgba(15,23,42,0.12)_45%,transparent_70%)]" />
+                  <div className="absolute inset-14 rounded-full border border-[#e7d7be] bg-white/65 shadow-[inset_0_0_60px_rgba(255,255,255,0.55)] dark:border-[#5b4a2f] dark:bg-white/5 dark:shadow-[inset_0_0_60px_rgba(255,255,255,0.04)]" />
+                  <div className="absolute inset-24 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,252,246,0.98),rgba(249,243,233,0.95)_55%,rgba(231,215,190,0.9)_100%)] flex items-center justify-center text-center p-8 shadow-[0_0_80px_rgba(161,128,74,0.14)] dark:bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.94),rgba(10,14,23,0.96)_55%,rgba(8,12,23,0.99)_100%)] dark:shadow-[0_0_90px_rgba(0,0,0,0.34),0_0_30px_rgba(161,128,74,0.08)]">
+                    <div>
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#a1804a] text-white mb-5 shadow-[0_0_30px_rgba(161,128,74,0.28)] dark:shadow-[0_0_36px_rgba(215,185,138,0.18)]">
+                        <Shield className="w-8 h-8" strokeWidth={1.8} />
+                      </div>
+                      <p className="text-sm font-semibold tracking-wide text-[#a1804a] mb-3 dark:text-[#f3d59b] dark:drop-shadow-[0_1px_0_rgba(0,0,0,0.45)]">Heritage Vault</p>
+                      <h3 className="font-serif text-2xl md:text-3xl font-bold text-[#0f172a] leading-tight max-w-[12ch] mx-auto dark:text-white">
+                        Trusted. Precise. Discreet.
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <motion.div
+                      animate={{
+                        x: [0, 6, 0, -4, 0],
+                        y: [0, -8, 0, 6, 0],
+                        rotate: [0, 1.25, 0, -1.25, 0],
+                      }}
+                      transition={{ duration: 8.5, repeat: Infinity, ease: 'easeInOut' }}
+                      className="absolute left-[-4%] top-[8%] w-44 rounded-2xl border border-[#e6dccb] bg-white/84 p-4 shadow-[0_14px_26px_rgba(161,128,74,0.08)] backdrop-blur-md dark:border-[#5b4a2f] dark:bg-gradient-to-br dark:from-[#111827]/96 dark:via-[#0f172a]/94 dark:to-[#111827]/98 dark:shadow-[0_18px_40px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.04)]"
+                    >
+                      <div className="absolute -inset-1 rounded-3xl bg-[radial-gradient(circle,rgba(161,128,74,0.14),transparent_68%)] blur-xl dark:bg-[radial-gradient(circle,rgba(161,128,74,0.2),transparent_68%)]" />
+                      <div className="relative flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-xl bg-[#a1804a]/15 flex items-center justify-center text-[#a1804a] shadow-[inset_0_0_0_1px_rgba(161,128,74,0.18)] dark:bg-[#a1804a]/20 dark:text-[#f3d59b] dark:shadow-[inset_0_0_0_1px_rgba(243,213,155,0.18)]">
+                          <FileText className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Case Workflow</p>
+                          <p className="text-sm font-semibold text-[#0f172a] dark:text-white">Priority review</p>
+                        </div>
+                      </div>
+                      <div className="relative h-1.5 rounded-full bg-[#efe4cf] overflow-hidden dark:bg-white/10">
+                        <motion.div
+                          animate={{ x: ['-18%', '120%', '-18%'] }}
+                          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+                          className="absolute inset-y-0 left-0 w-1/3 rounded-full bg-gradient-to-r from-[#a1804a] via-[#c7a56f] to-[#e7d7be] dark:from-[#a1804a] dark:via-[#d7b98a] dark:to-[#f3d59b]"
+                        />
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      animate={{
+                        x: [0, -8, 0, 5, 0],
+                        y: [0, 7, 0, -6, 0],
+                        rotate: [0, -1.5, 0, 1.5, 0],
+                      }}
+                      transition={{ duration: 9.5, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+                      className="absolute right-[-4%] bottom-[2%] w-48 rounded-2xl border border-[#e6dccb] bg-white/86 p-4 shadow-[0_14px_26px_rgba(161,128,74,0.08)] backdrop-blur-md dark:border-[#5b4a2f] dark:bg-gradient-to-br dark:from-[#111827]/96 dark:via-[#0f172a]/94 dark:to-[#111827]/98 dark:shadow-[0_18px_40px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.04)]"
+                    >
+                      <div className="absolute -inset-1 rounded-3xl bg-[radial-gradient(circle,rgba(161,128,74,0.14),transparent_68%)] blur-xl dark:bg-[radial-gradient(circle,rgba(161,128,74,0.2),transparent_68%)]" />
+                      <p className="relative text-[0.65rem] font-bold uppercase tracking-[0.2em] text-slate-500 mb-3 dark:text-slate-400">Advisory Desk</p>
+                      <div className="relative flex items-center gap-3 text-[#0f172a] dark:text-white">
+                        <div className="w-10 h-10 rounded-xl bg-[#a1804a]/15 flex items-center justify-center text-[#a1804a] dark:bg-[#a1804a]/20 dark:text-[#f3d59b] shadow-[inset_0_0_0_1px_rgba(161,128,74,0.16)] dark:shadow-[inset_0_0_0_1px_rgba(243,213,155,0.16)]">
+                          <Users className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold">Live concierge</p>
+                          <p className="text-xs text-slate-600 dark:text-slate-300">Guided every step</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  <div className="absolute -left-4 bottom-10 w-24 h-24 rounded-3xl border border-[#e7d7be]/70 bg-[#f6efe2]/90 backdrop-blur-sm dark:border-[#5b4a2f] dark:bg-gradient-to-br dark:from-[#1f2937]/90 dark:to-[#0f172a]/90" />
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 42, repeat: Infinity, ease: 'linear' }}
+                    className="absolute inset-0 rounded-full border border-dashed border-[#e1d2b4]/40 dark:border-[#7b6745]/35"
+                  />
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 58, repeat: Infinity, ease: 'linear' }}
+                    className="absolute inset-10 rounded-full border border-dashed border-white/10"
+                  />
+                </motion.div>
+              </div>
             </div>
           </motion.div>
         </div>

@@ -15,9 +15,16 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [isNavbarVisible, setIsNavbarVisible] = useState(true)
+  const [isNavbarElevated, setIsNavbarElevated] = useState(false)
   const profileMenuRef = useRef(null)
   const lastScrollYRef = useRef(0)
-  const isScrollToggledPage = ['/', '/login', '/register'].includes(location.pathname)
+  const isLandingPage = location.pathname === '/'
+  const isMarketingPage = ['/', '/company'].includes(location.pathname)
+  const isScrollToggledPage = isMarketingPage || ['/login', '/register', '/lawyers', '/verify-otp', '/forgot-password', '/verify-reset-otp', '/reset-password'].includes(location.pathname) || location.pathname.startsWith('/lawyer/')
+  const isAuthPage = ['/login', '/register', '/verify-otp', '/forgot-password', '/verify-reset-otp', '/reset-password'].includes(location.pathname)
+  const isLawyerDirectoryPage = location.pathname === '/lawyers' || location.pathname.startsWith('/lawyer/')
+  const needsReadableSurface = isAuthPage || isLawyerDirectoryPage
+  const needsOverlayNavbar = isAuthPage || isLawyerDirectoryPage
 
   const handleLogout = () => {
     logout.mutate()
@@ -43,11 +50,16 @@ const Navbar = () => {
   useEffect(() => {
     if (!isScrollToggledPage) {
       setIsNavbarVisible(true)
-      return
     }
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY
+      setIsNavbarElevated(currentScrollY > 12)
+
+      if (!isScrollToggledPage) {
+        lastScrollYRef.current = currentScrollY
+        return
+      }
 
       if (currentScrollY <= 10) {
         setIsNavbarVisible(true)
@@ -55,16 +67,17 @@ const Navbar = () => {
         return
       }
 
-      if (currentScrollY > lastScrollYRef.current && !mobileMenuOpen && !profileOpen) {
-        setIsNavbarVisible(false)
-      } else {
+      if (mobileMenuOpen || profileOpen) {
         setIsNavbarVisible(true)
+      } else {
+        setIsNavbarVisible(false)
       }
 
       lastScrollYRef.current = currentScrollY
     }
 
     lastScrollYRef.current = window.scrollY
+    setIsNavbarElevated(window.scrollY > 12)
     window.addEventListener('scroll', handleScroll, { passive: true })
 
     return () => {
@@ -80,6 +93,7 @@ const Navbar = () => {
 
     if (mobileMenuOpen || profileOpen) {
       setIsNavbarVisible(true)
+      setIsNavbarElevated(true)
     }
   }, [isScrollToggledPage, mobileMenuOpen, profileOpen])
 
@@ -111,15 +125,28 @@ const Navbar = () => {
     return location.pathname === path;
   }
 
-  const headerClass = `dd-navbar-wrap ${isScrollToggledPage && !isNavbarVisible ? 'dd-navbar-wrap--hidden' : ''} ${isNavbarVisible ? 'dd-navbar-wrap--elevated' : ''}`
+  const headerClass = `dd-navbar-wrap ${isMarketingPage || needsOverlayNavbar ? 'dd-navbar-wrap--landing' : ''} ${needsOverlayNavbar && !isMarketingPage ? 'dd-navbar-wrap--overlay' : ''} ${isScrollToggledPage && !isNavbarVisible ? 'dd-navbar-wrap--hidden' : ''} ${isNavbarElevated ? 'dd-navbar-wrap--elevated' : 'dd-navbar-wrap--transparent'}`
+  const navClass = `dd-navbar ${isMarketingPage || needsOverlayNavbar ? 'dd-navbar--landing' : ''}`
+  const navMotionProps = isMarketingPage || needsOverlayNavbar
+    ? {
+      initial: { opacity: 0, y: -18, scale: 0.985 },
+      animate: { opacity: 1, y: 0, scale: 1 },
+      transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1] },
+    }
+    : {}
+
+  const NavShell = (isMarketingPage || needsOverlayNavbar) ? motion.div : 'div'
 
   return (
     <header className={headerClass}>
-      <div className="dd-navbar">
+      <NavShell className={navClass} {...navMotionProps}>
+        <div className="dd-navbar-background" aria-hidden="true">
+          {isMarketingPage && <span className="dd-navbar-aurora" aria-hidden="true" />}
+        </div>
         {/* Left Area: Logo & Links */}
         <div className="dd-nav-left">
           <Link to="/" className="dd-nav-logo">
-            Royal Law
+            Lexora
           </Link>
 
           {/* Desktop Links */}
@@ -213,7 +240,7 @@ const Navbar = () => {
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
-      </div>
+      </NavShell>
 
       {/* Mobile Menu */}
       <AnimatePresence>

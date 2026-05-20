@@ -59,7 +59,7 @@ const AuthLayout = ({ children }) => {
                             <Sparkles size={18} strokeWidth={2} />
                         </div>
                         <h1 className="text-[0.72rem] font-bold tracking-[0.24em] text-white/90 uppercase">
-                            Royal Secure Access
+                            Lexora Secure Access
                         </h1>
                     </div>
 

@@ -160,7 +160,7 @@ const AdminVerifications = () => {
         <div className="max-w-2xl">
           <h1 className="font-serif text-4xl font-bold text-[#0f172a] dark:text-white mb-3">Verification Queue</h1>
           <p className="text-gray-500 font-medium leading-relaxed">
-            Maintain the integrity of the Royal Law network. Review and validate legal
+            Maintain the integrity of the Lexora network. Review and validate legal
             credentials for new professional applicants with administrative precision.
           </p>
         </div>
