@@ -88,7 +88,7 @@ const VerifyOtp = () => {
 
     return (
         <div
-            className="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden font-sans transition-colors duration-300"
+            className="min-h-screen flex items-center justify-center py-12 px-4 pt-[112px] relative overflow-hidden font-sans transition-colors duration-300"
             style={{
                 background: darkMode
                     ? 'linear-gradient(135deg, #030810 0%, #0a1220 15%, #1a2a4a 35%, #2a4a7a 50%, #1a2a5a 65%, #0a1220 85%, #030810 100%)'
@@ -169,7 +169,7 @@ const VerifyOtp = () => {
                 </div>
 
                 {/* Right Panel - Form Section - Extraordinary */}
-                <div className="w-full md:w-[55%] flex flex-col justify-center items-center p-8 lg:p-12 xl:p-16 relative bg-gradient-to-br from-[#fafbfc]/90 via-[#f8f4ef]/85 to-[#f5f0ea]/90 dark:from-[rgba(20,30,50,0.3)] dark:via-[rgba(20,35,55,0.25)] dark:to-[rgba(15,25,45,0.3)]">
+                <div className="w-full md:w-[55%] flex flex-col justify-start items-center p-8 lg:p-12 xl:p-16 relative bg-gradient-to-br from-[#fafbfc]/90 via-[#f8f4ef]/85 to-[#f5f0ea]/90 dark:from-[rgba(20,30,50,0.3)] dark:via-[rgba(20,35,55,0.25)] dark:to-[rgba(15,25,45,0.3)] overflow-y-auto scrollbar-hide min-h-[90vh]">
                     {/* Premium background effects */}
                     <div className="absolute inset-0 pointer-events-none">
                         <div className="absolute top-0 right-0 w-full h-96 bg-gradient-to-l from-[#ffc966]/12 via-transparent to-transparent rounded-full blur-3xl opacity-60 dark:opacity-40" />

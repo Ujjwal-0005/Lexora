@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
     Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
+    Route::delete('/auth/delete', [AuthController::class, 'deleteAccount']);
     Route::put('/auth/lawyer-profile', [AuthController::class, 'updateLawyerProfile']);
 
     // Consultations

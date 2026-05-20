@@ -36,7 +36,7 @@
             </div>
 
             <p class="muted">If you need to reschedule or have a question, open the consultation chat from your dashboard.</p>
-            <a class="cta" href="{{ config('app.frontend_url', url('/')) }}">View Consultation</a>
+            <a class="cta" href="{{ app()->environment('local') ? 'http://localhost:5173/client/consultations' : config('app.frontend_url', url('/')) }}">View Consultation</a>
 
             <div class="footer">
                 <p>This is an automated message from Lexora.</p>

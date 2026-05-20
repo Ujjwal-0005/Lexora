@@ -15,6 +15,14 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Consultation;
+use App\Models\ConsultationPayment;
+use App\Models\DocumentRequest;
+use App\Models\DocumentPayment;
+use App\Models\Message;
+use App\Models\Review;
+use App\Models\Rating;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
@@ -347,12 +355,29 @@ class AuthController extends Controller
         }
 
         if (!$user) {
+            // If user does not exist, only create an account when the intent was
+            // explicit registration. For plain login attempts we should not
+            // auto-provision an account — instead inform the frontend so it can
+            // ask the user if they want to sign up (client or professional).
+            if ($intent !== 'register') {
+                // Redirect to frontend with helpful info so the UI can offer signup.
+                $params = http_build_query([
+                    'error' => 'account_not_found',
+                    'email' => $email,
+                    'role' => $role,
+                ]);
+
+                return redirect()->away($frontendUrl . '/auth/google/callback?' . $params);
+            }
+
+            // For register intent: create a client account (lawyer register is
+            // handled earlier with a separate flow).
             $user = User::create([
                 'name' => $googleUser->getName() ?: 'Google User',
                 'email' => $email,
                 'password' => Hash::make(Str::random(40)),
-                'role' => 'client',
-                'is_verified_by_admin' => true,
+                'role' => $role === 'lawyer' ? 'lawyer' : 'client',
+                'is_verified_by_admin' => $role === 'client',
                 'google_id' => (string) $googleUser->getId(),
                 'google_avatar' => $googleUser->getAvatar(),
                 'auth_provider' => 'google',
@@ -735,6 +760,123 @@ class AuthController extends Controller
         $user->save();
 
         return response()->json(['message' => 'Password updated successfully']);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $user = $request->user();
+
+        // If user provided a current password, prefer that path (works for normal accounts)
+        if ($request->filled('current_password')) {
+            $validator = Validator::make($request->all(), [
+                'current_password' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            if (! Hash::check($request->current_password, $user->password)) {
+                return response()->json(['message' => 'Current password is incorrect'], 401);
+            }
+
+            $proceedWithDeletion = true;
+        } else {
+            $proceedWithDeletion = false;
+        }
+
+        // If the account was created via a social provider (e.g., Google) or uses external auth,
+        // allow an email OTP confirmation flow instead of requiring a password the user doesn't have.
+        $isSocial = !empty($user->auth_provider) || !empty($user->google_id);
+
+        if (!$proceedWithDeletion && $isSocial) {
+            // If OTP not provided, generate and send one and ask frontend to submit it back.
+            if (!$request->filled('otp')) {
+                $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+                // Delete ALL existing verification records for this email (to avoid unique constraint violation)
+                DB::table('email_verifications')->where('email', $user->email)->delete();
+                DB::table('email_verifications')->insert([
+                    'email' => $user->email,
+                    'otp' => $otp,
+                    'payload' => json_encode(['purpose' => 'delete_account']),
+                    'expires_at' => Carbon::now()->addMinutes(15),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+
+                try {
+                    Mail::to($user->email)->send(new OtpMail($otp));
+                } catch (\Exception $e) {
+                    Log::error('Failed sending delete-account OTP to ' . $user->email . ': ' . $e->getMessage());
+                    return response()->json(['message' => 'Unable to send confirmation OTP. Please try again.'], 500);
+                }
+
+                return response()->json(['message' => 'OTP sent to your email. Please confirm to proceed.', 'otp_sent' => true]);
+            }
+
+            // OTP provided — validate it
+            $validator = Validator::make($request->all(), [
+                'otp' => 'required|string|size:6',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $record = DB::table('email_verifications')
+                ->where('email', $user->email)
+                ->where('otp', $request->otp)
+                ->first();
+
+            if (! $record) {
+                return response()->json(['message' => 'Invalid OTP or email'], 422);
+            }
+
+            if (Carbon::now()->greaterThan(Carbon::parse($record->expires_at))) {
+                return response()->json(['message' => 'OTP expired'], 422);
+            }
+
+            $payload = json_decode($record->payload, true);
+            if (($payload['purpose'] ?? null) !== 'delete_account') {
+                return response()->json(['message' => 'Invalid OTP purpose'], 422);
+            }
+
+            // OTP valid — allow deletion to proceed
+            DB::table('email_verifications')->where('email', $user->email)->delete();
+            $proceedWithDeletion = true;
+        }
+
+        if (! $proceedWithDeletion) {
+            return response()->json(['errors' => ['current_password' => ['Current password is required to delete this account']]], 422);
+        }
+
+        // Perform deletion inside a transaction
+        try {
+            DB::transaction(function () use ($user) {
+                // Revoke tokens
+                $user->tokens()->delete();
+
+                // Remove profile photo (if stored locally)
+                if ($user->profile_photo) {
+                    try {
+                        Storage::disk('public')->delete($user->profile_photo);
+                    } catch (\Exception $e) {
+                        Log::warning('Failed to delete user profile photo: ' . $e->getMessage());
+                    }
+                }
+
+                // Delete the user — cascade constraints will handle all related data
+                // (consultations, reviews, messages, ratings, lawyer_profile, help_tickets, etc.)
+                $user->delete();
+            });
+        } catch (\Exception $e) {
+            Log::error('Failed to delete account for user ' . $user->id . ': ' . $e->getMessage());
+            Log::error('Exception trace: ' . $e->getTraceAsString());
+            return response()->json(['message' => 'Failed to delete account: ' . $e->getMessage()], 500);
+        }
+
+        return response()->json(['message' => 'Account deleted successfully']);
     }
 
     public function updateLawyerProfile(Request $request)

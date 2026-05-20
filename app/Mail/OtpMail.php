@@ -14,6 +14,7 @@ class OtpMail extends Mailable
 
     public function __construct(public string $otp)
     {
+        
     }
 
     /**

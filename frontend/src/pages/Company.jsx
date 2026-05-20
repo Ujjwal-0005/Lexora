@@ -92,7 +92,7 @@ const Company = () => {
                             <Landmark className="w-4 h-4" /> Company
                         </span>
                         <h1 className="font-serif text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
-                            About Lexora, our careers, and what the press is saying
+                            About Lexora, our careers, and what the press is saying.
                         </h1>
                         <p className="text-gray-300 text-base md:text-lg leading-relaxed max-w-2xl">
                             Lexora combines premium legal access with a modern digital experience. This page brings together who we are, how we hire, and the latest media coverage in one place.

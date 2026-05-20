@@ -58,7 +58,7 @@ const Help = () => {
     return (
         <div className="max-w-7xl mx-auto pb-20 font-sans">
             {/* Header */}
-            <div className="mb-10">
+            <div className="mb-10 mt-20">
                 <h1 className="font-serif text-5xl font-bold text-[#0f172a] dark:text-white tracking-tight mb-3">
                     Support Center
                 </h1>
@@ -111,8 +111,8 @@ const Help = () => {
                                             </div>
                                             <div className="flex flex-col items-end gap-3">
                                                 <span className={`text-[0.65rem] font-bold uppercase tracking-wider px-2 py-1 rounded-sm ${t.status === 'open'
-                                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                                        : 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                                    : 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
                                                     }`}>
                                                     {t.status}
                                                 </span>
