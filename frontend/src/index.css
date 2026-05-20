@@ -123,36 +123,19 @@
   }
 }
 
-/* Custom scrollbar for dark mode */
-.dark ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #1A1A2E;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #3A3A5C;
-  border-radius: 4px;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #4A4A6C;
-}
-
-/* Hide scrollbar in light mode (when `.dark` class is not present) */
-html:not(.dark) {
+/* Hide scrollbars globally while keeping scroll functionality */
+html,
+body {
   -ms-overflow-style: none;
-  /* IE and Edge */
   scrollbar-width: none;
-  /* Firefox */
 }
 
-html:not(.dark) ::-webkit-scrollbar {
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
   display: none;
-  /* Chrome, Safari, Opera */
 }
 
 /* React DatePicker custom styles */
@@ -200,7 +183,7 @@ html:not(.dark) ::-webkit-scrollbar {
 
 /* ── Hero banner ── */
 .dd-hero {
-  background: linear-gradient(160deg, #f0f4f9 0%, #e8eef7 50%, #f5f8fc 100%);
+  background: linear-gradient(160deg, #0b1220 0%, #162038 50%, #0b1a2e 100%);
   padding: 112px 24px 44px;
   display: flex;
   flex-direction: column;
@@ -212,7 +195,7 @@ html:not(.dark) ::-webkit-scrollbar {
   font-family: 'Playfair Display', serif;
   font-size: 2.05rem;
   font-weight: 700;
-  color: #1e3a5f;
+  color: #e2cfa0;
   letter-spacing: 0.025em;
   text-align: center;
   margin: 0;
@@ -247,9 +230,9 @@ html:not(.dark) ::-webkit-scrollbar {
   padding: 11px 16px 11px 40px;
   border: none;
   border-radius: 7px;
-  background: #fff;
+  background: #1e293b;
   font-size: 0.855rem;
-  color: #1f2937;
+  color: #f8fafc;
   outline: none;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
   box-sizing: border-box;
@@ -261,7 +244,7 @@ html:not(.dark) ::-webkit-scrollbar {
 }
 
 .dd-search-input::placeholder {
-  color: #9ca3af;
+  color: #cbd5e1;
   font-size: 0.83rem;
 }
 
@@ -1081,21 +1064,29 @@ html:not(.dark) ::-webkit-scrollbar {
 
 .dd-nav-logo {
   font-family: 'Playfair Display', serif;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
+  /* slightly larger for presence */
   font-weight: 600;
-  color: #111827;
   text-decoration: none;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.0em;
+  /* premium gold gradient text */
+  color: transparent;
+  background: linear-gradient(90deg, #f8e6b2 0%, #f1c453 50%, #d4af37 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  /* subtle depth */
+  text-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
+  padding: 2px 8px 4px 8px;
+  border-radius: 6px;
 }
 
 .dd-navbar--landing .dd-nav-logo {
-  color: #0f172a;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 0 18px rgba(148, 163, 184, 0.12);
   transform: translateZ(0);
 }
 
 .dd-navbar--landing .dd-nav-logo:hover {
-  color: #e99709;
+  filter: drop-shadow(0 6px 14px rgba(212, 175, 55, 0.12));
+  transform: translateY(-1px);
 }
 
 .dd-nav-links {

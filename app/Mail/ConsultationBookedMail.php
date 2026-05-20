@@ -20,7 +20,7 @@ class ConsultationBookedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Consultation booked successfully with LegalConnect',
+            subject: 'Consultation booked successfully with Lexora',
         );
     }
 

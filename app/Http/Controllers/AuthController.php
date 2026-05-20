@@ -762,6 +762,111 @@ class AuthController extends Controller
         return response()->json(['message' => 'Password updated successfully']);
     }
 
+    /**
+     * Allow social-authenticated users to set a password (no current password required).
+     */
+    public function setPassword(Request $request)
+    {
+        $user = $request->user();
+
+        // Only allow this for users authenticated via external provider (google, etc.)
+        if (empty($user->auth_provider) && empty($user->google_id)) {
+            return response()->json(['message' => 'This action is not allowed for your account. Use change password instead.'], 403);
+        }
+
+        // Two-step flow:
+        // 1) If no 'otp' provided => generate and send OTP to user's email and store with purpose 'set_password'.
+        // 2) If 'otp' provided => validate OTP and set new password.
+
+        if (!$request->has('otp')) {
+            // initiate OTP
+            $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+            DB::table('email_verifications')->where('email', $user->email)->delete();
+            DB::table('email_verifications')->insert([
+                'email' => $user->email,
+                'otp' => $otp,
+                'payload' => json_encode(['purpose' => 'set_password']),
+                'expires_at' => Carbon::now()->addMinutes(10),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+
+            try {
+                Mail::to($user->email)->send(new OtpMail($otp));
+            } catch (\Exception $e) {
+                Log::error('Failed sending set-password OTP to ' . $user->email . ': ' . $e->getMessage());
+                return response()->json(['message' => 'Unable to send OTP email. Please try again later.'], 500);
+            }
+
+            return response()->json(['otp_sent' => true]);
+        }
+
+        // Confirm OTP and set password
+        $validator = Validator::make($request->all(), [
+            'otp' => 'required|string|size:6',
+            'new_password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/',
+            ],
+            'new_password_confirmation' => 'required|string|same:new_password',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $record = DB::table('email_verifications')
+            ->where('email', $user->email)
+            ->where('otp', $request->otp)
+            ->first();
+
+        if (! $record) {
+            return response()->json(['message' => 'Invalid OTP or email'], 422);
+        }
+
+        if (Carbon::now()->greaterThan(Carbon::parse($record->expires_at))) {
+            return response()->json(['message' => 'OTP expired'], 422);
+        }
+
+        $payload = json_decode($record->payload, true);
+        if (($payload['purpose'] ?? null) !== 'set_password') {
+            return response()->json(['message' => 'Invalid OTP purpose'], 422);
+        }
+
+        // Set the password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        // Remove OTP records
+        DB::table('email_verifications')->where('email', $user->email)->delete();
+
+        // Revoke other tokens (keep current if available)
+        try {
+            $current = $request->user()->currentAccessToken();
+            if ($current) {
+                $user->tokens()->where('id', '<>', $current->id)->delete();
+            } else {
+                $user->tokens()->delete();
+            }
+        } catch (\Exception $e) {
+            Log::warning('Failed to revoke other tokens for user ' . $user->id . ': ' . $e->getMessage());
+        }
+
+        // Notify user by email
+        try {
+            Mail::raw('Your account password was set/changed. If this was not you, please contact support immediately.', function ($message) use ($user) {
+                $message->to($user->email)->subject('Your account password changed');
+            });
+        } catch (\Exception $e) {
+            Log::warning('Failed to send password change notification to ' . $user->email . ': ' . $e->getMessage());
+        }
+
+        return response()->json(['message' => 'Password set successfully']);
+    }
+
     public function deleteAccount(Request $request)
     {
         $user = $request->user();
