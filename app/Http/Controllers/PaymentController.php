@@ -92,6 +92,14 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Payment already completed'], 400);
         }
 
+        if ($documentRequest->price <= 0) {
+            return response()->json(['message' => 'This document does not have a payable amount yet'], 409);
+        }
+
+        if (!in_array($documentRequest->status, ['awaiting_payment', 'client_info_submitted', 'accepted', 'pending', 'requested'], true)) {
+            return response()->json(['message' => 'This document is not ready for payment'], 409);
+        }
+
         // Mock payment processing
         $transactionId = 'TXN' . strtoupper(Str::random(12));
 
@@ -107,7 +115,8 @@ class PaymentController extends Controller
         );
 
         // Update document status to pending so lawyer can act on it
-        $documentRequest->status = 'pending';
+        $documentRequest->status = 'paid';
+        $documentRequest->payment_completed_at = now();
         $documentRequest->save();
 
         return response()->json([

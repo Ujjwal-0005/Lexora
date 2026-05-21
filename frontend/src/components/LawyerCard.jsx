@@ -7,6 +7,7 @@ import { formatPrice } from '../utils/formatDate'
 const LawyerCard = ({ lawyer, index = 0 }) => {
   const user = lawyer.user
   const profile = lawyer
+  const isAvailable = profile.is_available !== false
 
   return (
     <motion.div
@@ -16,7 +17,7 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
     >
       <Tilt className="Tilt" options={{ max: 15, scale: 1.02 }}>
         <Link to={`/lawyer/${lawyer.id}`}>
-          <div className="glass dark:glass-dark rounded-xl p-6 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 group">
+          <div className={`glass dark:glass-dark rounded-xl p-6 transition-all duration-300 group ${isAvailable ? 'hover:shadow-xl hover:shadow-primary-500/10' : 'opacity-90 border border-amber-200/70 dark:border-amber-500/20'}`}>
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-4">
@@ -27,7 +28,7 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
                     </span>
                   </div>
                   {/* Availability pulse */}
-                  {profile.is_available && (
+                  {isAvailable && (
                     <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-dark-800 animate-pulse" />
                   )}
                 </div>
@@ -39,6 +40,9 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
                     <Briefcase className="w-4 h-4" />
                     <span>{profile.years_of_experience} years exp.</span>
                   </div>
+                  <span className={`mt-2 inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${isAvailable ? 'bg-green-100 text-green-800 dark:bg-green-500/10 dark:text-green-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300'}`}>
+                    {isAvailable ? 'Accepting Consultations' : 'Unavailable'}
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-1 bg-primary-500/10 px-2 py-1 rounded-lg">
@@ -81,8 +85,8 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
                 <span className="font-semibold">{formatPrice(profile.consultation_fee)}</span>
                 <span className="text-sm text-gray-500">/hr</span>
               </div>
-              <span className="text-sm text-primary-500 font-medium group-hover:underline">
-                View Profile →
+              <span className={`text-sm font-medium ${isAvailable ? 'text-primary-500 group-hover:underline' : 'text-amber-500'}`}>
+                {isAvailable ? 'View Profile →' : 'Currently unavailable'}
               </span>
             </div>
           </div>

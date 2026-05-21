@@ -2,7 +2,7 @@ import { create } from 'zustand'
 
 export const useFilterStore = create((set) => ({
   // Lawyer filters
-  specialization: '',
+  specialization: [],
   regionId: '',
   minRating: 0,
   maxFee: 30000,
@@ -20,7 +20,7 @@ export const useFilterStore = create((set) => ({
   setSortOrder: (sortOrder) => set({ sortOrder }),
 
   resetFilters: () => set({
-    specialization: '',
+    specialization: [],
     regionId: '',
     minRating: 0,
     maxFee: 30000,

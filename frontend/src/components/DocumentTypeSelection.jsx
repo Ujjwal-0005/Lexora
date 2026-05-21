@@ -59,6 +59,10 @@ const DocumentTypeSelection = () => {
         navigate(`/documents/request/${documentType.id}`, { state: { documentType } })
     }
 
+    const handleCustomRequest = () => {
+        navigate('/documents/custom-request')
+    }
+
     return (
         <div className="space-y-12 pb-20">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-200 dark:border-dark-700 pb-6">
@@ -135,6 +139,12 @@ const DocumentTypeSelection = () => {
                     <p className="text-sm font-medium tracking-wide text-gray-500 dark:text-gray-400 max-w-md mx-auto leading-relaxed relative z-10">
                         The document library is currently empty. Please check back later or contact support to request templates.
                     </p>
+                    <button
+                        onClick={handleCustomRequest}
+                        className="mt-8 px-8 py-3 bg-[#0f172a] text-white text-xs font-bold uppercase tracking-widest hover:bg-black transition-colors rounded-sm shadow-md relative z-10"
+                    >
+                        Create Custom Request
+                    </button>
                 </div>
             ) : (
                 <motion.div
@@ -208,6 +218,27 @@ const DocumentTypeSelection = () => {
                         className="px-8 py-4 bg-[#0f172a] text-white dark:bg-white dark:text-[#0f172a] text-xs font-bold uppercase tracking-widest hover:bg-black dark:hover:bg-gray-100 transition-all rounded-sm shadow-lg shrink-0 flex items-center justify-center gap-2 w-full md:w-auto"
                     >
                         Access Vault <ChevronRight className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-sm bg-[#0f172a] text-white p-10 md:p-12 shadow-xl">
+                <div className="absolute right-0 top-0 w-80 h-80 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
+                <div className="relative z-10 flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+                    <div className="max-w-2xl">
+                        <p className="text-[10px] uppercase tracking-[0.24em] text-gray-400 mb-3 font-bold">Custom Workflow</p>
+                        <h2 className="font-serif text-3xl font-bold text-white mb-3">
+                            Need a document that is not in the library?
+                        </h2>
+                        <p className="text-sm font-medium tracking-wide text-gray-300 leading-relaxed">
+                            Name the document, select a lawyer, and request a tailored drafting workflow with acceptance, fee quote, required fields, payment, and final PDF delivery.
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleCustomRequest}
+                        className="px-8 py-4 bg-[#D4AF37] text-[#0f172a] text-xs font-bold uppercase tracking-widest hover:bg-[#b8941d] transition-all rounded-sm shadow-lg shrink-0 flex items-center justify-center gap-2 w-full md:w-auto"
+                    >
+                        Start Custom Request <ChevronRight className="w-4 h-4" />
                     </button>
                 </div>
             </div>

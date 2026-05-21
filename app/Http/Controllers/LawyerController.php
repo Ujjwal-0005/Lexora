@@ -16,10 +16,15 @@ class LawyerController extends Controller
                 $q->where('is_verified_by_admin', true);
             });
 
-        // Filter by specialization
-        if ($request->has('specialization')) {
-            $query->whereHas('specializations', function ($q) use ($request) {
-                $q->where('slug', $request->specialization);
+        // Filter by specialization(s)
+        $specializations = $request->input('specialization', []);
+        if (is_string($specializations) && $specializations !== '') {
+            $specializations = [$specializations];
+        }
+        if (is_array($specializations) && count(array_filter($specializations)) > 0) {
+            $specializations = array_values(array_filter($specializations));
+            $query->whereHas('specializations', function ($q) use ($specializations) {
+                $q->whereIn('slug', $specializations);
             });
         }
 
@@ -38,6 +43,15 @@ class LawyerController extends Controller
         // Filter by max fee
         if ($request->has('max_fee')) {
             $query->where('consultation_fee', '<=', $request->max_fee);
+        }
+
+        // Filter by availability
+        if ($request->filled('availability')) {
+            if ($request->availability === 'available') {
+                $query->where('is_available', true);
+            } elseif ($request->availability === 'unavailable') {
+                $query->where('is_available', false);
+            }
         }
 
         // Search by name

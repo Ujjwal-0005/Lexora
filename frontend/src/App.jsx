@@ -30,6 +30,7 @@ import ClientDocuments from './pages/client/Documents'
 import ClientSettings from './pages/client/Settings'
 import DocumentTypeSelection from './components/DocumentTypeSelection'
 import DocumentFormWizard from './components/DocumentFormWizard'
+import CustomDocumentRequestWizard from './components/CustomDocumentRequestWizard'
 
 // Lawyer Pages
 import LawyerDashboard from './pages/lawyer/Dashboard'
@@ -158,6 +159,14 @@ const App = () => {
             <ProtectedRoute allowedRoles={['client']}>
               <DashboardLayout>
                 <DocumentFormWizard />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/documents/custom-request" element={
+            <ProtectedRoute allowedRoles={['client']}>
+              <DashboardLayout>
+                <CustomDocumentRequestWizard />
               </DashboardLayout>
             </ProtectedRoute>
           } />

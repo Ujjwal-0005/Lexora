@@ -110,6 +110,7 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
   const user = lawyer.user
   const profile = lawyer
   const badge = getRoleBadge(profile.designation, profile.years_of_experience || 0)
+  const isAvailable = profile.is_available !== false
   // Tags: prefer explicit specializations, then core_competencies, then document_expertise names
   let specs = []
   if (profile.specializations && profile.specializations.length > 0) {
@@ -131,7 +132,7 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
       transition={{ duration: 0.3, delay: index * 0.055 }}
     >
       <Link to={`/lawyer/${lawyer.id}`} className="dd-card-link">
-        <article className="dd-card">
+        <article className={`dd-card ${!isAvailable ? 'dd-card--unavailable' : ''}`}>
 
           {/* ── TOP: avatar + identity ── */}
           <div className="dd-card-head">
@@ -140,6 +141,9 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
             <div className="dd-card-identity">
               <h3 className="dd-lawyer-name">{user?.name}</h3>
               <span className={`dd-badge ${badge.cls}`}>{badge.label}</span>
+              <span className={`dd-status-pill ${isAvailable ? 'dd-status-pill--available' : 'dd-status-pill--unavailable'}`}>
+                {isAvailable ? 'Accepting Consultations' : 'Unavailable'}
+              </span>
               <Stars rating={rating} count={reviews} />
             </div>
           </div>
@@ -163,7 +167,7 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
           {/* ── BUTTON ── */}
           <div className="dd-card-footer">
             <span className="dd-view-btn">
-              View Profile <ArrowRight size={13} className="dd-arrow" />
+              {isAvailable ? 'View Profile' : 'Currently unavailable'} <ArrowRight size={13} className="dd-arrow" />
             </span>
           </div>
 
@@ -225,9 +229,9 @@ const LawyerList = () => {
 
   const [mobileOpen, setMobileOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [availability, setAvailability] = useState('') // '' | 'immediate' | '48h'
+  const [availability, setAvailability] = useState('') // '' | 'available' | 'unavailable'
 
-  const filters = { specialization, regionId, minRating, search: searchQuery, sortBy, sortOrder, page: currentPage }
+  const filters = { specialization, regionId, minRating, search: searchQuery, sortBy, sortOrder, page: currentPage, availability }
   const { data, isLoading } = useLawyers(filters)
 
   const lawyers = data?.lawyers?.data || []
@@ -249,8 +253,17 @@ const LawyerList = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const displayed = availability === 'immediate'
-    ? lawyers.filter(l => l.is_available)
+  const toggleSpecialization = (slug) => {
+    const next = specialization.includes(slug)
+      ? specialization.filter((item) => item !== slug)
+      : [...specialization, slug]
+
+    setSpecialization(next)
+    setCurrentPage(1)
+  }
+
+  const displayed = availability
+    ? lawyers.filter((lawyer) => availability === 'available' ? lawyer.is_available : !lawyer.is_available)
     : lawyers
 
   /* lock body scroll when mobile filter open */
@@ -325,8 +338,8 @@ const LawyerList = () => {
                 ).map(spec => (
                   <li key={spec.id}>
                     <label className="dd-check-row">
-                      <span className={`dd-check-box ${specialization === spec.slug ? 'dd-check-box--on' : ''}`}>
-                        {specialization === spec.slug && (
+                      <span className={`dd-check-box ${specialization.includes(spec.slug) ? 'dd-check-box--on' : ''}`}>
+                        {specialization.includes(spec.slug) && (
                           <svg viewBox="0 0 10 10" className="dd-check-tick">
                             <polyline points="1.5,5.5 4,8 8.5,2" strokeWidth="1.8" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
@@ -334,8 +347,8 @@ const LawyerList = () => {
                       </span>
                       <input
                         type="checkbox"
-                        checked={specialization === spec.slug}
-                        onChange={() => { setSpecialization(specialization === spec.slug ? '' : spec.slug); setCurrentPage(1) }}
+                        checked={specialization.includes(spec.slug)}
+                        onChange={() => toggleSpecialization(spec.slug)}
                         className="dd-check-hidden"
                       />
                       <span className="dd-check-text">{spec.name}</span>
@@ -363,11 +376,11 @@ const LawyerList = () => {
               </div>
             </div>
 
-            {/* AVAILABILITY
+            {/* AVAILABILITY */}
             <div className="dd-filter-block">
               <p className="dd-section-label">Availability</p>
               <ul className="dd-radio-list">
-                {[{ val: 'immediate', label: 'Immediate' }, { val: '48h', label: 'Within 48h' }].map(o => (
+                {[{ val: 'available', label: 'Available' }, { val: 'unavailable', label: 'Unavailable' }].map(o => (
                   <li key={o.val}>
                     <label className="dd-radio-row">
                       <span className={`dd-radio-ring ${availability === o.val ? 'dd-radio-ring--on' : ''}`}>
@@ -385,7 +398,7 @@ const LawyerList = () => {
                   </li>
                 ))}
               </ul>
-            </div> */}
+            </div>
 
             {/* MIN RATING */}
             <div className="dd-filter-block">

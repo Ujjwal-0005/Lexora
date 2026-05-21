@@ -9,7 +9,8 @@ import {
   Video,
   CreditCard,
   CheckCircle2,
-  Loader2
+  Loader2,
+  ShieldCheck
 } from 'lucide-react'
 import { useLawyer, useLawyerAvailability } from '../hooks/useLawyers'
 import { useCreateConsultation } from '../hooks/useConsultations'
@@ -32,6 +33,7 @@ const BookConsultation = () => {
   const { data: lawyer, isLoading: lawyerLoading } = useLawyer(lawyerId)
   const { data: availability, isLoading: availabilityLoading } = useLawyerAvailability(lawyerId, duration)
   const createConsultation = useCreateConsultation()
+  const isBookingOpen = lawyer?.is_available !== false
 
   const consultationFee = duration === 60
     ? (Number(lawyer?.consultation_fee_60) || Number(lawyer?.consultation_fee) * 1.5 || 0)
@@ -40,7 +42,7 @@ const BookConsultation = () => {
       : (Number(lawyer?.consultation_fee) || 0)
 
   const handleBooking = async () => {
-    if (!selectedSlot) return
+    if (!isBookingOpen || !selectedSlot) return
 
     const result = await createConsultation.mutateAsync({
       lawyer_profile_id: parseInt(lawyerId),
@@ -119,8 +121,23 @@ const BookConsultation = () => {
               <p className="text-sm tracking-wide font-semibold text-gray-500 dark:text-gray-400 uppercase">
                 {lawyer?.specializations?.[0]?.name} <span className="text-[#D4AF37] mx-2">•</span> {lawyer?.years_of_experience} years exp.
               </p>
+              {!isBookingOpen && (
+                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-300">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Unavailable for new consultations
+                </div>
+              )}
             </div>
           </div>
+
+          {!isBookingOpen && (
+            <div className="mb-10 rounded-sm border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-5 text-amber-900 dark:text-amber-100 shadow-sm">
+              <p className="font-bold uppercase tracking-widest text-xs mb-1">Booking paused</p>
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                This lawyer is not accepting new consultation requests right now. The secure appointment flow is blocked until they turn availability back on.
+              </p>
+            </div>
+          )}
 
           {/* Step 1: Select Date & Time */}
           {step === 1 && (
@@ -140,7 +157,14 @@ const BookConsultation = () => {
                   Available Time Slots
                 </label>
 
-                {availabilityLoading ? (
+                {!isBookingOpen ? (
+                  <div className="rounded-sm border border-dashed border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 p-8 text-center">
+                    <p className="font-serif text-xl font-bold text-amber-900 dark:text-amber-100 mb-2">Booking currently unavailable</p>
+                    <p className="text-sm text-amber-800 dark:text-amber-200">
+                      The lawyer has switched off new consultation requests.
+                    </p>
+                  </div>
+                ) : availabilityLoading ? (
                   <div className="py-12"><Loader /></div>
                 ) : (
                   <div className="space-y-6 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
@@ -193,7 +217,7 @@ const BookConsultation = () => {
               <div className="pt-4">
                 <button
                   onClick={() => selectedSlot && setStep(2)}
-                  disabled={!selectedSlot}
+                  disabled={!selectedSlot || !isBookingOpen}
                   className="w-full py-4 bg-[#0f172a] dark:bg-white text-white dark:text-[#0f172a] font-bold tracking-widest uppercase text-sm rounded-sm hover:bg-black dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg"
                 >
                   Continue to Payment
@@ -262,10 +286,12 @@ const BookConsultation = () => {
                 </button>
                 <button
                   onClick={handleBooking}
-                  disabled={createConsultation.isPending}
+                  disabled={createConsultation.isPending || !isBookingOpen}
                   className="sm:w-2/3 py-4 bg-[#D4AF37] text-[#0f172a] font-bold tracking-widest uppercase text-sm rounded-sm hover:bg-[#b8941d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg"
                 >
-                  {createConsultation.isPending ? (
+                  {!isBookingOpen ? (
+                    'Booking unavailable'
+                  ) : createConsultation.isPending ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
                       Processing securely...

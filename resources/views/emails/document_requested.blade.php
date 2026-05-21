@@ -23,17 +23,20 @@
     <div class="wrap">
         <div class="card">
             <div class="brand">Lexora</div>
-            <h1 class="title">We’ve received your document request</h1>
-            <p class="muted">Your request is now with the assigned lawyer for review and preparation.</p>
+            <h1 class="title">A new document request is waiting for your review</h1>
+            <p class="muted">A client has sent a custom document request through the portal. Review it, accept or reject it, and then send the required fields and fee.</p>
 
             <div class="panel">
-                <div class="row"><span class="label">Document Type</span><br><span class="value">{{ $documentRequest->documentType->name ?? 'Document' }}</span></div>
-                <div class="row"><span class="label">Assigned Lawyer</span><br><span class="value">{{ $documentRequest->lawyerProfile->user->name ?? 'Assigned lawyer' }}</span></div>
-                <div class="row"><span class="label">Status</span><br><span class="value">Under review</span></div>
+                <div class="row"><span class="label">Document Name</span><br><span class="value">{{ $documentRequest->document_name ?? $documentRequest->documentType->name ?? 'Document' }}</span></div>
+                <div class="row"><span class="label">Client</span><br><span class="value">{{ $documentRequest->client->name ?? 'Client' }}</span></div>
+                <div class="row"><span class="label">Status</span><br><span class="value">{{ \Illuminate\Support\Str::headline(str_replace('_', ' ', $documentRequest->status ?? 'requested')) }}</span></div>
+                @if(!empty($documentRequest->request_notes))
+                    <div class="row"><span class="label">Notes</span><br><span class="value">{{ $documentRequest->request_notes }}</span></div>
+                @endif
             </div>
 
-            <p class="muted">We’ll notify you again when the document is prepared and ready for download.</p>
-            <a class="cta" href="{{ app()->environment('local') ? 'http://localhost:5173/client/documents' : config('app.frontend_url', url('/')) }}">View Request</a>
+            <p class="muted">Open the lawyer portal to define the required fields, quote the fee, and move the request forward.</p>
+            <a class="cta" href="{{ app()->environment('local') ? 'http://localhost:5173/lawyer/documents' : config('app.frontend_url', url('/')) }}">Open Lawyer Portal</a>
 
             <div class="footer">
                 <p>This is an automated message from Lexora.</p>
