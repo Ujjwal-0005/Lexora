@@ -388,9 +388,9 @@ const LawyerDashboard = () => {
         {/* Next Session Card - Premium Match */}
         <div className="relative overflow-hidden min-h-[260px] rounded-3xl border border-[#d7c8a7]/70 bg-gradient-to-br from-[#f7f1e5] via-[#efe4cd] to-[#d7c7a2] shadow-[0_20px_60px_rgba(15,23,42,0.16)] dark:border-white/10 dark:from-[#0a1120] dark:via-[#111c30] dark:to-[#1d2a42] dark:shadow-[0_22px_70px_rgba(0,0,0,0.5)]">
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-6 right-0 h-56 w-56 rounded-full bg-white/55 blur-3xl dark:bg-[#f5d28a]/16"></div>
-            <div className="absolute -bottom-24 left-0 h-72 w-72 rounded-full bg-[#b8892d]/18 blur-3xl dark:bg-[#f5d28a]/8"></div>
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#b8892d]/60 to-transparent dark:via-[#f5d28a]/65"></div>
+            <div className="absolute -top-20 right-0 h-56 w-56 rounded-full bg-white/55 blur-3xl dark:bg-[#f5d28a]/10"></div>
+            <div className="absolute -bottom-24 left-0 h-72 w-72 rounded-full bg-[#b8892d]/18 blur-3xl dark:bg-[#f5d28a]/12"></div>
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#b8892d]/60 to-transparent dark:via-[#f5d28a]/55"></div>
           </div>
 
           <div className="relative z-10 flex h-full flex-col p-7 sm:p-8 text-[#111827] dark:text-white">
