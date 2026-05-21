@@ -35,10 +35,10 @@ export default function RateModal({ open, onClose }) {
     const averageRating = Number(summary?.average ?? 0)
 
     return (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/80" onClick={onClose} />
 
-            <div className="relative z-50 w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative z-[61] w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-white dark:bg-dark-800">
                 {/* Header */}
                 <div className="flex items-center justify-between gap-4 p-6 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-800">
                     <div className="flex items-center gap-4">
