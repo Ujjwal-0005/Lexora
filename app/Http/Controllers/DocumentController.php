@@ -38,8 +38,8 @@ class DocumentController extends Controller
         }
 
         $documents->getCollection()->transform(function ($document) {
-            $document->document_type_name = $document->documentType?->name ?? 'Document';
-            $document->document_type_slug = $document->documentType?->slug ?? 'document';
+            $document->document_type_name = $document->documentType?->name ?? $document->document_name ?? 'Document';
+            $document->document_type_slug = $document->documentType?->slug ?? Str::slug($document->document_name ?? 'document');
             $document->advocate_name = $document->lawyerProfile?->user?->name ?? 'Unassigned advocate';
 
             return $document;
@@ -51,9 +51,11 @@ class DocumentController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'document_type_id' => 'required|exists:document_types,id',
+            'document_type_id' => 'nullable|exists:document_types,id',
+            'document_name' => 'nullable|string|max:255',
+            'request_notes' => 'nullable|string|max:4000',
             'lawyer_profile_id' => 'required|exists:lawyer_profiles,id',
-            'custom_fields' => 'required|array',
+            'custom_fields' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -65,34 +67,48 @@ class DocumentController extends Controller
             return response()->json(['message' => 'Only clients can request documents'], 403);
         }
 
-        $documentType = DocumentType::findOrFail($request->document_type_id);
-
-        // Calculate price using lawyer custom_price if available, otherwise base price
-        $price = $documentType->base_price;
-        $lawyerProfile = LawyerProfile::findOrFail($request->lawyer_profile_id);
-        $pivot = $lawyerProfile->documentTypes()
-            ->where('document_type_id', $documentType->id)
-            ->first();
-        if ($pivot && $pivot->pivot->custom_price) {
-            $price = $pivot->pivot->custom_price;
+        if (!$request->filled('document_type_id') && !$request->filled('document_name')) {
+            return response()->json(['message' => 'Document name is required for custom requests'], 422);
         }
 
-        // Create document request in pending state (awaiting payment/acceptance)
+        $documentType = $request->filled('document_type_id')
+            ? DocumentType::findOrFail($request->document_type_id)
+            : null;
+
+        // Calculate price using lawyer custom_price if available, otherwise base price
+        $price = (float) ($documentType?->base_price ?? 0);
+        $lawyerProfile = LawyerProfile::with('user')->findOrFail($request->lawyer_profile_id);
+
+        if ($documentType) {
+            $pivot = $lawyerProfile->documentTypes()
+                ->where('document_type_id', $documentType->id)
+                ->first();
+            if ($pivot && $pivot->pivot->custom_price) {
+                $price = $pivot->pivot->custom_price;
+            }
+        }
+
+        $isCustomRequest = !$documentType;
+
+        // Create document request in pending/requested state
         $documentRequest = DocumentRequest::create([
             'client_id' => $user->id,
             'lawyer_profile_id' => $request->lawyer_profile_id,
-            'document_type_id' => $request->document_type_id,
-            'custom_fields' => $request->custom_fields,
-            'status' => 'pending',
+            'document_type_id' => $documentType?->id,
+            'document_name' => $request->document_name ?? $documentType?->name,
+            'request_notes' => $request->request_notes,
+            'requested_fields' => null,
+            'custom_fields' => $request->custom_fields ?? [],
+            'status' => $isCustomRequest ? 'requested' : 'pending',
             'price' => $price,
         ]);
 
-        if (NotificationPreference::emailEnabled($user, 'document')) {
-            Mail::to($user->email)->send(new DocumentRequestedMail($documentRequest->load(['documentType', 'lawyerProfile.user'])));
+        if (NotificationPreference::emailEnabled($lawyerProfile->user, 'document')) {
+            Mail::to($lawyerProfile->user->email)->send(new DocumentRequestedMail($documentRequest->load(['documentType', 'lawyerProfile.user', 'client'])));
         }
 
         return response()->json([
-            'document' => $documentRequest->load(['documentType', 'lawyerProfile.user']),
+            'document' => $documentRequest->load(['documentType', 'lawyerProfile.user', 'client']),
             'message' => 'Document request created successfully',
         ], 201);
     }
@@ -126,6 +142,10 @@ class DocumentController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        if (!$documentRequest->documentType) {
+            return response()->json(['message' => 'Custom requests must be finalized by file upload'], 422);
+        }
+
         // Ensure document is paid before generation
         if (!$documentRequest->payment || $documentRequest->payment->status !== 'completed') {
             return response()->json(['message' => 'Document must be paid before generation'], 402);
@@ -157,6 +177,7 @@ class DocumentController extends Controller
         $previousStatus = $documentRequest->status;
         $documentRequest->generated_file_path = $path;
         $documentRequest->status = 'completed';
+        $documentRequest->payment_completed_at = $documentRequest->payment_completed_at ?? now();
         $documentRequest->save();
 
         if ($previousStatus !== 'completed' && NotificationPreference::emailEnabled($documentRequest->client, 'document')) {
@@ -414,7 +435,7 @@ HTML;
     public function download(Request $request, $id)
     {
         $user = $request->user();
-        $document = DocumentRequest::findOrFail($id);
+        $document = DocumentRequest::with(['documentType', 'lawyerProfile.user'])->findOrFail($id);
 
         // Check authorization
         if ($user->id !== $document->client_id &&
@@ -433,14 +454,15 @@ HTML;
         }
 
         // Stream the file download
-        $filename = pathinfo($filePath, PATHINFO_BASENAME);
+        $downloadSlug = $document->documentType?->slug
+            ?? Str::slug($document->document_name ?? 'document');
         
         return Storage::disk('public')->download(
             $filePath,
-            $document->documentType->slug . '-' . $document->id . '.pdf',
+            $downloadSlug . '-' . $document->id . '.pdf',
             [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="' . $document->documentType->slug . '-' . $document->id . '.pdf"'
+                'Content-Disposition' => 'attachment; filename="' . $downloadSlug . '-' . $document->id . '.pdf"'
             ]
         );
     }
@@ -448,7 +470,7 @@ HTML;
     public function updateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:draft,review,completed,delivered',
+            'status' => 'required|in:draft,pending,requested,accepted,rejected,awaiting_client_info,client_info_submitted,awaiting_payment,paid,in_progress,review,completed,delivered',
         ]);
 
         if ($validator->fails()) {
@@ -461,6 +483,10 @@ HTML;
         // Only lawyer can update status
         if (!$user->isLawyer() || $document->lawyer_profile_id !== $user->lawyerProfile->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        if ($request->status === 'paid') {
+            $document->payment_completed_at = $document->payment_completed_at ?? now();
         }
 
         $previousStatus = $document->status;
@@ -539,15 +565,12 @@ HTML;
 
         $documents = DocumentRequest::with(['documentType', 'client', 'payment'])
             ->where('lawyer_profile_id', $lawyerProfile->id)
-            ->whereHas('payment', function ($q) {
-                $q->where('status', 'completed');
-            })
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
         $documents->getCollection()->transform(function ($document) {
-            $document->document_type_name = $document->documentType?->name ?? 'Document';
-            $document->document_type_slug = $document->documentType?->slug ?? 'document';
+            $document->document_type_name = $document->documentType?->name ?? $document->document_name ?? 'Document';
+            $document->document_type_slug = $document->documentType?->slug ?? Str::slug($document->document_name ?? 'document');
             $document->advocate_name = $document->client?->name ?? 'Client';
 
             return $document;
@@ -560,7 +583,9 @@ HTML;
     public function lawyerUpdateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:accepted,in_progress,completed,delivered',
+            'status' => 'required|in:accepted,rejected,awaiting_client_info,client_info_submitted,awaiting_payment,in_progress,completed,delivered',
+            'price' => 'nullable|numeric|min:0',
+            'requested_fields' => 'nullable|array',
             'file' => 'nullable|file|mimes:pdf|max:5120',
         ]);
 
@@ -580,6 +605,33 @@ HTML;
 
         $status = $request->status;
 
+        if ($status === 'rejected') {
+            $document->status = 'rejected';
+            $document->accepted_at = null;
+            $document->requirements_sent_at = null;
+            $document->save();
+
+            return response()->json(['document' => $document, 'message' => 'Request rejected successfully']);
+        }
+
+        if ($request->filled('price')) {
+            $document->price = $request->price;
+        }
+
+        if ($request->filled('requested_fields')) {
+            $document->requested_fields = $request->requested_fields;
+            $document->requirements_sent_at = now();
+        }
+
+        if ($status === 'accepted') {
+            $document->accepted_at = now();
+            $status = $request->filled('requested_fields') ? 'awaiting_client_info' : 'accepted';
+        }
+
+        if ($status === 'awaiting_client_info' && !$document->accepted_at) {
+            $document->accepted_at = now();
+        }
+
         // If marking completed and a file is provided, store it
         if ($status === 'completed' && $request->hasFile('file')) {
             $file = $request->file('file');
@@ -590,6 +642,7 @@ HTML;
             $path = $file->storeAs('documents', $filename, 'public');
             $document->generated_file_path = $path;
             $document->status = 'completed';
+            $document->payment_completed_at = $document->payment_completed_at ?? now();
             $document->save();
 
             return response()->json(['document' => $document, 'message' => 'File uploaded and request completed']);
@@ -600,5 +653,37 @@ HTML;
         $document->save();
 
         return response()->json(['document' => $document, 'message' => 'Status updated successfully']);
+    }
+
+    public function submitClientResponse(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'custom_fields' => 'required|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = $request->user();
+        $document = DocumentRequest::with(['lawyerProfile.user', 'documentType', 'payment'])->findOrFail($id);
+
+        if ($user->id !== $document->client_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        if (!in_array($document->status, ['awaiting_client_info', 'accepted', 'pending', 'requested', 'client_info_submitted', 'awaiting_payment'], true)) {
+            return response()->json(['message' => 'This request is not ready for client submission'], 409);
+        }
+
+        $document->custom_fields = $request->custom_fields;
+        $document->client_submitted_at = now();
+        $document->status = $document->price > 0 ? 'awaiting_payment' : 'client_info_submitted';
+        $document->save();
+
+        return response()->json([
+            'document' => $document->load(['documentType', 'lawyerProfile.user', 'payment']),
+            'message' => 'Information submitted successfully',
+        ]);
     }
 }

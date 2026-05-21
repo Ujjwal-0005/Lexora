@@ -29,6 +29,37 @@ if (app()->environment('local')) {
 
         return response()->json(['user' => $user, 'token' => $token]);
     });
+
+    Route::get('/dev/create-test-lawyer', function () {
+        $email = 'dev-lawyer@local.test';
+        $user = \App\Models\User::where('email', $email)->first();
+        if (! $user) {
+            $user = \App\Models\User::create([
+                'name' => 'Dev Lawyer',
+                'email' => $email,
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'role' => 'lawyer',
+                'is_verified_by_admin' => true,
+            ]);
+        }
+
+        // ensure lawyer profile exists
+        $profile = \App\Models\LawyerProfile::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'license_number' => 'DEV-LAW-001',
+                'bar_council_id' => 'DEVBC',
+                'years_of_experience' => 3,
+                'bio' => 'Dev lawyer for testing',
+                'consultation_fee' => 1000,
+                'is_available' => true,
+            ]
+        );
+
+        $token = $user->createToken('dev-lawyer-token')->plainTextToken;
+
+        return response()->json(['user' => $user->load('lawyerProfile'), 'token' => $token, 'lawyer_profile' => $profile]);
+    });
 }
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
@@ -59,6 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
     Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
+    Route::post('/auth/change-password-otp', [AuthController::class, 'changePasswordWithOtp']);
     Route::post('/auth/set-password', [AuthController::class, 'setPassword']);
     Route::delete('/auth/delete', [AuthController::class, 'deleteAccount']);
     Route::put('/auth/lawyer-profile', [AuthController::class, 'updateLawyerProfile']);
@@ -75,6 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/lawyer/documents', [DocumentController::class, 'lawyerDocuments']);
     Route::post('/documents', [DocumentController::class, 'store']);
     Route::get('/documents/{id}', [DocumentController::class, 'show']);
+    Route::put('/documents/{id}/client-response', [DocumentController::class, 'submitClientResponse']);
     Route::post('/documents/{id}/generate', [DocumentController::class, 'generate']);
     Route::get('/documents/{id}/download', [DocumentController::class, 'download']);
     Route::put('/documents/{id}/status', [DocumentController::class, 'updateStatus']);

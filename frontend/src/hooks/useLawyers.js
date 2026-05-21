@@ -1,24 +1,32 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import api from '../api/axios'
 
 export const useLawyers = (filters = {}) => {
-  const { specialization, regionId, minRating, maxFee, search, sortBy, sortOrder } = filters
+  const { specialization, regionId, minRating, maxFee, search, sortBy, sortOrder, availability } = filters
 
   return useQuery({
     queryKey: ['lawyers', filters],
     queryFn: async () => {
       const params = new URLSearchParams()
-      if (specialization) params.append('specialization', specialization)
+      if (Array.isArray(specialization)) {
+        specialization.forEach((item) => {
+          if (item) params.append('specialization[]', item)
+        })
+      } else if (specialization) {
+        params.append('specialization', specialization)
+      }
       if (regionId) params.append('region_id', regionId)
       if (minRating) params.append('min_rating', minRating)
       if (maxFee) params.append('max_fee', maxFee)
       if (search) params.append('search', search)
       if (sortBy) params.append('sort_by', sortBy)
       if (sortOrder) params.append('sort_order', sortOrder)
+      if (availability) params.append('availability', availability)
 
       const response = await api.get(`/lawyers?${params.toString()}`)
       return response.data
     },
+    placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }

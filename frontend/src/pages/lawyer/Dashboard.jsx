@@ -1,11 +1,8 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Calendar,
-  DollarSign,
   Star,
-  Users,
   ArrowRight,
   Clock,
   CheckCircle2,
@@ -94,6 +91,27 @@ const LawyerDashboard = () => {
   ]
 
   const nextConsultation = upcomingConsultations.length > 0 ? upcomingConsultations[0] : null;
+
+  const credentialItems = [
+    {
+      icon: Shield,
+      label: 'Bar License',
+      value: profile?.license_number || 'Pending Verification',
+      highlight: false,
+    },
+    {
+      icon: ShieldCheck,
+      label: 'Bar Council ID',
+      value: profile?.bar_council_id || 'Pending Verification',
+      highlight: false,
+    },
+    {
+      icon: Award,
+      label: 'Years of Experience',
+      value: `${profile?.years_of_experience || 0} Years`,
+      highlight: true,
+    },
+  ]
 
   return (
     <div className="max-w-7xl mx-auto pb-20 font-sans">

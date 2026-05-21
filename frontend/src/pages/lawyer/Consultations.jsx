@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -22,19 +22,30 @@ const LawyerConsultations = () => {
   const [selectedConsultation, setSelectedConsultation] = useState(null)
   const [meetingLink, setMeetingLink] = useState('')
   const [showMeetingModal, setShowMeetingModal] = useState(false)
+  const [now, setNow] = useState(() => new Date())
 
   const { data: consultations, isLoading } = useConsultations()
   const updateStatus = useUpdateConsultationStatus()
 
-  const now = new Date()
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30 * 1000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  const noShowGraceMs = 15 * 60 * 1000
 
   const filteredConsultations = consultations?.data?.filter((c) => {
     const scheduledTime = c.scheduled_at ? new Date(c.scheduled_at) : null
     const isPastSlot = scheduledTime && scheduledTime < now
     const isFutureSlot = scheduledTime && scheduledTime >= now
+    const isOverdueWithinGrace = scheduledTime && isPastSlot && (now.getTime() - scheduledTime.getTime() <= noShowGraceMs)
 
-    if (activeTab === 'upcoming') return ['pending', 'confirmed'].includes(c.status) && isFutureSlot
-    if (activeTab === 'past') return isPastSlot && ['pending', 'confirmed'].includes(c.status)
+    if (activeTab === 'upcoming') {
+      return ['pending', 'confirmed'].includes(c.status) && (isFutureSlot || isOverdueWithinGrace)
+    }
+    if (activeTab === 'past') {
+      return c.status === 'missed' || (isPastSlot && ['pending', 'confirmed'].includes(c.status) && !isOverdueWithinGrace)
+    }
     if (activeTab === 'completed') return c.status === 'completed'
     if (activeTab === 'cancelled') return c.status === 'cancelled'
     if (activeTab === 'all') return true
@@ -51,6 +62,8 @@ const LawyerConsultations = () => {
         return <span className="bg-red-100 text-red-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">Cancelled</span>
       case 'confirmed':
         return <span className="bg-blue-100 text-blue-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">Confirmed</span>
+      case 'missed':
+        return <span className="bg-amber-100 text-amber-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">No Show</span>
       default:
         return <span className="bg-gray-100 text-gray-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">{status}</span>
     }
@@ -93,6 +106,20 @@ const LawyerConsultations = () => {
       toast.error('Failed to complete consultation')
     }
   }
+
+  const handleNoShow = async (id) => {
+    try {
+      await updateStatus.mutateAsync({
+        id,
+        status: 'missed',
+      })
+      toast.success('Consultation moved to past as no-show')
+    } catch (error) {
+      toast.error('Failed to mark no-show')
+    }
+  }
+
+  const isReadonlyTab = ['past', 'completed', 'cancelled', 'all'].includes(activeTab)
 
   return (
     <div className="max-w-7xl mx-auto space-y-10 pb-20 font-sans">
@@ -169,7 +196,7 @@ const LawyerConsultations = () => {
 
               {/* Actions */}
               <div className="flex flex-wrap items-center gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-dark-600">
-                {consultation.status === 'pending' && (
+                {!isReadonlyTab && consultation.status === 'pending' && new Date(consultation.scheduled_at) >= now && (
                   <>
                     <button
                       onClick={() => handleConfirm(consultation.id)}
@@ -188,7 +215,7 @@ const LawyerConsultations = () => {
                   </>
                 )}
 
-                {consultation.status === 'confirmed' && new Date(consultation.scheduled_at) >= now && (
+                {!isReadonlyTab && consultation.status === 'confirmed' && new Date(consultation.scheduled_at) >= now && (
                   <>
                     {consultation.meeting_link && (
                       <a
@@ -209,6 +236,16 @@ const LawyerConsultations = () => {
                       Mark Complete
                     </button>
                   </>
+                )}
+
+                {!isReadonlyTab && ['pending', 'confirmed'].includes(consultation.status) && new Date(consultation.scheduled_at) < now && (
+                  <button
+                    onClick={() => handleNoShow(consultation.id)}
+                    className="flex items-center gap-2 px-6 py-2.5 border border-amber-200 text-amber-700 hover:bg-amber-50 font-semibold text-sm transition-colors rounded-sm"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    User not connected
+                  </button>
                 )}
 
                 <button
@@ -272,7 +309,14 @@ const LawyerConsultations = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={() => handleSubmitMeetingLink(selectedConsultation?.id)}
+                  onClick={() => {
+                    if (!meetingLink.trim()) {
+                      toast.error('Please enter a meeting link')
+                      return
+                    }
+
+                    handleSubmitMeetingLink(selectedConsultation?.id)
+                  }}
                   className="flex-1 py-3 px-4 bg-[#0f172a] text-white font-semibold text-sm hover:bg-black transition-colors rounded-sm shadow-md"
                 >
                   Confirm Session

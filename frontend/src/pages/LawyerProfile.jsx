@@ -28,6 +28,7 @@ const LawyerProfile = () => {
 
   const { data: lawyer, isLoading: lawyerLoading } = useLawyer(id)
   const { data: reviewsData, isLoading: reviewsLoading } = useLawyerReviews(id)
+  const isBookingOpen = lawyer?.is_available !== false
 
   const reviews = reviewsData?.reviews?.data || []
   const averageRating = reviewsData?.average_rating || 0
@@ -154,6 +155,12 @@ const LawyerProfile = () => {
               <ShieldCheck size={14} fill="#22c55e" color="#fff" />
               Verified Expert
             </div>
+            {!isBookingOpen && (
+              <div className="lp-verified-badge" style={{ top: '3.2rem', background: 'rgba(180, 83, 9, 0.92)' }}>
+                <ShieldCheck size={14} fill="#fff" color="#fff" />
+                Unavailable
+              </div>
+            )}
           </div>
 
           {/* Info */}
@@ -184,6 +191,11 @@ const LawyerProfile = () => {
               <button
                 className="lp-btn-contact"
                 onClick={() => {
+                  if (!isBookingOpen) {
+                    toast.error('This lawyer is currently unavailable for new consultation requests.')
+                    return
+                  }
+
                   if (!isAuthenticated) {
                     navigate('/login')
                     return
@@ -372,13 +384,19 @@ const LawyerProfile = () => {
             {!isLawyer && (
               <div className="lp-secure-wrap">
                 <button
-                  className="lp-btn-secure dark:bg-orange-500 dark:hover:bg-orange-700 dark:text-white  light:bg-orange-500 light:text-white"
+                  className="lp-btn-secure dark:bg-orange-500 dark:hover:bg-orange-700 dark:text-white  light:bg-orange-500 light:text-white disabled:opacity-60 disabled:cursor-not-allowed"
+                  disabled={!isBookingOpen}
                   onClick={() => {
+                    if (!isBookingOpen) {
+                      toast.error('This lawyer is currently unavailable for new consultation requests.')
+                      return
+                    }
+
                     if (!isAuthenticated) navigate('/login')
                     else navigate(`/book/${id}`, { state: { selectedDuration } })
                   }}
                 >
-                  Secure Appointment
+                  {isBookingOpen ? 'Secure Appointment' : 'Unavailable'}
                 </button>
               </div>
             )}

@@ -20,7 +20,7 @@ class DocumentRequestedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your document request has been received',
+            subject: 'New document request awaiting your review',
         );
     }
 

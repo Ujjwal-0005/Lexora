@@ -57,6 +57,10 @@ class ConsultationController extends Controller
 
         $lawyerProfile = LawyerProfile::findOrFail($request->lawyer_profile_id);
 
+        if (!$lawyerProfile->is_available) {
+            return response()->json(['message' => 'This lawyer is currently unavailable for new consultation requests'], 422);
+        }
+
         // Check if time slot is available by ensuring no overlapping consultations
         $slotStart = \Carbon\Carbon::parse($request->scheduled_at);
         $slotEnd = $slotStart->copy()->addMinutes($request->duration);
@@ -125,7 +129,7 @@ class ConsultationController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:pending,confirmed,completed,cancelled',
+            'status' => 'required|in:pending,confirmed,completed,cancelled,missed',
             'meeting_link' => 'nullable|url',
         ]);
 

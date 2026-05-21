@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -10,7 +10,11 @@ import {
   Edit3,
   Send,
   X,
-  Activity
+  Activity,
+  Plus,
+  Trash2,
+  CircleDollarSign,
+  Mail
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '../../api/axios'
@@ -22,7 +26,19 @@ const LawyerDocuments = () => {
   const [selectedDocument, setSelectedDocument] = useState(null)
   const [showReviewModal, setShowReviewModal] = useState(false)
   const [downloading, setDownloading] = useState(null)
+  const [quotePrice, setQuotePrice] = useState('')
+  const [requestedFields, setRequestedFields] = useState([
+    { id: 'field-full-name', key: 'full_name', label: 'Full Name', type: 'text', required: true },
+  ])
   const queryClient = useQueryClient()
+
+  const createRequestedField = (field = {}) => ({
+    id: field.id || (window.crypto?.randomUUID ? window.crypto.randomUUID() : `field-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`),
+    key: field.key || field.name || '',
+    label: field.label || field.key || '',
+    type: field.type || 'text',
+    required: Boolean(field.required),
+  })
 
   // Fetch document requests assigned to this lawyer
   const { data: documentsResponse, isLoading } = useQuery({
@@ -46,12 +62,33 @@ const LawyerDocuments = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['lawyer-documents'])
+      queryClient.invalidateQueries(['documents'])
       toast.success('Document generated successfully!')
       setShowReviewModal(false)
     },
     onError: (error) => {
       console.error('Generate error:', error)
       toast.error(error.response?.data?.message || 'Failed to generate document')
+    },
+  })
+
+  const updateRequest = useMutation({
+    mutationFn: async ({ id, status, price, requested_fields }) => {
+      const response = await api.put(`/lawyer/documents/${id}/status`, {
+        status,
+        price,
+        requested_fields,
+      })
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['lawyer-documents'])
+      queryClient.invalidateQueries(['documents'])
+      toast.success('Request updated successfully')
+      setShowReviewModal(false)
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to update request')
     },
   })
 
@@ -67,6 +104,7 @@ const LawyerDocuments = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['lawyer-documents'])
+      queryClient.invalidateQueries(['documents'])
       toast.success('File uploaded and request completed')
       setShowReviewModal(false)
     },
@@ -103,11 +141,21 @@ const LawyerDocuments = () => {
 
   const getStatusBadge = (status) => {
     switch (status) {
+      case 'requested':
+        return <span className="bg-amber-100 text-amber-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">Requested</span>
       case 'completed':
       case 'delivered':
         return <span className="bg-green-100 text-green-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">Completed</span>
       case 'in_progress':
         return <span className="bg-indigo-100 text-indigo-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">In Progress</span>
+      case 'awaiting_client_info':
+        return <span className="bg-sky-100 text-sky-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">Waiting Info</span>
+      case 'client_info_submitted':
+        return <span className="bg-violet-100 text-violet-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">Info Submitted</span>
+      case 'awaiting_payment':
+        return <span className="bg-fuchsia-100 text-fuchsia-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">Awaiting Payment</span>
+      case 'paid':
+        return <span className="bg-cyan-100 text-cyan-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">Paid</span>
       case 'review':
         return <span className="bg-[#fef3c7] text-[#92400e] px-3 py-1 text-xs font-bold uppercase tracking-wider">Reviewing</span>
       case 'pending':
@@ -121,7 +169,26 @@ const LawyerDocuments = () => {
     }
   }
 
-  const actionableStatuses = ['pending', 'review', 'accepted', 'in_progress']
+  useEffect(() => {
+    if (!selectedDocument) {
+      return
+    }
+
+    setQuotePrice(selectedDocument.price ? String(selectedDocument.price) : '')
+
+    const nextFields = selectedDocument.requested_fields?.length
+      ? selectedDocument.requested_fields.map((field, index) => createRequestedField({
+        ...field,
+        id: field.id || `field-${selectedDocument.id}-${index}`,
+        key: field.key || field.name || `field_${index}`,
+        label: field.label || field.key || `Field ${index + 1}`,
+      }))
+      : [createRequestedField({ id: 'field-full-name', key: 'full_name', label: 'Full Name', type: 'text', required: true })]
+
+    setRequestedFields(nextFields)
+  }, [selectedDocument])
+
+  const actionableStatuses = ['requested', 'pending', 'review', 'accepted', 'awaiting_client_info', 'client_info_submitted', 'awaiting_payment', 'paid', 'in_progress']
   const pendingDocuments = documents?.filter(d => actionableStatuses.includes(d.status)) || []
   const completedDocuments = documents?.filter(d => ['completed', 'delivered'].includes(d.status)) || []
   const totalDocumentEarnings = completedDocuments.reduce((sum, doc) => {
@@ -138,6 +205,21 @@ const LawyerDocuments = () => {
           <p className="text-sm text-gray-500 mt-2 font-medium">
             {totalDocuments} document{totalDocuments === 1 ? '' : 's'} assigned to your oversight
           </p>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm p-6 rounded-sm">
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Pending Requests</p>
+          <h3 className="font-serif text-4xl font-bold text-[#0f172a] dark:text-white">{pendingDocuments.length}</h3>
+        </div>
+        <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm p-6 rounded-sm">
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Ready to Finalize</p>
+          <h3 className="font-serif text-4xl font-bold text-[#0f172a] dark:text-white">{documents.filter((doc) => doc.status === 'paid').length}</h3>
+        </div>
+        <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm p-6 rounded-sm">
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Completed Files</p>
+          <h3 className="font-serif text-4xl font-bold text-[#0f172a] dark:text-white">{completedDocuments.length}</h3>
         </div>
       </div>
 
@@ -217,7 +299,7 @@ const LawyerDocuments = () => {
                 <div className="flex items-start gap-4">
                   <FileText className="w-5 h-5 text-gray-400 mt-1" />
                   <div>
-                    <h3 className="font-serif font-bold text-lg text-[#0f172a] dark:text-white mb-1">{doc.documentType?.name}</h3>
+                    <h3 className="font-serif font-bold text-lg text-[#0f172a] dark:text-white mb-1">{doc.document_display_name || doc.documentType?.name || 'Document'}</h3>
                     <p className="text-sm text-gray-500 font-medium mb-2">
                       Requested by {doc.client?.name} • {formatDate(doc.created_at)}
                     </p>
@@ -235,7 +317,7 @@ const LawyerDocuments = () => {
                   className="bg-[#0f172a] text-white hover:bg-black transition-colors rounded-sm shadow-md py-2.5 px-6 font-semibold text-sm flex items-center gap-2 whitespace-nowrap"
                 >
                   <Edit3 className="w-4 h-4" />
-                  Review & Generate
+                  Review Request
                 </button>
               </motion.div>
             ))}
@@ -270,7 +352,7 @@ const LawyerDocuments = () => {
                       <div className="flex items-start gap-4">
                         <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
                         <div>
-                          <p className="font-bold text-[#0f172a] dark:text-white text-sm mb-1">{doc.documentType?.name}</p>
+                          <p className="font-bold text-[#0f172a] dark:text-white text-sm mb-1">{doc.document_display_name || doc.documentType?.name || 'Document'}</p>
                           <p className="text-xs text-gray-500 font-medium">Client: {doc.client?.name}</p>
                         </div>
                       </div>
@@ -330,7 +412,7 @@ const LawyerDocuments = () => {
             >
               <div className="p-8 border-b border-gray-200 dark:border-dark-600 flex items-center justify-between sticky top-0 bg-white dark:bg-dark-800 z-10">
                 <h2 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white">
-                  Review: {selectedDocument.documentType?.name}
+                  Review: {selectedDocument.document_display_name || selectedDocument.documentType?.name || 'Document'}
                 </h2>
                 <button
                   onClick={() => setShowReviewModal(false)}
@@ -350,6 +432,85 @@ const LawyerDocuments = () => {
                     <p className="text-gray-500 text-sm">{selectedDocument.client?.email}</p>
                   </div>
                 </div>
+
+                {selectedDocument.status === 'requested' || selectedDocument.status === 'pending' ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <CircleDollarSign className="w-4 h-4 text-[#0f172a] dark:text-white" />
+                      <h3 className="font-bold text-[#0f172a] dark:text-white uppercase tracking-widest text-xs">Accept and Quote</h3>
+                    </div>
+                    <div className="grid gap-4">
+                      <label className="block text-xs font-bold text-[#0f172a] dark:text-white uppercase tracking-widest">Quoted Fee</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={quotePrice}
+                        onChange={(e) => setQuotePrice(e.target.value)}
+                        className="w-full p-3 border border-gray-300 dark:border-dark-600 rounded-sm bg-gray-50 dark:bg-dark-700 text-sm focus:outline-none"
+                      />
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold text-[#0f172a] dark:text-white uppercase tracking-widest">Requested Fields</h4>
+                          <button
+                            type="button"
+                            onClick={() => setRequestedFields((current) => [...current, createRequestedField({ key: '', label: '', type: 'text', required: false })])}
+                            className="text-xs font-bold uppercase tracking-widest text-[#0f172a] dark:text-white flex items-center gap-2"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Add field
+                          </button>
+                        </div>
+
+                        <div className="space-y-3">
+                          {requestedFields.map((field, index) => (
+                            <div key={field.id} className="grid gap-3 md:grid-cols-[1fr_1fr_120px_90px_auto] items-center bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-dark-600 p-3 rounded-sm">
+                              <input
+                                value={field.label}
+                                onChange={(e) => setRequestedFields((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, label: e.target.value } : item))}
+                                placeholder="Label"
+                                className="w-full p-2 border border-gray-300 dark:border-dark-600 rounded-sm bg-white dark:bg-dark-800 text-sm"
+                              />
+                              <input
+                                value={field.key}
+                                onChange={(e) => setRequestedFields((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, key: e.target.value } : item))}
+                                placeholder="key_name"
+                                className="w-full p-2 border border-gray-300 dark:border-dark-600 rounded-sm bg-white dark:bg-dark-800 text-sm"
+                              />
+                              <select
+                                value={field.type}
+                                onChange={(e) => setRequestedFields((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, type: e.target.value } : item))}
+                                className="w-full p-2 border border-gray-300 dark:border-dark-600 rounded-sm bg-white dark:bg-dark-800 text-sm"
+                              >
+                                <option value="text">Text</option>
+                                <option value="textarea">Textarea</option>
+                                <option value="number">Number</option>
+                                <option value="date">Date</option>
+                                <option value="email">Email</option>
+                              </select>
+                              <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 justify-center">
+                                <input
+                                  type="checkbox"
+                                  checked={field.required}
+                                  onChange={(e) => setRequestedFields((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, required: e.target.checked } : item))}
+                                />
+                                Required
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => setRequestedFields((current) => current.filter((_, itemIndex) => itemIndex !== index))}
+                                className="text-red-500 hover:text-red-700 justify-self-end"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
 
                 {/* Form Data */}
                 <div>
@@ -372,6 +533,20 @@ const LawyerDocuments = () => {
                   </span>
                 </div>
 
+                {selectedDocument.custom_fields && Object.keys(selectedDocument.custom_fields).length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-[#0f172a] dark:text-white uppercase tracking-widest text-xs mb-3">Client Submitted Information</h3>
+                    <div className="bg-gray-50 dark:bg-dark-700 p-6 border border-gray-200 dark:border-dark-600 rounded-sm space-y-4 max-h-48 overflow-y-auto">
+                      {Object.entries(selectedDocument.custom_fields || {}).map(([key, value]) => (
+                        <div key={key} className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 pb-4 border-b border-gray-200 dark:border-dark-600 last:border-0 last:pb-0">
+                          <span className="text-xs font-bold text-gray-500 uppercase tracking-wide w-1/3">{key.replace(/_/g, ' ')}</span>
+                          <span className="font-medium text-gray-900 dark:text-white sm:w-2/3 break-words">{String(value)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Status */}
                 {selectedDocument.generated_file_path && (
                   <div className="p-6 bg-green-50 border border-green-200 rounded-sm">
@@ -381,7 +556,7 @@ const LawyerDocuments = () => {
                   </div>
                 )}
 
-                {!selectedDocument.generated_file_path && (
+                {!selectedDocument.generated_file_path && selectedDocument.status === 'paid' && !selectedDocument.documentType && (
                   <div className="space-y-4">
                     <label className="block text-xs font-bold text-[#0f172a] dark:text-white uppercase tracking-widest">Manual Override: Upload Final PDF</label>
                     <input type="file" accept="application/pdf" id="upload-pdf" className="w-full p-3 border border-gray-300 dark:border-dark-600 rounded-sm bg-gray-50 dark:bg-dark-700 text-sm focus:outline-none" />
@@ -415,7 +590,50 @@ const LawyerDocuments = () => {
                 >
                   Close
                 </button>
-                {!selectedDocument.generated_file_path && (
+
+                {(selectedDocument.status === 'requested' || selectedDocument.status === 'pending') && (
+                  <button
+                    onClick={() => updateRequest.mutate({
+                      id: selectedDocument.id,
+                      status: 'rejected',
+                    })}
+                    disabled={updateRequest.isPending}
+                    className="flex-1 py-3 px-4 border border-red-300 text-red-600 font-semibold text-sm hover:bg-red-50 transition-colors rounded-sm disabled:opacity-50"
+                  >
+                    Reject
+                  </button>
+                )}
+
+                {(selectedDocument.status === 'requested' || selectedDocument.status === 'pending') && (
+                  <button
+                    onClick={() => {
+                      const fieldsToSend = requestedFields.filter((field) => field.label && field.key)
+                      if (!fieldsToSend.length) {
+                        toast.error('Please add at least one requested field before sending requirements')
+                        return
+                      }
+                      const priceNum = Number(quotePrice)
+                      if (isNaN(priceNum) || priceNum < 0) {
+                        toast.error('Please enter a valid quoted fee')
+                        return
+                      }
+
+                      updateRequest.mutate({
+                        id: selectedDocument.id,
+                        status: 'accepted',
+                        price: quotePrice,
+                        requested_fields: fieldsToSend,
+                      })
+                    }}
+                    disabled={updateRequest.isPending}
+                    className="flex-1 py-3 px-4 bg-[#0f172a] text-white font-semibold text-sm hover:bg-black transition-colors rounded-sm shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <Mail className="w-5 h-5" />
+                    Accept and Send Requirements
+                  </button>
+                )}
+
+                {!selectedDocument.generated_file_path && selectedDocument.status === 'paid' && selectedDocument.documentType && (
                   <button
                     onClick={() => generateDocument.mutate(selectedDocument.id)}
                     disabled={generateDocument.isPending}
@@ -434,6 +652,7 @@ const LawyerDocuments = () => {
                     )}
                   </button>
                 )}
+
               </div>
             </motion.div>
           </motion.div>

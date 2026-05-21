@@ -10,10 +10,11 @@ const LawyerSettings = () => {
     const profile = user?.lawyerProfile || user?.lawyer_profile || {}
     const photoUrl = user?.photo_url || null
 
-    const [showPassword, setShowPassword] = useState(false)
     const [showNewPassword, setShowNewPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [awaitingPasswordOtp, setAwaitingPasswordOtp] = useState(false)
+    const [passwordOtp, setPasswordOtp] = useState('')
     const [documentTypes, setDocumentTypes] = useState([])
     const [profilePhoto, setProfilePhoto] = useState(null)
     const [photoPreviewUrl, setPhotoPreviewUrl] = useState(photoUrl)
@@ -30,7 +31,6 @@ const LawyerSettings = () => {
         license_number: profile?.license_number || '',
         bar_council_id: profile?.bar_council_id || '',
         is_available: profile?.is_available ?? true,
-        currentPassword: '',
         newPassword: '',
         confirmPassword: '',
     })
@@ -308,52 +308,96 @@ const LawyerSettings = () => {
     const handlePasswordUpdate = async (e) => {
         e.preventDefault()
 
-        if (!formData.currentPassword?.trim()) {
-            toast.error('Current password is required')
+        const validateNewPassword = () => {
+            if (!formData.newPassword?.trim()) {
+                toast.error('New password is required')
+                return false
+            }
+
+            if (!formData.confirmPassword?.trim()) {
+                toast.error('Confirm password is required')
+                return false
+            }
+
+            if (formData.newPassword !== formData.confirmPassword) {
+                toast.error('Passwords do not match')
+                return false
+            }
+
+            const rules = [
+                { ok: formData.newPassword.length >= 8 },
+                { ok: /[A-Z]/.test(formData.newPassword) },
+                { ok: /[a-z]/.test(formData.newPassword) },
+                { ok: /\d/.test(formData.newPassword) },
+                { ok: /[^A-Za-z0-9]/.test(formData.newPassword) },
+            ]
+            const strength = rules.filter((r) => r.ok).length
+
+            if (strength < 3) {
+                toast.error('Password is too weak. It must contain uppercase, lowercase, number, and special character')
+                return false
+            }
+
+            return true
+        }
+
+        if (!awaitingPasswordOtp) {
+            if (!validateNewPassword()) {
+                return
+            }
+
+            setLoading(true)
+            try {
+                const response = await api.post('/auth/change-password-otp', {
+                    new_password: formData.newPassword,
+                    new_password_confirmation: formData.confirmPassword,
+                })
+
+                if (response.data?.otp_sent) {
+                    setAwaitingPasswordOtp(true)
+                    toast.success('Verification code sent to your email. Enter it to confirm the password update.')
+                } else {
+                    toast.error(response.data?.message || 'Unable to start password verification')
+                }
+            } catch (error) {
+                const validationErrors = error.response?.data?.errors
+                const message = validationErrors
+                    ? Object.values(validationErrors).flat()[0]
+                    : (error.response?.data?.message || 'Failed to start password verification')
+                toast.error(message)
+            } finally {
+                setLoading(false)
+            }
+
             return
         }
 
-        if (!formData.newPassword?.trim()) {
-            toast.error('New password is required')
+        if (!passwordOtp || passwordOtp.length !== 6) {
+            toast.error('Please enter the 6-digit verification code sent to your email')
             return
         }
 
-        if (!formData.confirmPassword?.trim()) {
-            toast.error('Confirm password is required')
-            return
-        }
-
-        if (formData.newPassword !== formData.confirmPassword) {
-            toast.error('Passwords do not match')
-            return
-        }
-
-        const rules = [
-            { ok: formData.newPassword.length >= 8 },
-            { ok: /[A-Z]/.test(formData.newPassword) },
-            { ok: /[a-z]/.test(formData.newPassword) },
-            { ok: /\d/.test(formData.newPassword) },
-            { ok: /[^A-Za-z0-9]/.test(formData.newPassword) },
-        ]
-        const strength = rules.filter((r) => r.ok).length
-
-        if (strength < 3) {
-            toast.error('Password is too weak. It must contain uppercase, lowercase, number, and special character')
+        if (!validateNewPassword()) {
             return
         }
 
         setLoading(true)
         try {
-            await api.post('/auth/change-password', {
-                current_password: formData.currentPassword,
+            await api.post('/auth/change-password-otp', {
+                otp: passwordOtp,
                 new_password: formData.newPassword,
                 new_password_confirmation: formData.confirmPassword,
             })
 
             toast.success('Password updated successfully!')
-            setFormData({ ...formData, currentPassword: '', newPassword: '', confirmPassword: '' })
+            setFormData({ ...formData, newPassword: '', confirmPassword: '' })
+            setAwaitingPasswordOtp(false)
+            setPasswordOtp('')
         } catch (error) {
-            const message = error.response?.data?.message || 'Failed to update password'
+            const validationErrors = error.response?.data?.errors
+            const message = validationErrors
+                ? Object.values(validationErrors).flat()[0]
+                : (error.response?.data?.message || 'Failed to update password')
             toast.error(message)
         } finally {
             setLoading(false)
@@ -815,26 +859,11 @@ const LawyerSettings = () => {
                 </div>
 
                 <form onSubmit={handlePasswordUpdate} className="space-y-6">
+                    <div className="rounded-sm border border-gray-200 dark:border-dark-600 bg-gray-50/70 dark:bg-dark-900/50 p-4 text-sm text-gray-600 dark:text-gray-300">
+                        Use email verification to update your password. We will send a 6-digit code to your inbox before the change is applied.
+                    </div>
+
                     <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Current Password</label>
-                            <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={formData.currentPassword}
-                                    onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
-                                    className="input pl-12 pr-12 !rounded-sm bg-gray-50 border-gray-200 focus:border-[#0f172a] focus:ring-[#0f172a]"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                >
-                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                </button>
-                            </div>
-                        </div>
                         <div>
                             <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">New Password</label>
                             <div className="relative">
@@ -890,7 +919,8 @@ const LawyerSettings = () => {
                                 )
                             })()}
                         </div>
-                        <div className="md:col-span-2">
+
+                        <div>
                             <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Confirm New Password</label>
                             <div className="relative">
                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -910,9 +940,62 @@ const LawyerSettings = () => {
                             </div>
                         </div>
                     </div>
+
+                    {awaitingPasswordOtp && (
+                        <div className="rounded-sm border border-gray-200 dark:border-dark-600 bg-gray-50 dark:bg-dark-700 p-4 space-y-3">
+                            <div>
+                                <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Verification Code</label>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    Enter the 6-digit code we emailed you to confirm the password update.
+                                </p>
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                                <input
+                                    type="text"
+                                    value={passwordOtp}
+                                    onChange={(e) => setPasswordOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                    placeholder="000000"
+                                    className="input w-40 font-mono text-lg text-center !rounded-sm bg-white dark:bg-dark-800 border-gray-300 dark:border-dark-600"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+                                        if (!formData.newPassword?.trim() || !formData.confirmPassword?.trim() || formData.newPassword !== formData.confirmPassword) {
+                                            toast.error('Please enter matching new passwords before resending the code.')
+                                            return
+                                        }
+
+                                        setLoading(true)
+                                        try {
+                                            const response = await api.post('/auth/change-password-otp', {
+                                                new_password: formData.newPassword,
+                                                new_password_confirmation: formData.confirmPassword,
+                                            })
+
+                                            if (response.data?.otp_sent) {
+                                                toast.success('Verification code resent to your email')
+                                            } else {
+                                                toast.error(response.data?.message || 'Unable to resend verification code')
+                                            }
+                                        } catch (error) {
+                                            const message = error.response?.data?.message || 'Failed to resend verification code'
+                                            toast.error(message)
+                                        } finally {
+                                            setLoading(false)
+                                        }
+                                    }}
+                                    disabled={loading}
+                                    className="py-2 px-4 border border-gray-300 dark:border-dark-600 rounded-sm text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-600 transition-colors"
+                                >
+                                    Resend Code
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     <button type="submit" disabled={loading} className="border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 py-3 px-6 rounded-sm shadow-sm font-semibold text-sm flex items-center gap-2 transition-colors">
                         <Lock className="w-4 h-4" />
-                        {loading ? 'Updating...' : 'Update Password'}
+                        {loading ? 'Processing...' : awaitingPasswordOtp ? 'Confirm & Update Password' : 'Send Verification Code'}
                     </button>
                 </form>
             </motion.div>
