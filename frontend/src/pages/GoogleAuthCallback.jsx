@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import api from '../api/axios'
 import { useAuthStore } from '../store/authStore'
+import React from 'react'
 
 const GoogleAuthCallback = () => {
     const navigate = useNavigate()
