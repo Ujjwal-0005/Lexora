@@ -296,179 +296,148 @@ const LawyerDashboard = () => {
 
       {/* Bottom 2 Cards */}
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Professional Credentials Card - Premium Design */}
-        <div className="relative overflow-hidden min-h-[260px] rounded-3xl border border-[#d7c8a7]/70 bg-gradient-to-br from-[#f7f1e5] via-[#efe4cd] to-[#d7c7a2] shadow-[0_20px_60px_rgba(15,23,42,0.16)] dark:border-white/10 dark:from-[#0f172a] dark:via-[#172033] dark:to-[#233046] dark:shadow-[0_22px_70px_rgba(0,0,0,0.45)]">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-20 right-0 h-56 w-56 rounded-full bg-white/55 blur-3xl dark:bg-[#f5d28a]/10"></div>
-            <div className="absolute -bottom-24 left-0 h-72 w-72 rounded-full bg-[#b8892d]/18 blur-3xl dark:bg-[#f5d28a]/12"></div>
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#b8892d]/60 to-transparent dark:via-[#f5d28a]/55"></div>
-          </div>
+        <div className="relative overflow-hidden rounded-[2rem] border border-[#e7dcc6] bg-[radial-gradient(circle_at_top_right,_rgba(251,191,36,0.14),_transparent_34%),linear-gradient(180deg,#fffdf8_0%,#f8fafc_100%)] shadow-[0_24px_70px_rgba(15,23,42,0.10)] dark:border-dark-600 dark:bg-[radial-gradient(circle_at_top_right,_rgba(251,191,36,0.10),_transparent_34%),linear-gradient(180deg,rgba(15,23,42,0.98)_0%,rgba(15,23,42,0.92)_100%)] dark:shadow-[0_24px_70px_rgba(0,0,0,0.35)]">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4af37] via-[#fbbf24] to-transparent"></div>
+          <div className="absolute -top-20 right-0 h-56 w-56 rounded-full bg-[#fbbf24]/10 blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-16 -left-12 h-64 w-64 rounded-full bg-[#0f172a]/5 blur-3xl pointer-events-none"></div>
 
-          <div className="relative z-10 flex h-full flex-col p-7 sm:p-8 text-[#111827] dark:text-white">
-            <div className="flex items-start justify-between gap-4 mb-6">
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#b8892d]/20 bg-white/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-[#8a6212] backdrop-blur-sm dark:border-white/10 dark:bg-white/10 dark:text-[#f5d28a]">
-                  <Award className="h-3.5 w-3.5" />
-                  Bar Association Credentials
-                </div>
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#111827] text-white shadow-lg shadow-[#111827]/20 ring-1 ring-white/40 dark:bg-white dark:text-[#111827] dark:shadow-black/30 dark:ring-white/10">
-                      <Briefcase className="h-5 w-5" strokeWidth={1.5} />
+          <div className="relative z-10 flex h-full flex-col p-6 lg:p-7">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-[#b45309] dark:text-[#fbbf24] mb-2">Bar Association</p>
+                <h3 className="font-serif text-[28px] font-bold text-[#0f172a] leading-none dark:text-white">Credentials</h3>
+                <p className="mt-2 max-w-md text-sm text-slate-500 dark:text-slate-300">
+                  Your professional registration presented with a calmer, more distinguished visual hierarchy.
+                </p>
+              </div>
+
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#e7dcc6] bg-white/80 shadow-sm backdrop-blur dark:border-dark-600 dark:bg-dark-700/80">
+                <Briefcase className="h-5 w-5 text-[#b45309] dark:text-[#fbbf24]" strokeWidth={1.8} />
+              </div>
+            </div>
+
+            <div className="grid gap-3">
+              {credentialItems.map((item) => {
+                const Icon = item.icon
+
+                return (
+                  <div
+                    key={item.label}
+                    className={`group flex items-start gap-3 rounded-2xl border p-4 transition-all duration-200 ${item.highlight
+                      ? 'border-[#e7dcc6] bg-gradient-to-r from-[#fff7df] via-white to-[#fffdf8] shadow-[0_10px_30px_rgba(180,83,9,0.08)] dark:border-dark-600 dark:from-dark-700 dark:via-dark-800 dark:to-dark-700 dark:bg-dark-800 dark:shadow-[0_10px_30px_rgba(0,0,0,0.25)]'
+                      : 'border-[#e5e7eb] bg-white/80 shadow-sm hover:-translate-y-0.5 hover:shadow-md dark:border-dark-600 dark:bg-dark-800/80 dark:hover:bg-dark-700/80 dark:hover:shadow-[0_12px_28px_rgba(0,0,0,0.22)]'
+                      }`}
+                  >
+                    <div className={`mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border ${item.highlight ? 'border-[#fbbf24]/40 bg-[#fbbf24]/10 dark:border-[#fbbf24]/25 dark:bg-[#fbbf24]/10' : 'border-slate-200 bg-slate-50 dark:border-dark-600 dark:bg-dark-700'}`}>
+                      <Icon className={`h-4 w-4 ${item.highlight ? 'text-[#b45309] dark:text-[#fbbf24]' : 'text-slate-500 dark:text-slate-300'}`} />
                     </div>
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#8a6212] dark:text-[#f5d28a]">Verified Practice Identity</p>
-                      <h3 className="font-serif text-3xl font-bold text-[#111827] leading-none dark:text-white">Credentials</h3>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#b45309] dark:text-[#fbbf24] mb-1">{item.label}</p>
+                      <p className="font-serif text-[15px] font-bold text-[#0f172a] dark:text-white leading-snug break-words">
+                        {item.value}
+                      </p>
                     </div>
                   </div>
-                  <p className="max-w-md text-sm leading-6 text-[#4b5563] dark:text-white/70">
-                    Your bar profile appears as a polished authority block, with premium spacing and quiet contrast for easier reading.
-                  </p>
-                </div>
-              </div>
-              <div className="rounded-2xl border border-[#b8892d]/20 bg-white/55 px-4 py-3 text-right backdrop-blur-sm shadow-sm dark:border-white/10 dark:bg-white/10">
-                <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#8a6212] mb-1 dark:text-[#f5d28a]">Standing</p>
-                <p className="text-sm font-semibold text-[#111827] dark:text-white">Professional</p>
-              </div>
+                )
+              })}
             </div>
 
-            <div className="grid gap-3 mb-6">
-              <div className="flex items-start gap-3 rounded-2xl border border-[#d7c8a7]/70 bg-white/60 p-4 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-transform hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/5 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#111827] text-[#f5d28a] shadow-sm dark:bg-white/10 dark:text-[#f5d28a]">
-                  <Shield className="h-4 w-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8a6212] mb-1 dark:text-[#f5d28a]">Bar License</p>
-                  <p className="font-serif text-base font-bold text-[#111827] leading-tight break-words dark:text-white">
-                    {profile?.license_number || 'Pending Verification'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 rounded-2xl border border-[#d7c8a7]/70 bg-white/60 p-4 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-transform hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/5 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#111827] text-[#f5d28a] shadow-sm dark:bg-white/10 dark:text-[#f5d28a]">
-                  <ShieldCheck className="h-4 w-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8a6212] mb-1 dark:text-[#f5d28a]">Bar Council ID</p>
-                  <p className="font-serif text-base font-bold text-[#111827] leading-tight break-words dark:text-white">
-                    {profile?.bar_council_id || 'Pending Verification'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 rounded-2xl border border-[#d7c8a7]/70 bg-white/60 p-4 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-transform hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/5 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#111827] text-[#f5d28a] shadow-sm dark:bg-white/10 dark:text-[#f5d28a]">
-                  <Award className="h-4 w-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8a6212] mb-1 dark:text-[#f5d28a]">Years of Experience</p>
-                  <p className="font-serif text-base font-bold text-[#111827] leading-tight dark:text-white">
-                    {profile?.years_of_experience || 0} <span className="text-sm font-medium text-[#6b7280] dark:text-white/70">Years</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-auto flex items-center justify-between gap-4 border-t border-[#b8892d]/20 pt-5 dark:border-white/10">
-              <p className="text-xs font-medium text-[#6b7280] dark:text-white/60">
-                Keep your professional identity current and presentation-ready.
-              </p>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
               <Link
                 to="/lawyer/settings"
-                className="inline-flex items-center gap-2 rounded-full bg-[#111827] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.28em] text-white shadow-lg shadow-[#111827]/20 transition-all hover:-translate-y-0.5 hover:bg-[#0b1220] dark:bg-white dark:text-[#111827] dark:shadow-black/20 dark:hover:bg-[#f8fafc]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#0f172a] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.28em] text-white shadow-[0_14px_30px_rgba(15,23,42,0.18)] transition-all hover:-translate-y-0.5 hover:bg-[#111c35] dark:bg-[#fbbf24] dark:text-[#0f172a] dark:shadow-[0_14px_30px_rgba(0,0,0,0.28)] dark:hover:bg-[#f8d974]"
               >
+                <Settings className="h-3.5 w-3.5" />
                 Update Credentials
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.26em] text-slate-400 dark:text-slate-400">
+                Verified professional profile
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Next Session Card - Premium Match */}
-        <div className="relative overflow-hidden min-h-[260px] rounded-3xl border border-[#d7c8a7]/70 bg-gradient-to-br from-[#f7f1e5] via-[#efe4cd] to-[#d7c7a2] shadow-[0_20px_60px_rgba(15,23,42,0.16)] dark:border-white/10 dark:from-[#0a1120] dark:via-[#111c30] dark:to-[#1d2a42] dark:shadow-[0_22px_70px_rgba(0,0,0,0.5)]">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-20 right-0 h-56 w-56 rounded-full bg-white/55 blur-3xl dark:bg-[#f5d28a]/10"></div>
-            <div className="absolute -bottom-24 left-0 h-72 w-72 rounded-full bg-[#b8892d]/18 blur-3xl dark:bg-[#f5d28a]/12"></div>
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#b8892d]/60 to-transparent dark:via-[#f5d28a]/55"></div>
-          </div>
+        <div className="relative overflow-hidden rounded-[2rem] border border-[#e7dcc6] bg-[radial-gradient(circle_at_top_right,_rgba(15,23,42,0.10),_transparent_36%),linear-gradient(180deg,#fffdf8_0%,#f8fafc_100%)] shadow-[0_24px_70px_rgba(15,23,42,0.10)] dark:border-dark-600 dark:bg-[radial-gradient(circle_at_top_right,_rgba(251,191,36,0.08),_transparent_36%),linear-gradient(180deg,rgba(15,23,42,0.98)_0%,rgba(17,24,39,0.94)_100%)] dark:shadow-[0_24px_70px_rgba(0,0,0,0.35)]">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4af37] via-[#94a3b8] to-transparent"></div>
+          <div className="absolute -top-20 right-0 h-56 w-56 rounded-full bg-[#0f172a]/10 blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-16 -left-12 h-64 w-64 rounded-full bg-[#fbbf24]/10 blur-3xl pointer-events-none"></div>
 
-          <div className="relative z-10 flex h-full flex-col p-7 sm:p-8 text-[#111827] dark:text-white">
-            <div className="flex items-start justify-between gap-4 mb-7">
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#b8892d]/20 bg-white/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-[#8a6212] backdrop-blur-sm dark:border-white/10 dark:bg-white/10 dark:text-[#f5d28a] dark:shadow-[0_0_0_1px_rgba(245,210,138,0.08)]">
-                  <Clock className="h-3.5 w-3.5" />
-                  Next Session Schedule
-                </div>
-                <div>
-                  <h3 className="font-serif text-3xl font-bold leading-tight text-[#111827] dark:text-[#f8fafc]">Your next appointment, elegantly staged.</h3>
-                  <p className="mt-2 max-w-md text-sm leading-6 text-[#4b5563] dark:text-white/62">
-                    A refined snapshot of the next consultation, designed to feel calm, premium, and easy to scan at a glance.
-                  </p>
-                </div>
+          <div className="relative z-10 flex h-full flex-col p-6 lg:p-7">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-[#b45309] dark:text-[#fbbf24] mb-2">Session Planning</p>
+                <h3 className="font-serif text-[28px] font-bold text-[#0f172a] leading-none dark:text-white">Next Session Schedule</h3>
+                <p className="mt-2 max-w-md text-sm text-slate-500 dark:text-slate-300">
+                  A quieter, more elegant presentation of your next booking so it feels purposeful instead of loud.
+                </p>
               </div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#b8892d]/20 bg-white/55 backdrop-blur-sm shadow-sm dark:border-white/10 dark:bg-white/10 dark:shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
-                <Calendar className="h-5 w-5 text-[#8a6212] dark:text-[#f5d28a]" />
+
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#e7dcc6] bg-white/80 shadow-sm backdrop-blur dark:border-dark-600 dark:bg-dark-700/80">
+                <Calendar className="h-5 w-5 text-[#b45309] dark:text-[#fbbf24]" />
               </div>
             </div>
 
-            <div className="mb-6 rounded-3xl border border-[#d7c8a7]/70 bg-white/60 p-5 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] dark:border-white/10 dark:bg-[#121b2e] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+            <div className="rounded-[1.5rem] border border-[#e5e7eb] bg-white/80 p-5 shadow-sm backdrop-blur-sm dark:border-dark-600 dark:bg-dark-800/80 dark:shadow-[0_12px_30px_rgba(0,0,0,0.22)]">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#e7dcc6] bg-[#fff8e7] px-3 py-1 text-[9px] font-bold uppercase tracking-[0.24em] text-[#92400e] dark:border-[#fbbf24]/20 dark:bg-[#fbbf24]/10 dark:text-[#fbbf24]">
+                  <Clock className="h-3 w-3 text-[#b45309] dark:text-[#fbbf24]" />
+                  Auto-synced
+                </div>
+                <div className="h-10 w-10 rounded-full border border-[#e7dcc6] bg-gradient-to-br from-[#fff8e7] to-white flex items-center justify-center dark:border-dark-600 dark:from-dark-700 dark:to-dark-800">
+                  <ShieldCheck className="h-4 w-4 text-[#b45309] dark:text-[#fbbf24]" />
+                </div>
+              </div>
+
               {nextConsultation ? (
                 <>
-                  <div className="flex flex-wrap items-center gap-2 mb-4">
-                    <span className="rounded-full bg-[#f5d28a]/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-[#8a6212] dark:bg-[#f5d28a]/16 dark:text-[#f5d28a]">
-                      Confirmed Queue
-                    </span>
-                    <span className="rounded-full border border-[#d7c8a7]/70 bg-white/65 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#6b7280] dark:border-white/10 dark:bg-white/5 dark:text-white/62">
-                      Auto-synced
-                    </span>
-                  </div>
-
-                  <h4 className="font-serif text-2xl font-bold text-[#111827] leading-tight mb-3 dark:text-[#f8fafc]">
+                  <h4 className="font-serif text-[24px] font-bold text-[#0f172a] leading-tight dark:text-white">
                     {formatDateTime(nextConsultation.scheduled_at).split(' at ')[0]}
-                    <span className="block text-[#8a6212] dark:text-[#f5d28a]">{formatDateTime(nextConsultation.scheduled_at).split(' at ')[1]}</span>
+                    <span className="block text-[#b45309] dark:text-[#fbbf24]">{formatDateTime(nextConsultation.scheduled_at).split(' at ')[1]}</span>
                   </h4>
-
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-[#d7c8a7]/70 bg-white/65 p-4 dark:border-white/10 dark:bg-[#1a2437] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8a6212] mb-1 dark:text-[#f5d28a]/80">Client</p>
-                      <p className="text-sm font-semibold text-[#111827] leading-tight dark:text-[#f8fafc]">{nextConsultation.client?.name}</p>
-                    </div>
-                    <div className="rounded-2xl border border-[#d7c8a7]/70 bg-white/65 p-4 dark:border-white/10 dark:bg-[#1a2437] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8a6212] mb-1 dark:text-[#f5d28a]/80">Session</p>
-                      <p className="text-sm font-semibold text-[#111827] leading-tight dark:text-[#f8fafc]">
-                        {nextConsultation.duration} min · {formatPrice(nextConsultation.fee)}
-                      </p>
+                  <div className="mt-4 grid gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    <p>
+                      Client: <span className="font-semibold text-slate-900 dark:text-white">{nextConsultation.client?.name}</span>
+                    </p>
+                    <p>
+                      {nextConsultation.duration} min consultation <span className="text-slate-300 dark:text-slate-500">•</span> {formatPrice(nextConsultation.fee)}
+                    </p>
+                  </div>
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    <Link
+                      to="/lawyer/consultations"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#0f172a] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.28em] text-white shadow-[0_14px_30px_rgba(15,23,42,0.18)] transition-all hover:-translate-y-0.5 hover:bg-[#111c35] dark:bg-[#fbbf24] dark:text-[#0f172a] dark:shadow-[0_14px_30px_rgba(0,0,0,0.28)] dark:hover:bg-[#f8d974]"
+                    >
+                      Manage Queue
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.26em] text-slate-400 dark:text-slate-400">
+                      Ready for the next client
                     </div>
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-[#f5d28a]/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-[#8a6212] mb-4 dark:bg-white/8 dark:text-white/62">
-                    Clear schedule
-                  </div>
-                  <h4 className="font-serif text-2xl font-bold text-[#111827] leading-tight mb-2 dark:text-[#f8fafc]">
+                  <h4 className="font-serif text-[24px] font-bold text-[#0f172a] leading-tight dark:text-white">
                     No upcoming sessions
                   </h4>
-                  <p className="text-sm leading-6 text-[#4b5563] dark:text-white/65">
-                    Your calendar is open. Use this space to keep availability polished and current.
+                  <p className="mt-3 max-w-sm text-sm text-slate-500 dark:text-slate-300">
+                    Your schedule is clear and calm. Use this space to open availability when needed.
                   </p>
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    <Link
+                      to="/lawyer/settings"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#b45309] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.28em] text-white shadow-[0_14px_30px_rgba(180,83,9,0.18)] transition-all hover:-translate-y-0.5 hover:bg-[#9a3412] dark:bg-[#fbbf24] dark:text-[#0f172a] dark:shadow-[0_14px_30px_rgba(0,0,0,0.28)] dark:hover:bg-[#f8d974]"
+                    >
+                      Update Availability
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.26em] text-slate-400 dark:text-slate-400">
+                      Keep your calendar current
+                    </div>
+                  </div>
                 </>
               )}
-            </div>
-
-            <div className="mt-auto flex items-center justify-between gap-4 border-t border-[#b8892d]/20 pt-5 dark:border-white/10">
-              <div className="flex items-center gap-2 text-xs font-medium text-[#6b7280] dark:text-white/60">
-                <span className={`h-2.5 w-2.5 rounded-full ${profile?.is_available ? 'bg-emerald-400' : 'bg-rose-400'}`}></span>
-                {profile?.is_available ? 'Accepting consultations now' : 'Availability currently paused'}
-              </div>
-              <Link
-                to={nextConsultation ? '/lawyer/consultations' : '/lawyer/settings'}
-                className="inline-flex items-center gap-2 rounded-full bg-[#111827] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.28em] text-white shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5 hover:bg-[#0b1220] dark:bg-[#f5d28a] dark:text-[#111827] dark:shadow-black/30 dark:hover:bg-[#ffe7a8]"
-              >
-                {nextConsultation ? 'Manage Queue' : 'Update Availability'}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
             </div>
           </div>
         </div>
