@@ -57,12 +57,12 @@ const HelpTicket = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto pb-20 font-sans">
+        <div className="lawyer-help-ticket-page pt-[100px] lp-premium-page max-w-4xl mx-auto pb-20 font-sans">
             <button onClick={() => navigate('/help')} className="flex items-center gap-2 text-sm font-bold text-gray-500 uppercase tracking-widest hover:text-[#0f172a] dark:hover:text-white transition-colors mb-8">
                 <ArrowLeft size={16} /> Back to Support Logs
             </button>
 
-            <div className="bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-gray-800 shadow-sm p-8 mb-8">
+            <div className="lp-surface bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-gray-800 shadow-sm p-8 mb-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-gray-100 dark:border-gray-800">
                     <div>
                         <div className="flex items-center gap-3 mb-2">

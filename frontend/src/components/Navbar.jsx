@@ -19,12 +19,12 @@ const Navbar = () => {
   const profileMenuRef = useRef(null)
   const lastScrollYRef = useRef(0)
   const isLandingPage = location.pathname === '/'
-  const isMarketingPage = ['/', '/company'].includes(location.pathname)
+  const isMarketingPage = ['/', '/company', '/help', '/privacy'].includes(location.pathname) || location.pathname.startsWith('/help/')
   const isScrollToggledPage = isMarketingPage || ['/login', '/register', '/lawyers', '/verify-otp', '/forgot-password', '/verify-reset-otp', '/reset-password'].includes(location.pathname) || location.pathname.startsWith('/lawyer/')
   const isAuthPage = ['/login', '/register', '/verify-otp', '/forgot-password', '/verify-reset-otp', '/reset-password'].includes(location.pathname)
   const isLawyerDirectoryPage = location.pathname === '/lawyers' || location.pathname.startsWith('/lawyer/')
   const needsReadableSurface = isAuthPage || isLawyerDirectoryPage
-  const needsOverlayNavbar = isAuthPage || isLawyerDirectoryPage
+  const needsOverlayNavbar = isAuthPage || isLawyerDirectoryPage || isMarketingPage
 
   const handleLogout = () => {
     logout.mutate()
@@ -103,6 +103,11 @@ const Navbar = () => {
     return '/client/dashboard'
   }
 
+  const getDocumentsLink = () => {
+    if (isLawyer()) return '/lawyer/documents'
+    return '/client/documents'
+  }
+
   let navLinks = []
 
   if (isAuthenticated) {
@@ -113,7 +118,7 @@ const Navbar = () => {
 
     // Hide the Documents link for admin users since it's not applicable
     if (!isAdmin || !isAdmin()) {
-      navLinks.push({ path: '/client/documents', label: 'Documents' })
+      navLinks.push({ path: getDocumentsLink(), label: 'Documents' })
     }
   }
 
@@ -121,7 +126,7 @@ const Navbar = () => {
   const isActive = (path) => {
     if (path === '/lawyers' && location.pathname.includes('/lawyer')) return true;
     if (path === getDashboardLink() && location.pathname.includes('/dashboard')) return true;
-    if (path === '/client/documents' && location.pathname.includes('/document')) return true;
+    if ((path === '/client/documents' || path === '/lawyer/documents') && location.pathname.includes('/document')) return true;
     return location.pathname === path;
   }
 

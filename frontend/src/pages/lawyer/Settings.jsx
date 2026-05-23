@@ -416,8 +416,8 @@ const LawyerSettings = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-10 pb-20 font-sans">
-            <div className="flex items-start justify-between border-b border-gray-200 dark:border-dark-600 pb-6">
+        <div className="lawyer-settings-page lp-premium-page max-w-4xl mx-auto space-y-10 pb-20 font-sans">
+            <div className="lp-page-hero flex items-start justify-between border-b border-gray-200 dark:border-dark-600 pb-6">
                 <div>
                     <h2 className="text-sm font-semibold tracking-widest text-gray-500 uppercase mb-2">Account Management</h2>
                     <h1 className="text-3xl font-serif font-bold text-[#0f172a] dark:text-white">Profile Settings</h1>
@@ -437,7 +437,7 @@ const LawyerSettings = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 rounded-sm shadow-sm"
+                    className="lp-surface bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 rounded-sm shadow-sm"
                 >
                     <div className="flex items-center gap-4 mb-8 pb-4 border-b border-gray-100 dark:border-dark-600">
                         <div className="p-3 bg-gray-50 dark:bg-dark-700 rounded-sm">
@@ -798,7 +798,7 @@ const LawyerSettings = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 rounded-sm shadow-sm"
+                    className="lp-surface bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 rounded-sm shadow-sm"
                 >
                     <div className="flex items-center gap-4 mb-8 pb-4 border-b border-gray-100 dark:border-dark-600">
                         <div className="p-3 bg-gray-50 dark:bg-dark-700 rounded-sm">
@@ -846,7 +846,7 @@ const LawyerSettings = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 rounded-sm shadow-sm"
+                className="lp-surface bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 rounded-sm shadow-sm"
             >
                 <div className="flex items-center gap-4 mb-8 pb-6 border-b border-gray-100 dark:border-dark-600">
                     <div className="w-12 h-12 rounded-sm bg-[#fef3c7] flex items-center justify-center">

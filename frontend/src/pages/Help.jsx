@@ -56,9 +56,9 @@ const Help = () => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto pb-20 font-sans">
+        <div className="lawyer-help-page pt-[100px] lp-premium-page max-w-7xl mx-auto pb-20 font-sans">
             {/* Header */}
-            <div className="mb-10 mt-20">
+            <div className="lp-page-hero mb-10 ">
                 <h1 className="font-serif text-5xl font-bold text-[#0f172a] dark:text-white tracking-tight mb-3">
                     Support Center
                 </h1>
@@ -71,7 +71,7 @@ const Help = () => {
                 {/* Main Content Area */}
                 <div className="lg:col-span-2 space-y-8">
                     {/* Ticket List */}
-                    <div className="bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-gray-800 shadow-sm p-8">
+                    <div className="lp-surface bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-gray-800 shadow-sm p-8">
                         <div className="flex items-center justify-between mb-8">
                             <h2 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white">
                                 {isAdmin() ? 'Active Tickets' : 'Your Inquiries'}
@@ -132,7 +132,7 @@ const Help = () => {
 
                     {/* FAQs for non-admins */}
                     {!isAdmin() && faqs.length > 0 && (
-                        <div className="bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-gray-800 shadow-sm p-8">
+                        <div className="lp-surface bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-gray-800 shadow-sm p-8">
                             <h2 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white mb-6">Common Questions</h2>
                             <div className="space-y-6">
                                 {faqs.map((f, idx) => (
@@ -149,7 +149,7 @@ const Help = () => {
                 {/* Sidebar area */}
                 {!isAdmin() && (
                     <div className="lg:col-span-1">
-                        <div className="bg-[#0f172a] text-white p-8 shadow-xl sticky top-6">
+                        <div className="lp-surface bg-[#0f172a] text-white p-8 shadow-xl sticky top-6">
                             <h2 className="font-serif text-2xl font-bold text-[#d97706] mb-2">New Inquiry</h2>
                             <p className="text-xs text-gray-400 mb-6 font-medium leading-relaxed">
                                 Submit a query or complaint to our administrators. We respond within 24 hours.

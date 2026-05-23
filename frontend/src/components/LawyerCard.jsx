@@ -45,9 +45,9 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-1 bg-primary-500/10 px-2 py-1 rounded-lg">
+              <div className="flex items-center  gap-1bg-primary-500/10 px-2 py-1 rounded-lg">
                 <Star className="w-4 h-4 text-primary-500 fill-primary-500" />
-                <span className="text-sm font-semibold text-primary-500">
+                <span className="text-sm  font-semibold text-primary-500">
                   {profile.average_rating || 'New'}
                 </span>
               </div>

@@ -29,7 +29,7 @@ const LegalDocs = () => {
     ]
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center font-sans">
+        <div className="lawyer-legaldocs-page lp-premium-page fixed inset-0 z-[130] flex items-center justify-center font-sans">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -42,7 +42,7 @@ const LegalDocs = () => {
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="relative w-full max-w-4xl mx-4 bg-white dark:bg-[#0f172a] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-gray-200 dark:border-gray-800 rounded-sm"
+                className="lp-surface relative w-full max-w-4xl mx-4 bg-white dark:bg-[#0f172a] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-gray-200 dark:border-gray-800 rounded-sm"
             >
                 <div className="flex items-center justify-between p-8 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#151f32]">
                     <div>

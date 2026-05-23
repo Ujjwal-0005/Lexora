@@ -200,8 +200,8 @@ const LawyerDocuments = () => {
   const isCustomDocument = selectedDocument && !isLibraryDocument
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 pb-20 font-sans">
-      <div className="flex items-start justify-between">
+    <div className="lawyer-documents-page lp-premium-page max-w-7xl mx-auto space-y-10 pb-20 font-sans">
+      <div className="lp-page-hero flex items-start justify-between">
         <div>
           <h2 className="text-sm font-semibold tracking-widest text-gray-500 uppercase mb-2">Legal Vault</h2>
           <h1 className="text-3xl font-serif font-bold text-[#0f172a] dark:text-white">Document Requests</h1>
@@ -215,7 +215,7 @@ const LawyerDocuments = () => {
 
       {/* Stats */}
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-dark-800 border-t-4 border-[#0f172a] shadow-sm p-6 flex flex-col justify-between">
+        <div className="lp-metric-card bg-white dark:bg-dark-800 border-t-4 border-[#0f172a] shadow-sm p-6 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-6">
             <p className="text-xs font-bold text-gray-500 tracking-widest uppercase w-2/3 leading-tight">PENDING REVIEW</p>
             <div className="p-2 bg-gray-50 dark:bg-dark-700 rounded-sm">
@@ -233,7 +233,7 @@ const LawyerDocuments = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-dark-800 border-t-4 border-[#0f172a] shadow-sm p-6 flex flex-col justify-between">
+        <div className="lp-metric-card bg-white dark:bg-dark-800 border-t-4 border-[#0f172a] shadow-sm p-6 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-6">
             <p className="text-xs font-bold text-gray-500 tracking-widest uppercase w-2/3 leading-tight">COMPLETED</p>
             <div className="p-2 bg-gray-50 dark:bg-dark-700 rounded-sm">
@@ -251,7 +251,7 @@ const LawyerDocuments = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-dark-800 border-t-4 border-[#0f172a] shadow-sm p-6 flex flex-col justify-between">
+        <div className="lp-metric-card bg-white dark:bg-dark-800 border-t-4 border-[#0f172a] shadow-sm p-6 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-6">
             <p className="text-xs font-bold text-gray-500 tracking-widest uppercase w-2/3 leading-tight">TOTAL EARNINGS</p>
             <div className="p-2 bg-gray-50 dark:bg-dark-700 rounded-sm">
@@ -271,7 +271,7 @@ const LawyerDocuments = () => {
       </div>
 
       {/* Pending Documents */}
-      <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm p-8">
+      <div className="lp-surface bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm p-8">
         <h2 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white mb-8">Documents Awaiting Action</h2>
 
         {isLoading ? (
@@ -318,7 +318,7 @@ const LawyerDocuments = () => {
       </div>
 
       {/* All Documents */}
-      <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm overflow-hidden">
+      <div className="lp-surface bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm overflow-hidden">
         <div className="p-8 border-b border-gray-200 dark:border-dark-600">
           <h2 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white">Document History</h2>
         </div>
@@ -398,7 +398,7 @@ const LawyerDocuments = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+              className="lp-surface bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
             >
               <div className="p-8 border-b border-gray-200 dark:border-dark-600 flex items-center justify-between sticky top-0 bg-white dark:bg-dark-800 z-10">
                 <h2 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white">

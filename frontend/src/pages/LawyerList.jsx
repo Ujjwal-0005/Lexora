@@ -123,7 +123,7 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
 
   const bio = profile.bio || profile.description || ''
   const rating = profile.average_rating
-  const reviews = profile.total_consultations ?? (profile.reviews ? profile.reviews.length : 0)
+  const reviews = profile.reviews_count ?? profile.total_reviews ?? 0
 
   return (
     <motion.div

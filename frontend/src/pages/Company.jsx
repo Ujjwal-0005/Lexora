@@ -76,7 +76,7 @@ const Company = () => {
     ]
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#050816] text-[#0f172a] dark:text-white transition-colors duration-300">
+        <div className="lp-premium-page min-h-screen bg-[#f8f9fa] dark:bg-[#050816] text-[#0f172a] dark:text-white transition-colors duration-300">
             <section className="relative overflow-hidden border-b border-gray-200 dark:border-[#22314d]">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#10192b] to-[#050816]" />
                 <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_top_right,rgba(161,128,74,0.35),transparent_36%),radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_22%)]" />
@@ -86,7 +86,7 @@ const Company = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="max-w-3xl"
+                        className="lp-page-hero max-w-3xl"
                     >
                         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/8 border border-white/10 text-[#d7b77a] text-xs font-semibold tracking-[0.2em] uppercase mb-6">
                             <Landmark className="w-4 h-4" /> Company
@@ -113,7 +113,7 @@ const Company = () => {
             <section className="py-14 md:py-16 border-b border-gray-200 dark:border-[#22314d] bg-white dark:bg-[#070b14]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6">
                     {stats.map((stat) => (
-                        <div key={stat.label} className="rounded-sm border border-gray-200 dark:border-[#22314d] bg-[#f8f9fa] dark:bg-[#0b1220] p-6 text-center">
+                        <div key={stat.label} className="lp-surface rounded-sm border border-gray-200 dark:border-[#22314d] bg-[#f8f9fa] dark:bg-[#0b1220] p-6 text-center">
                             <div className="font-serif text-3xl md:text-4xl font-bold text-[#a1804a] mb-2">{stat.value}</div>
                             <p className="text-xs uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">{stat.label}</p>
                         </div>
@@ -151,7 +151,7 @@ const Company = () => {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.7, delay: index * 0.1 }}
-                                    className="rounded-sm border border-gray-200 dark:border-[#22314d] bg-white dark:bg-gradient-to-b dark:from-[#10192b] dark:to-[#0b1220] p-6"
+                                    className="lp-surface rounded-sm border border-gray-200 dark:border-[#22314d] bg-white dark:bg-gradient-to-b dark:from-[#10192b] dark:to-[#0b1220] p-6"
                                 >
                                     <div className="flex items-start gap-4">
                                         <div className="w-12 h-12 rounded-sm bg-[#a1804a]/10 border border-[#a1804a]/20 flex items-center justify-center shrink-0">
@@ -195,7 +195,7 @@ const Company = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.7, delay: index * 0.12 }}
-                                className="rounded-sm border border-gray-200 dark:border-[#22314d] bg-[#f8f9fa] dark:bg-gradient-to-b dark:from-[#10192b] dark:to-[#0b1220] p-7"
+                                className="lp-surface rounded-sm border border-gray-200 dark:border-[#22314d] bg-[#f8f9fa] dark:bg-gradient-to-b dark:from-[#10192b] dark:to-[#0b1220] p-7"
                             >
                                 <Briefcase className="w-6 h-6 text-[#a1804a] mb-5" />
                                 <h3 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white mb-2">{role.title}</h3>
@@ -237,7 +237,7 @@ const Company = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.7, delay: index * 0.12 }}
-                                className="rounded-sm border border-gray-200 dark:border-[#22314d] bg-white dark:bg-gradient-to-b dark:from-[#10192b] dark:to-[#0b1220] p-7"
+                                className="lp-surface rounded-sm border border-gray-200 dark:border-[#22314d] bg-white dark:bg-gradient-to-b dark:from-[#10192b] dark:to-[#0b1220] p-7"
                             >
                                 <div className="w-12 h-12 rounded-sm bg-[#a1804a]/10 border border-[#a1804a]/20 flex items-center justify-center mb-5">
                                     <Megaphone className="w-5 h-5 text-[#a1804a]" />

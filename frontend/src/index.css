@@ -1820,7 +1820,135 @@ body::-webkit-scrollbar,
   font-size: 1.15rem;
   font-weight: 700;
   color: #111827;
-  margin: 0 0 10px;
+  margin: 0 0 12px;
+}
+
+/* ── Lawyer Portal Premium System ── */
+.lp-premium-page {
+  position: relative;
+}
+
+.lp-premium-page::before {
+  content: '';
+  position: absolute;
+  inset: -2rem 0 auto;
+  height: 18rem;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 14% 30%, rgba(212, 175, 55, 0.16), transparent 44%),
+    radial-gradient(circle at 82% 18%, rgba(15, 23, 42, 0.10), transparent 42%);
+  z-index: -1;
+}
+
+.dark .lp-premium-page::before {
+  background:
+    radial-gradient(circle at 14% 24%, rgba(251, 191, 36, 0.14), transparent 42%),
+    radial-gradient(circle at 84% 16%, rgba(56, 189, 248, 0.09), transparent 38%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.55) 0%, rgba(2, 6, 23, 0) 100%);
+}
+
+.lp-page-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.6rem;
+  border: 1px solid #e7dcc6;
+  background:
+    radial-gradient(circle at top right, rgba(212, 175, 55, 0.22), transparent 42%),
+    linear-gradient(140deg, #fffdf8 0%, #f8fafc 55%, #edf2f7 100%);
+  padding: 1.5rem 1.75rem;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.11);
+}
+
+.dark .lp-page-hero {
+  border-color: rgba(51, 65, 85, 0.72);
+  background:
+    radial-gradient(circle at top right, rgba(251, 191, 36, 0.18), transparent 40%),
+    linear-gradient(155deg, #050b1a 0%, #0b1326 56%, #111827 100%);
+  box-shadow: 0 24px 65px rgba(0, 0, 0, 0.5);
+}
+
+.lp-page-hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #d4af37, #fbbf24, transparent);
+  pointer-events: none;
+}
+
+.lp-surface {
+  border-radius: 1.35rem;
+  border-color: #e5e7eb;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.09);
+}
+
+.dark .lp-surface {
+  border-color: rgba(51, 65, 85, 0.72) !important;
+  background: linear-gradient(155deg, rgba(7, 12, 24, 0.95) 0%, rgba(15, 23, 42, 0.92) 100%) !important;
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.45);
+}
+
+.lp-metric-card {
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border-top-width: 2px;
+}
+
+.dark .lp-metric-card {
+  border-color: rgba(51, 65, 85, 0.72) !important;
+  background:
+    radial-gradient(circle at top right, rgba(251, 191, 36, 0.12), transparent 48%),
+    linear-gradient(150deg, rgba(7, 12, 24, 0.95) 0%, rgba(15, 23, 42, 0.92) 100%) !important;
+}
+
+.lp-tabs-wrap {
+  border-bottom-color: #dbe3ef;
+}
+
+.dark .lp-tabs-wrap {
+  border-bottom-color: rgba(71, 85, 105, 0.55) !important;
+}
+
+.dark .lawyer-settings-page input,
+.dark .lawyer-settings-page select,
+.dark .lawyer-settings-page textarea,
+.dark .lawyer-documents-page input,
+.dark .lawyer-documents-page select,
+.dark .lawyer-documents-page textarea,
+.dark .lawyer-consultations-page input,
+.dark .lawyer-consultations-page select,
+.dark .lawyer-consultations-page textarea,
+.dark .lawyer-help-page input,
+.dark .lawyer-help-page select,
+.dark .lawyer-help-page textarea,
+.dark .lawyer-help-ticket-page input,
+.dark .lawyer-help-ticket-page select,
+.dark .lawyer-help-ticket-page textarea {
+  border-color: rgba(71, 85, 105, 0.68) !important;
+  background-color: rgba(15, 23, 42, 0.75) !important;
+  color: #e2e8f0 !important;
+}
+
+.dark .lawyer-settings-page input:focus,
+.dark .lawyer-settings-page select:focus,
+.dark .lawyer-settings-page textarea:focus,
+.dark .lawyer-documents-page input:focus,
+.dark .lawyer-documents-page select:focus,
+.dark .lawyer-documents-page textarea:focus,
+.dark .lawyer-consultations-page input:focus,
+.dark .lawyer-consultations-page select:focus,
+.dark .lawyer-consultations-page textarea:focus,
+.dark .lawyer-help-page input:focus,
+.dark .lawyer-help-page select:focus,
+.dark .lawyer-help-page textarea:focus,
+.dark .lawyer-help-ticket-page input:focus,
+.dark .lawyer-help-ticket-page select:focus,
+.dark .lawyer-help-ticket-page textarea:focus {
+  border-color: rgba(251, 191, 36, 0.55) !important;
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.15);
+  outline: none;
 }
 
 .lp-svc-desc {

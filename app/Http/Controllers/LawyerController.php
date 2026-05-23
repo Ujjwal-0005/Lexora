@@ -12,6 +12,7 @@ class LawyerController extends Controller
     public function index(Request $request)
     {
         $query = LawyerProfile::with(['user', 'specializations', 'regions'])
+            ->withCount('reviews')
             ->whereHas('user', function ($q) {
                 $q->where('is_verified_by_admin', true);
             });

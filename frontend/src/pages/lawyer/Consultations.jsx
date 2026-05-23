@@ -123,8 +123,8 @@ const LawyerConsultations = () => {
   const isReadonlyTab = ['past', 'completed', 'cancelled', 'all'].includes(activeTab)
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 pb-20 font-sans">
-      <div className="flex items-start justify-between">
+    <div className="lawyer-consultations-page lp-premium-page max-w-7xl mx-auto space-y-10 pb-20 font-sans">
+      <div className="lp-page-hero flex items-start justify-between">
         <div>
           <h2 className="text-sm font-semibold tracking-widest text-gray-500 uppercase mb-2">Practice Management</h2>
           <h1 className="text-3xl font-serif font-bold text-[#0f172a] dark:text-white">My Consultations</h1>
@@ -132,7 +132,7 @@ const LawyerConsultations = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-gray-200 dark:border-dark-600">
+      <div className="lp-tabs-wrap flex gap-6 border-b border-gray-200 dark:border-dark-600">
         {['upcoming', 'past', 'completed', 'cancelled', 'all'].map((tab) => (
           <button
             key={tab}
@@ -158,7 +158,7 @@ const LawyerConsultations = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow"
+              className="lp-surface bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                 <div className="flex items-start gap-6">
@@ -261,7 +261,7 @@ const LawyerConsultations = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm rounded-sm">
+        <div className="lp-surface text-center py-20 bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm rounded-sm">
           <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-6" />
           <h3 className="font-serif text-xl font-bold text-[#0f172a] dark:text-white mb-2">No consultations found</h3>
           <p className="text-gray-500 max-w-md mx-auto text-sm font-medium">
@@ -283,7 +283,7 @@ const LawyerConsultations = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm p-8 max-w-md w-full shadow-2xl"
+              className="lp-surface bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm p-8 max-w-md w-full shadow-2xl"
             >
               <div className="flex justify-between items-center mb-6">
                 <h3 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white">Meeting Details</h3>

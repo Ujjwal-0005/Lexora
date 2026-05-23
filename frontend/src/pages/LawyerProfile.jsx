@@ -31,6 +31,7 @@ const LawyerProfile = () => {
   const isBookingOpen = lawyer?.is_available !== false
 
   const reviews = reviewsData?.reviews?.data || []
+  const totalReviews = reviewsData?.total_reviews ?? reviews.length
   const averageRating = reviewsData?.average_rating || 0
 
   if (lawyerLoading) {
@@ -319,7 +320,7 @@ const LawyerProfile = () => {
               <div className="lp-rating-summary">
                 <Star size={14} className="star" />
                 <span className="lp-rating-score">{averageRating || '4.9'}</span>
-                <span className="lp-rating-count">({reviews.length || 124} Reviews)</span>
+                <span className="lp-rating-count">({totalReviews || 124} Reviews)</span>
               </div>
             </div>
 
