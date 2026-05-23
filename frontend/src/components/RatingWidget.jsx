@@ -5,6 +5,76 @@ import api from '../api/axios'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '../store/authStore'
 
+const SUMMARY_KEYS = [['ratings-summary'], ['ratings-summary-modal']]
+const DISTRIBUTION_KEYS = [['ratings-distribution'], ['ratings-distribution-modal']]
+
+const cloneDistribution = (distribution = {}) => {
+    const next = {}
+    for (let i = 1; i <= 5; i += 1) {
+        next[i] = Number(distribution[i] ?? 0)
+    }
+    return next
+}
+
+const updateOptimisticRating = (queryClient, nextRating, previousRating) => {
+    SUMMARY_KEYS.forEach((queryKey) => {
+        const summary = queryClient.getQueryData(queryKey)
+        if (!summary) return
+
+        const count = Number(summary.count ?? 0)
+        const average = Number(summary.average ?? 0)
+        const normalizedPrevious = Number(previousRating ?? 0)
+
+        let nextCount = count
+        let nextAverage = average
+
+        if (normalizedPrevious > 0) {
+            nextAverage = count > 0 ? ((average * count) - normalizedPrevious + nextRating) / count : nextRating
+        } else {
+            nextCount = count + 1
+            nextAverage = nextCount > 0 ? ((average * count) + nextRating) / nextCount : nextRating
+        }
+
+        queryClient.setQueryData(queryKey, {
+            ...summary,
+            count: nextCount,
+            average: Number(nextAverage.toFixed(2)),
+        })
+    })
+
+    DISTRIBUTION_KEYS.forEach((queryKey) => {
+        const distribution = queryClient.getQueryData(queryKey)
+        if (!distribution) return
+
+        const nextDistribution = cloneDistribution(distribution)
+        if (previousRating > 0) {
+            nextDistribution[previousRating] = Math.max(0, (Number(nextDistribution[previousRating] ?? 0) || 0) - 1)
+        }
+        nextDistribution[nextRating] = (Number(nextDistribution[nextRating] ?? 0) || 0) + 1
+        queryClient.setQueryData(queryKey, nextDistribution)
+    })
+
+    queryClient.setQueryData(['my-rating'], { rating: nextRating })
+}
+
+const rollbackOptimisticRating = (queryClient, snapshot) => {
+    SUMMARY_KEYS.forEach((queryKey) => {
+        if (snapshot?.[JSON.stringify(queryKey)]) {
+            queryClient.setQueryData(queryKey, snapshot[JSON.stringify(queryKey)])
+        }
+    })
+
+    DISTRIBUTION_KEYS.forEach((queryKey) => {
+        if (snapshot?.[JSON.stringify(queryKey)]) {
+            queryClient.setQueryData(queryKey, snapshot[JSON.stringify(queryKey)])
+        }
+    })
+
+    if (snapshot?.myRating !== undefined) {
+        queryClient.setQueryData(['my-rating'], snapshot.myRating)
+    }
+}
+
 export default function RatingWidget({ compact = false }) {
     const queryClient = useQueryClient()
     const { user } = useAuthStore()
@@ -40,13 +110,42 @@ export default function RatingWidget({ compact = false }) {
             const res = await api.post('/ratings', { rating })
             return res.data
         },
+        onMutate: async ({ rating }) => {
+            await Promise.all([
+                ...SUMMARY_KEYS.map((queryKey) => queryClient.cancelQueries({ queryKey })),
+                ...DISTRIBUTION_KEYS.map((queryKey) => queryClient.cancelQueries({ queryKey })),
+                queryClient.cancelQueries({ queryKey: ['my-rating'] }),
+            ])
+
+            const snapshot = {
+                myRating: queryClient.getQueryData(['my-rating']),
+            }
+
+            SUMMARY_KEYS.forEach((queryKey) => {
+                snapshot[JSON.stringify(queryKey)] = queryClient.getQueryData(queryKey)
+            })
+
+            DISTRIBUTION_KEYS.forEach((queryKey) => {
+                snapshot[JSON.stringify(queryKey)] = queryClient.getQueryData(queryKey)
+            })
+
+            const previousRating = snapshot.myRating?.rating ?? 0
+            updateOptimisticRating(queryClient, rating, previousRating)
+
+            return { snapshot }
+        },
         onSuccess: () => {
             toast.success('Rating saved')
-            queryClient.invalidateQueries(['ratings-summary'])
-            queryClient.invalidateQueries(['ratings-distribution'])
-            queryClient.invalidateQueries(['my-rating'])
+            queryClient.invalidateQueries({ queryKey: ['ratings-summary'] })
+            queryClient.invalidateQueries({ queryKey: ['ratings-summary-modal'] })
+            queryClient.invalidateQueries({ queryKey: ['ratings-distribution'] })
+            queryClient.invalidateQueries({ queryKey: ['ratings-distribution-modal'] })
+            queryClient.invalidateQueries({ queryKey: ['my-rating'] })
         },
-        onError: () => toast.error('Failed to save rating')
+        onError: (_error, _variables, context) => {
+            rollbackOptimisticRating(queryClient, context?.snapshot)
+            toast.error('Failed to save rating')
+        }
     })
 
     const deleteMutation = useMutation({
@@ -54,19 +153,75 @@ export default function RatingWidget({ compact = false }) {
             const res = await api.delete('/ratings/me')
             return res.data
         },
+        onMutate: async () => {
+            await Promise.all([
+                ...SUMMARY_KEYS.map((queryKey) => queryClient.cancelQueries({ queryKey })),
+                ...DISTRIBUTION_KEYS.map((queryKey) => queryClient.cancelQueries({ queryKey })),
+                queryClient.cancelQueries({ queryKey: ['my-rating'] }),
+            ])
+
+            const snapshot = {
+                myRating: queryClient.getQueryData(['my-rating']),
+            }
+
+            SUMMARY_KEYS.forEach((queryKey) => {
+                snapshot[JSON.stringify(queryKey)] = queryClient.getQueryData(queryKey)
+            })
+
+            DISTRIBUTION_KEYS.forEach((queryKey) => {
+                snapshot[JSON.stringify(queryKey)] = queryClient.getQueryData(queryKey)
+            })
+
+            const previousRating = snapshot.myRating?.rating ?? 0
+
+            if (previousRating > 0) {
+                SUMMARY_KEYS.forEach((queryKey) => {
+                    const summary = queryClient.getQueryData(queryKey)
+                    if (!summary) return
+                    const count = Number(summary.count ?? 0)
+                    const average = Number(summary.average ?? 0)
+                    const nextCount = Math.max(0, count - 1)
+                    const nextAverage = nextCount > 0 ? ((average * count) - previousRating) / nextCount : 0
+                    queryClient.setQueryData(queryKey, {
+                        ...summary,
+                        count: nextCount,
+                        average: Number(nextAverage.toFixed(2)),
+                    })
+                })
+
+                DISTRIBUTION_KEYS.forEach((queryKey) => {
+                    const distribution = queryClient.getQueryData(queryKey)
+                    if (!distribution) return
+                    const nextDistribution = cloneDistribution(distribution)
+                    nextDistribution[previousRating] = Math.max(0, (Number(nextDistribution[previousRating] ?? 0) || 0) - 1)
+                    queryClient.setQueryData(queryKey, nextDistribution)
+                })
+            }
+
+            queryClient.setQueryData(['my-rating'], null)
+
+            return { snapshot }
+        },
         onSuccess: () => {
             toast.success('Rating removed')
-            queryClient.invalidateQueries(['ratings-summary'])
-            queryClient.invalidateQueries(['ratings-distribution'])
-            queryClient.invalidateQueries(['my-rating'])
+            queryClient.invalidateQueries({ queryKey: ['ratings-summary'] })
+            queryClient.invalidateQueries({ queryKey: ['ratings-summary-modal'] })
+            queryClient.invalidateQueries({ queryKey: ['ratings-distribution'] })
+            queryClient.invalidateQueries({ queryKey: ['ratings-distribution-modal'] })
+            queryClient.invalidateQueries({ queryKey: ['my-rating'] })
         },
-        onError: () => toast.error('Failed to remove rating')
+        onError: (_error, _variables, context) => {
+            rollbackOptimisticRating(queryClient, context?.snapshot)
+            toast.error('Failed to remove rating')
+        }
     })
 
     const submitRating = (value) => {
         if (!user) return toast.error('Please sign in to rate')
         saveMutation.mutate({ rating: value })
     }
+
+    const isBusy = saveMutation.isPending || deleteMutation.isPending
 
     const avg = summary?.average ?? 0
     const count = summary?.count ?? 0
@@ -90,7 +245,8 @@ export default function RatingWidget({ compact = false }) {
                                     onClick={() => submitRating(n)}
                                     onMouseEnter={() => setHover(n)}
                                     onMouseLeave={() => setHover(0)}
-                                    className="p-1">
+                                    disabled={isBusy}
+                                    className="p-1 transition-transform disabled:opacity-50 disabled:cursor-not-allowed">
                                     <Star className={`w-5 h-5 ${filled ? 'text-yellow-400' : 'text-gray-300'}`} />
                                 </button>
                             )
@@ -99,12 +255,19 @@ export default function RatingWidget({ compact = false }) {
 
                     {user && myRating && (
                         <div className="mt-2 text-xs text-gray-500">
-                            Your rating: <span className="font-bold text-[#0f172a]">{myRating.rating}</span>
-                            <button onClick={() => deleteMutation.mutate()} className="ml-3 text-sm text-red-600">Remove</button>
+                            Your rating: <span className="font-bold dark:text-slate-50 text-[#0f172a]">{myRating.rating}</span>
+                            <button onClick={() => deleteMutation.mutate()} disabled={isBusy} className="ml-3 text-sm text-red-600 disabled:opacity-50 disabled:cursor-not-allowed">Remove</button>
                         </div>
                     )}
                 </div>
             </div>
+
+            {isBusy && (
+                <p className="mt-3 text-xs text-gray-500 flex items-center gap-2">
+                    <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-300 border-t-[#0f172a]" />
+                    Updating rating...
+                </p>
+            )}
 
             {/* Distribution */}
             {distribution && (

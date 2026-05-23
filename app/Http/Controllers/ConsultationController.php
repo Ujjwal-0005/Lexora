@@ -19,13 +19,13 @@ class ConsultationController extends Controller
         $user = $request->user();
 
         if ($user->isClient()) {
-            $consultations = Consultation::with(['lawyerProfile.user', 'specialization', 'payment'])
+            $consultations = Consultation::with(['lawyerProfile.user', 'specialization', 'payment', 'review'])
                 ->where('client_id', $user->id)
                 ->orderBy('scheduled_at', 'desc')
                 ->paginate(10);
         } else if ($user->isLawyer()) {
             $lawyerProfile = $user->lawyerProfile;
-            $consultations = Consultation::with(['client', 'specialization', 'payment'])
+            $consultations = Consultation::with(['client', 'specialization', 'payment', 'review'])
                 ->where('lawyer_profile_id', $lawyerProfile->id)
                 ->orderBy('scheduled_at', 'desc')
                 ->paginate(10);

@@ -13,7 +13,7 @@ import {
   Activity,
   Plus,
   Trash2,
-  CircleDollarSign,
+  IndianRupee,
   Mail
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -211,20 +211,7 @@ const LawyerDocuments = () => {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm p-6 rounded-sm">
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Pending Requests</p>
-          <h3 className="font-serif text-4xl font-bold text-[#0f172a] dark:text-white">{pendingDocuments.length}</h3>
-        </div>
-        <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm p-6 rounded-sm">
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Ready to Finalize</p>
-          <h3 className="font-serif text-4xl font-bold text-[#0f172a] dark:text-white">{documents.filter((doc) => doc.status === 'paid').length}</h3>
-        </div>
-        <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm p-6 rounded-sm">
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Completed Files</p>
-          <h3 className="font-serif text-4xl font-bold text-[#0f172a] dark:text-white">{completedDocuments.length}</h3>
-        </div>
-      </div>
+
 
       {/* Stats */}
       <div className="grid md:grid-cols-3 gap-6">
@@ -439,7 +426,7 @@ const LawyerDocuments = () => {
                 {selectedDocument.status === 'requested' || selectedDocument.status === 'pending' ? (
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                      <CircleDollarSign className="w-4 h-4 text-[#0f172a] dark:text-white" />
+                      <IndianRupee className="w-4 h-4 text-[#0f172a] dark:text-white" />
                       <h3 className="font-bold text-[#0f172a] dark:text-white uppercase tracking-widest text-xs">Accept and Quote</h3>
                     </div>
                     <div className="grid gap-4">
@@ -574,7 +561,7 @@ const LawyerDocuments = () => {
                           const file = input.files[0]
                           uploadFile.mutate({ id: selectedDocument.id, file })
                         }}
-                        className="flex-1 py-3 px-4 border border-[#0f172a] text-[#0f172a] font-semibold text-sm hover:bg-[#0f172a] hover:text-white transition-colors rounded-sm"
+                        className="flex-1 py-3 px-4 border border-[#0f172a] text-[#0f172a] font-semibold dark:text-slate-500 dark:hover:text-white dark:hover:bg-[#131e39] text-sm hover:bg-[#0f172a] hover:text-white transition-colors rounded-sm"
                         disabled={uploadFile.isLoading}
                       >
                         {uploadFile.isLoading ? 'Uploading...' : 'Upload & Mark Complete'}

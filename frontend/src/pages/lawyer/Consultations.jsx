@@ -72,6 +72,7 @@ const LawyerConsultations = () => {
   const handleConfirm = async (id) => {
     const consultation = filteredConsultations.find(c => c.id === id)
     setSelectedConsultation(consultation)
+    setMeetingLink(consultation?.meeting_link || '')
     setShowMeetingModal(true)
   }
 
@@ -304,6 +305,7 @@ const LawyerConsultations = () => {
               <div className="flex gap-4">
                 <button
                   onClick={() => setShowMeetingModal(false)}
+                  disabled={updateStatus.isPending}
                   className="flex-1 py-3 px-4 border border-gray-300 dark:border-dark-600 text-gray-700 dark:text-gray-300 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors rounded-sm"
                 >
                   Cancel
@@ -317,9 +319,17 @@ const LawyerConsultations = () => {
 
                     handleSubmitMeetingLink(selectedConsultation?.id)
                   }}
+                  disabled={updateStatus.isPending}
                   className="flex-1 py-3 px-4 bg-[#0f172a] text-white font-semibold text-sm hover:bg-black transition-colors rounded-sm shadow-md"
                 >
-                  Confirm Session
+                  {updateStatus.isPending ? (
+                    <span className="inline-flex items-center gap-2">
+                      <span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                      Confirming...
+                    </span>
+                  ) : (
+                    'Confirm Session'
+                  )}
                 </button>
               </div>
             </motion.div>

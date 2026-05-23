@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 import {
   Calendar,
   Clock,
@@ -15,13 +17,73 @@ import { useMessages } from '../../hooks/useMessages'
 import { formatDateTime, getRelativeTime, formatPrice } from '../../utils/formatDate'
 import ChatWidget from '../ChatWidget'
 import Loader from '../../components/Loader'
+import api from '../../api/axios'
 
 const ClientConsultations = () => {
   const [activeTab, setActiveTab] = useState('upcoming')
   const [selectedConsultation, setSelectedConsultation] = useState(null)
   const [chatOpenSignal, setChatOpenSignal] = useState(0)
+  const [reviewModalOpen, setReviewModalOpen] = useState(false)
+  const [reviewConsultation, setReviewConsultation] = useState(null)
+  const [reviewRating, setReviewRating] = useState(0)
+  const [reviewHover, setReviewHover] = useState(0)
+  const [reviewComment, setReviewComment] = useState('')
+  const queryClient = useQueryClient()
 
   const { data: consultations, isLoading } = useConsultations()
+
+  const submitReviewMutation = useMutation({
+    mutationFn: async ({ lawyerProfileId, consultationId, rating, comment }) => {
+      const response = await api.post('/reviews', {
+        lawyer_profile_id: lawyerProfileId,
+        consultation_id: consultationId,
+        rating,
+        comment,
+      })
+      return response.data
+    },
+    onSuccess: (_data, variables) => {
+      toast.success('Review submitted successfully')
+      queryClient.invalidateQueries({ queryKey: ['consultations'] })
+      queryClient.invalidateQueries({ queryKey: ['lawyer-reviews', String(variables.lawyerProfileId)] })
+      queryClient.invalidateQueries({ queryKey: ['lawyer-reviews', Number(variables.lawyerProfileId)] })
+      queryClient.invalidateQueries({ queryKey: ['lawyer', String(variables.lawyerProfileId)] })
+      queryClient.invalidateQueries({ queryKey: ['lawyer', Number(variables.lawyerProfileId)] })
+      queryClient.invalidateQueries({ queryKey: ['lawyers'] })
+      setReviewModalOpen(false)
+      setReviewConsultation(null)
+      setReviewRating(0)
+      setReviewHover(0)
+      setReviewComment('')
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to submit review')
+    }
+  })
+
+  const openReviewModal = (consultation) => {
+    setReviewConsultation(consultation)
+    setReviewRating(0)
+    setReviewHover(0)
+    setReviewComment('')
+    setReviewModalOpen(true)
+  }
+
+  const handleSubmitReview = () => {
+    if (!reviewConsultation) return
+
+    if (!reviewRating || reviewRating < 1 || reviewRating > 5) {
+      toast.error('Please select a rating between 1 and 5 stars')
+      return
+    }
+
+    submitReviewMutation.mutate({
+      lawyerProfileId: reviewConsultation.lawyer_profile_id || reviewConsultation.lawyer_profile?.id,
+      consultationId: reviewConsultation.id,
+      rating: reviewRating,
+      comment: reviewComment.trim(),
+    })
+  }
 
   const isMissedConsultation = (consultation) => {
     if (!consultation?.scheduled_at) return false
@@ -167,7 +229,10 @@ const ClientConsultations = () => {
                   </button>
 
                   {consultation.status === 'completed' && !consultation.review && (
-                    <button className="flex items-center gap-2 px-6 py-2.5 bg-[#fef3c7] text-[#92400e] font-semibold text-sm hover:bg-orange-100 transition-colors rounded-sm">
+                    <button
+                      onClick={() => openReviewModal(consultation)}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-[#fef3c7] text-[#92400e] font-semibold text-sm hover:bg-orange-100 transition-colors rounded-sm"
+                    >
                       <Star className="w-4 h-4" />
                       Leave Review
                     </button>
@@ -201,6 +266,72 @@ const ClientConsultations = () => {
           openSignal={chatOpenSignal}
           onClose={() => setSelectedConsultation(null)}
         />
+      )}
+
+      {/* Leave Review Modal */}
+      {reviewModalOpen && reviewConsultation && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setReviewModalOpen(false)} />
+          <div className="relative z-[71] w-full max-w-xl rounded-sm bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-2xl">
+            <div className="p-6 border-b border-gray-200 dark:border-dark-600">
+              <h3 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white">Leave a Review</h3>
+              <p className="text-sm text-gray-500 mt-2">
+                Share your experience with {reviewConsultation.lawyer_profile?.user?.name || 'this lawyer'}
+              </p>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Rating</p>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const active = (reviewHover || reviewRating) >= star
+                    return (
+                      <button
+                        key={star}
+                        type="button"
+                        onMouseEnter={() => setReviewHover(star)}
+                        onMouseLeave={() => setReviewHover(0)}
+                        onClick={() => setReviewRating(star)}
+                        className="p-1"
+                      >
+                        <Star className={`w-7 h-7 ${active ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Written Review</label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  rows={4}
+                  placeholder="Tell others about your consultation experience"
+                  className="w-full p-3 border border-gray-300 dark:border-dark-600 rounded-sm bg-gray-50 dark:bg-dark-700 text-sm text-[#0f172a] dark:text-white focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 dark:border-dark-600 bg-gray-50 dark:bg-dark-800 flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setReviewModalOpen(false)}
+                disabled={submitReviewMutation.isPending}
+                className="flex-1 py-3 px-4 border border-gray-300 dark:border-dark-600 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-sm hover:bg-white dark:hover:bg-dark-700 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitReview}
+                disabled={submitReviewMutation.isPending}
+                className="flex-1 py-3 px-4 bg-[#0f172a] text-white text-sm font-semibold rounded-sm hover:bg-black transition-colors disabled:opacity-50"
+              >
+                {submitReviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

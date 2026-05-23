@@ -297,7 +297,7 @@ const ClientDocuments = () => {
                         <div className="flex items-center justify-end gap-3">
                           <button
                             onClick={() => handleOpenDetails(doc)}
-                            className="text-[#0f172a] hover:text-black p-2 hover:bg-gray-100 rounded-full transition-colors flex items-center justify-center"
+                            className="text-[#0f172a] dark:text-white dark:hover:text-black p-2 hover:bg-gray-100 rounded-full transition-colors flex items-center justify-center"
                             title="View details"
                           >
                             <Eye className="w-4 h-4" />

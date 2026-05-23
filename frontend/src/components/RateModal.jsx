@@ -33,6 +33,7 @@ export default function RateModal({ open, onClose }) {
 
     const totalRatings = Number(summary?.count ?? 0)
     const averageRating = Number(summary?.average ?? 0)
+    const liveDistribution = distribution || {}
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -75,7 +76,7 @@ export default function RateModal({ open, onClose }) {
                                     <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Rating Distribution</p>
                                     <div className="space-y-2">
                                         {[5, 4, 3, 2, 1].map((r) => {
-                                            const val = distribution ? (distribution[r] || 0) : 0
+                                            const val = liveDistribution[r] || 0
                                             const percent = totalRatings > 0 ? Math.round((val / totalRatings) * 100) : 0
                                             return (
                                                 <div key={r} className="flex items-center gap-3">
