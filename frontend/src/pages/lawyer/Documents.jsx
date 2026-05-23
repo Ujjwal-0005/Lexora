@@ -196,6 +196,9 @@ const LawyerDocuments = () => {
     return sum + (Number.isFinite(price) ? price : 0)
   }, 0)
 
+  const isLibraryDocument = Boolean(selectedDocument?.document_type_id || selectedDocument?.documentType)
+  const isCustomDocument = selectedDocument && !isLibraryDocument
+
   return (
     <div className="max-w-7xl mx-auto space-y-10 pb-20 font-sans">
       <div className="flex items-start justify-between">
@@ -365,7 +368,7 @@ const LawyerDocuments = () => {
                         <span className="font-semibold text-sm text-[#0f172a] dark:text-white">₹{(doc.price || 0).toLocaleString('en-IN')}</span>
                         {doc.generated_file_path && (doc.status === 'completed' || doc.status === 'delivered') && (
                           <button
-                            onClick={() => handleDownload(doc.id, doc.documentType?.slug || 'document')}
+                            onClick={() => handleDownload(doc.id, doc.document_type_slug || doc.documentType?.slug || 'document')}
                             disabled={downloading === doc.id}
                             className="text-[#d97706] hover:text-[#b45309] p-2 hover:bg-orange-50 rounded-full transition-colors flex items-center justify-center disabled:opacity-50"
                             title="Download PDF"
@@ -556,7 +559,7 @@ const LawyerDocuments = () => {
                   </div>
                 )}
 
-                {!selectedDocument.generated_file_path && selectedDocument.status === 'paid' && !selectedDocument.documentType && (
+                {!selectedDocument.generated_file_path && selectedDocument.status === 'paid' && isCustomDocument && (
                   <div className="space-y-4">
                     <label className="block text-xs font-bold text-[#0f172a] dark:text-white uppercase tracking-widest">Manual Override: Upload Final PDF</label>
                     <input type="file" accept="application/pdf" id="upload-pdf" className="w-full p-3 border border-gray-300 dark:border-dark-600 rounded-sm bg-gray-50 dark:bg-dark-700 text-sm focus:outline-none" />
@@ -576,6 +579,51 @@ const LawyerDocuments = () => {
                       >
                         {uploadFile.isLoading ? 'Uploading...' : 'Upload & Mark Complete'}
                       </button>
+                    </div>
+                  </div>
+                )}
+
+                {!selectedDocument.generated_file_path && selectedDocument.status === 'paid' && isLibraryDocument && (
+                  <div className="space-y-4">
+                    <div className="p-5 rounded-sm border border-gray-200 dark:border-dark-600 bg-gray-50 dark:bg-dark-700 space-y-4">
+                      <div>
+                        <label className="block text-xs font-bold text-[#0f172a] dark:text-white uppercase tracking-widest mb-2">Manual Upload (optional)</label>
+                        <input type="file" accept="application/pdf" id="library-upload-pdf" className="w-full p-3 border border-gray-300 dark:border-dark-600 rounded-sm bg-white dark:bg-dark-800 text-sm focus:outline-none" />
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <button
+                          onClick={async () => {
+                            const input = document.getElementById('library-upload-pdf')
+                            if (!input || !input.files || input.files.length === 0) {
+                              toast.error('Please pick a PDF file')
+                              return
+                            }
+                            const file = input.files[0]
+                            uploadFile.mutate({ id: selectedDocument.id, file })
+                          }}
+                          className="flex-1 py-3 px-4 border border-[#0f172a] text-[#0f172a] font-semibold text-sm hover:bg-[#0f172a] hover:text-white transition-colors rounded-sm"
+                          disabled={uploadFile.isPending}
+                        >
+                          {uploadFile.isPending ? 'Uploading...' : 'Upload Final PDF'}
+                        </button>
+                        <button
+                          onClick={() => generateDocument.mutate(selectedDocument.id)}
+                          disabled={generateDocument.isPending}
+                          className="flex-1 py-3 px-4 bg-[#0f172a] text-white font-semibold text-sm hover:bg-black transition-colors rounded-sm shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          {generateDocument.isPending ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              Generating...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-5 h-5" />
+                              Auto-Generate System PDF
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -630,26 +678,6 @@ const LawyerDocuments = () => {
                   >
                     <Mail className="w-5 h-5" />
                     Accept and Send Requirements
-                  </button>
-                )}
-
-                {!selectedDocument.generated_file_path && selectedDocument.status === 'paid' && selectedDocument.documentType && (
-                  <button
-                    onClick={() => generateDocument.mutate(selectedDocument.id)}
-                    disabled={generateDocument.isPending}
-                    className="flex-1 py-3 px-4 bg-[#0f172a] text-white font-semibold text-sm hover:bg-black transition-colors rounded-sm shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {generateDocument.isPending ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-5 h-5" />
-                        Auto-Generate System PDF
-                      </>
-                    )}
                   </button>
                 )}
 
