@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
@@ -104,6 +105,22 @@ const ClientConsultations = () => {
     return true
   }) || []
 
+  const launcherConsultation =
+    filteredConsultations.find((c) => ['pending', 'confirmed'].includes(c.status) && !isMissedConsultation(c)) ||
+    filteredConsultations[0] ||
+    consultations?.data?.[0] ||
+    null
+
+  const handleOpenFloatingChat = () => {
+    if (!launcherConsultation) {
+      toast.error('No consultation available for chat right now')
+      return
+    }
+
+    setSelectedConsultation(launcherConsultation)
+    setChatOpenSignal((s) => s + 1)
+  }
+
   const getStatusBadge = (consultation) => {
     if (isMissedConsultation(consultation)) {
       return <span className="bg-rose-100 text-rose-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">Missed</span>
@@ -126,15 +143,15 @@ const ClientConsultations = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 pb-20">
+    <div className="portal-page portal-appear space-y-10">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-sm font-semibold tracking-widest text-gray-500 uppercase mb-2">Secure Sessions</h2>
-          <h1 className="text-3xl font-serif font-bold text-[#0f172a] dark:text-white">My Consultations</h1>
+          <h2 className="portal-page-kicker mb-2">Secure Sessions</h2>
+          <h1 className="portal-page-title">My Consultations</h1>
         </div>
         <Link
           to="/lawyers"
-          className="bg-[#0f172a] dark:bg-white dark:hover:bg-slate-600 dark:hover:text-white text-white dark:text-[#0f172a] hover:bg-black py-3 px-6 flex items-center gap-2 transition-colors rounded-sm shadow-md"
+          className="portal-btn-primary py-3 px-6 flex items-center gap-2"
         >
           <Calendar className="w-4 h-4" />
           <span className="text-sm font-semibold">Book New Session</span>
@@ -142,14 +159,14 @@ const ClientConsultations = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-gray-200 dark:border-dark-600">
+      <div className="portal-card p-2.5 flex gap-2 border-none overflow-x-auto scrollbar-hide">
         {['upcoming', 'missed', 'completed', 'cancelled', 'all'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-4 font-semibold text-sm capitalize transition-colors border-b-2 -mb-[1px] ${activeTab === tab
-              ? 'border-[#0f172a] text-[#0f172a] dark:border-white dark:text-white'
-              : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
+            className={`px-4 py-2.5 rounded-xl font-semibold text-sm capitalize transition-all duration-200 ${activeTab === tab
+              ? 'bg-[linear-gradient(130deg,rgba(199,156,66,0.25),rgba(199,156,66,0.08))] text-[color:var(--portal-text)] border border-[color:var(--portal-border-strong)] shadow-[0_8px_22px_rgba(15,23,42,0.08)]'
+              : 'text-[color:var(--portal-muted)] hover:text-[color:var(--portal-text)]'
               }`}
           >
             {tab}
@@ -171,26 +188,26 @@ const ClientConsultations = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow"
+                className="portal-card p-8 hover:-translate-y-0.5 transition-all duration-300"
               >
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                   <div className="flex items-start gap-6">
-                    <div className="w-16 h-16 rounded-sm bg-[#0f172a] text-white flex items-center justify-center shadow-inner">
+                    <div className="w-16 h-16 rounded-xl bg-[linear-gradient(150deg,#13213b,#2c436d)] dark:bg-[linear-gradient(150deg,#d8b66f,#c69b49)] text-white dark:text-[#18263f] flex items-center justify-center shadow-inner">
                       <span className="font-serif text-2xl font-bold">
                         {consultation.lawyer_profile?.user?.name?.charAt(0)}
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white mb-2">
+                      <h3 className="font-serif font-bold text-xl text-[color:var(--portal-text)] mb-2">
                         {consultation.lawyer_profile?.user?.name}
                       </h3>
-                      <div className="flex flex-wrap items-center gap-5 text-sm text-gray-500 font-medium">
+                      <div className="flex flex-wrap items-center gap-5 text-sm text-[color:var(--portal-muted)] font-medium">
                         <span className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-gray-400" />
+                          <Calendar className="w-4 h-4 text-[color:var(--portal-muted)]" />
                           {formatDateTime(consultation.scheduled_at)}
                         </span>
                         <span className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-gray-400" />
+                          <Clock className="w-4 h-4 text-[color:var(--portal-muted)]" />
                           {consultation.duration} min
                         </span>
                       </div>
@@ -199,18 +216,18 @@ const ClientConsultations = () => {
 
                   <div className="flex flex-col items-end gap-3">
                     {getStatusBadge(consultation)}
-                    <span className="font-bold text-[#0f172a] dark:text-white text-lg">{formatPrice(consultation.fee)}</span>
+                    <span className="font-bold text-[color:var(--portal-text)] text-lg">{formatPrice(consultation.fee)}</span>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-dark-600">
+                <div className="flex items-center gap-4 mt-8 pt-6 border-t border-[color:var(--portal-border)]">
                   {consultation.status === 'confirmed' && consultation.meeting_link && !isMissed && (
                     <a
                       href={consultation.meeting_link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-6 py-2.5 bg-[#d97706] text-white font-semibold text-sm hover:bg-[#b45309] transition-colors rounded-sm shadow-sm"
+                      className="portal-btn-primary flex items-center gap-2 px-6 py-2.5 text-sm"
                     >
                       <Video className="w-4 h-4" />
                       Join Meeting
@@ -222,7 +239,7 @@ const ClientConsultations = () => {
                       setSelectedConsultation(consultation)
                       setChatOpenSignal((s) => s + 1)
                     }}
-                    className="flex items-center gap-2 px-6 py-2.5 border border-gray-300 dark:border-dark-500 text-gray-700 dark:text-gray-300 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors rounded-sm"
+                    className="portal-btn-ghost flex items-center gap-2 px-6 py-2.5 text-sm"
                   >
                     <MessageSquare className="w-4 h-4" />
                     Chat
@@ -231,7 +248,7 @@ const ClientConsultations = () => {
                   {consultation.status === 'completed' && !consultation.review && (
                     <button
                       onClick={() => openReviewModal(consultation)}
-                      className="flex items-center gap-2 px-6 py-2.5 bg-[#fef3c7] text-[#92400e] font-semibold text-sm hover:bg-orange-100 transition-colors rounded-sm"
+                      className="portal-chip !text-[0.74rem] !px-5 !py-2.5 hover:bg-orange-100 dark:hover:bg-white/[0.07]"
                     >
                       <Star className="w-4 h-4" />
                       Leave Review
@@ -243,15 +260,15 @@ const ClientConsultations = () => {
           })}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm rounded-sm">
-          <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-6" />
-          <h3 className="font-serif text-xl font-bold text-[#0f172a] dark:text-white mb-2">No consultations found</h3>
-          <p className="text-gray-500 mb-8 max-w-md mx-auto text-sm font-medium">
+        <div className="portal-card text-center py-20">
+          <Calendar className="w-12 h-12 text-[color:var(--portal-muted)]/60 mx-auto mb-6" />
+          <h3 className="font-serif text-xl font-bold text-[color:var(--portal-text)] mb-2">No consultations found</h3>
+          <p className="text-[color:var(--portal-muted)] mb-8 max-w-md mx-auto text-sm font-medium">
             You don't have any {activeTab} consultations at this time. Book a session with our elite partners to get started.
           </p>
           <Link
             to="/lawyers"
-            className="bg-[#0f172a] hover:bg-black text-white py-3 px-8 transition-colors rounded-sm shadow-md font-semibold text-sm mx-auto inline-flex items-center gap-2"
+            className="portal-btn-primary py-3 px-8 mx-auto inline-flex items-center gap-2"
           >
             <Calendar className="w-4 h-4" />
             Find a Lawyer
@@ -260,29 +277,42 @@ const ClientConsultations = () => {
       )}
 
       {/* Chat Widget */}
-      {selectedConsultation && (
+      {selectedConsultation && typeof document !== 'undefined' && createPortal(
         <ChatWidget
           consultation={selectedConsultation}
           openSignal={chatOpenSignal}
           onClose={() => setSelectedConsultation(null)}
-        />
+        />,
+        document.body
+      )}
+
+      {!selectedConsultation && activeTab === 'upcoming' && !!launcherConsultation && typeof document !== 'undefined' && createPortal(
+        <button
+          type="button"
+          onClick={handleOpenFloatingChat}
+          className="portal-btn-primary fixed right-6 bottom-6 z-[70] rounded-full px-6 py-3.5 flex items-center gap-2 shadow-[0_20px_40px_rgba(15,23,42,0.3)]"
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span className="text-xs uppercase tracking-widest font-bold">Open Chat</span>
+        </button>,
+        document.body
       )}
 
       {/* Leave Review Modal */}
       {reviewModalOpen && reviewConsultation && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70" onClick={() => setReviewModalOpen(false)} />
-          <div className="relative z-[71] w-full max-w-xl rounded-sm bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-2xl">
-            <div className="p-6 border-b border-gray-200 dark:border-dark-600">
-              <h3 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white">Leave a Review</h3>
-              <p className="text-sm text-gray-500 mt-2">
+          <div className="portal-card-elevated relative z-[71] w-full max-w-xl">
+            <div className="p-6 border-b border-[color:var(--portal-border)]">
+              <h3 className="font-serif text-2xl font-bold text-[color:var(--portal-text)]">Leave a Review</h3>
+              <p className="text-sm text-[color:var(--portal-muted)] mt-2">
                 Share your experience with {reviewConsultation.lawyer_profile?.user?.name || 'this lawyer'}
               </p>
             </div>
 
             <div className="p-6 space-y-6">
               <div>
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Rating</p>
+                <p className="text-xs font-bold text-[color:var(--portal-muted)] uppercase tracking-widest mb-3">Rating</p>
                 <div className="flex items-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => {
                     const active = (reviewHover || reviewRating) >= star
@@ -303,29 +333,29 @@ const ClientConsultations = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Written Review</label>
+                <label className="block text-xs font-bold text-[color:var(--portal-muted)] uppercase tracking-widest mb-3">Written Review</label>
                 <textarea
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   rows={4}
                   placeholder="Tell others about your consultation experience"
-                  className="w-full p-3 border border-gray-300 dark:border-dark-600 rounded-sm bg-gray-50 dark:bg-dark-700 text-sm text-[#0f172a] dark:text-white focus:outline-none"
+                  className="portal-input p-3 text-sm"
                 />
               </div>
             </div>
 
-            <div className="p-6 border-t border-gray-200 dark:border-dark-600 bg-gray-50 dark:bg-dark-800 flex flex-col sm:flex-row gap-3">
+            <div className="p-6 border-t border-[color:var(--portal-border)] bg-white/35 dark:bg-black/20 flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => setReviewModalOpen(false)}
                 disabled={submitReviewMutation.isPending}
-                className="flex-1 py-3 px-4 border border-gray-300 dark:border-dark-600 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-sm hover:bg-white dark:hover:bg-dark-700 transition-colors disabled:opacity-50"
+                className="portal-btn-ghost flex-1 py-3 px-4 text-sm disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmitReview}
                 disabled={submitReviewMutation.isPending}
-                className="flex-1 py-3 px-4 bg-[#0f172a] text-white text-sm font-semibold rounded-sm hover:bg-black transition-colors disabled:opacity-50"
+                className="portal-btn-primary flex-1 py-3 px-4 text-sm disabled:opacity-50"
               >
                 {submitReviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
               </button>

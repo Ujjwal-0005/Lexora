@@ -163,7 +163,14 @@ const ClientDocuments = () => {
   }
 
   const getAdvocateName = (doc) => {
-    return doc.advocate_name || doc.lawyerProfile?.user?.name || 'Unassigned advocate'
+    return (
+      doc.advocate_name ||
+      doc.lawyer_name ||
+      doc.lawyerProfile?.user?.name ||
+      doc.lawyer_profile?.user?.name ||
+      doc.lawyer?.name ||
+      'Unassigned advocate'
+    )
   }
 
   const getDocumentTypeLabel = (doc) => {
@@ -231,18 +238,18 @@ const ClientDocuments = () => {
   const canDownload = selectedDocument && selectedDocument.generated_file_path && ['completed', 'delivered'].includes(selectedDocument.status)
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 pb-20">
+    <div className="portal-page portal-appear space-y-10">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-sm font-semibold tracking-widest text-gray-500 uppercase mb-2">Legal Vault</h2>
-          <h1 className="text-3xl font-serif font-bold text-[#0f172a] dark:text-white">My Documents</h1>
-          <p className="text-sm text-gray-500 mt-2 font-medium">
+          <h2 className="portal-page-kicker mb-2">Legal Vault</h2>
+          <h1 className="portal-page-title">My Documents</h1>
+          <p className="text-sm text-[color:var(--portal-muted)] mt-2 font-medium">
             {totalDocuments} document{totalDocuments === 1 ? '' : 's'} managed in your secure vault
           </p>
         </div>
         <button
           onClick={handleGenerateDocument}
-          className="bg-[#0f172a] dark:bg-white text-white dark:text-[#0f172a] hover:bg-black dark:hover:bg-gray-100 py-3 px-6 flex items-center gap-2 transition-colors rounded-sm shadow-md"
+          className="portal-btn-primary py-3 px-6 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           <span className="text-sm font-semibold">Generate Document</span>
@@ -252,7 +259,7 @@ const ClientDocuments = () => {
       <div className="flex flex-wrap gap-3">
         <button
           onClick={handleCustomRequest}
-          className="bg-[#D4AF37] text-[#0f172a] hover:bg-[#b8941d] py-3 px-6 flex items-center gap-2 transition-colors rounded-sm shadow-md"
+          className="portal-btn-ghost border-[color:var(--portal-border-strong)] py-3 px-6 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           <span className="text-sm font-semibold">Custom Request</span>
@@ -260,7 +267,7 @@ const ClientDocuments = () => {
       </div>
 
       {/* Documents List */}
-      <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-sm overflow-hidden">
+      <div className="portal-card overflow-hidden">
         {isLoading ? (
           <div className="py-20"><Loader /></div>
         ) : documents.length > 0 ? (
@@ -268,26 +275,26 @@ const ClientDocuments = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-200 dark:border-dark-600 bg-gray-50/50 dark:bg-dark-800/50">
-                    <th className="py-5 px-8 text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider w-4/12">Document Details</th>
-                    <th className="py-5 px-8 text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider w-3/12">Advocate</th>
-                    <th className="py-5 px-8 text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider w-2/12">Status</th>
-                    <th className="py-5 px-8 text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider text-right w-3/12">Actions</th>
+                  <tr className="border-b border-[color:var(--portal-border)] bg-white/30 dark:bg-black/15">
+                    <th className="py-5 px-8 text-xs font-bold text-[color:var(--portal-text)] uppercase tracking-wider w-4/12">Document Details</th>
+                    <th className="py-5 px-8 text-xs font-bold text-[color:var(--portal-text)] uppercase tracking-wider w-3/12">Advocate</th>
+                    <th className="py-5 px-8 text-xs font-bold text-[color:var(--portal-text)] uppercase tracking-wider w-2/12">Status</th>
+                    <th className="py-5 px-8 text-xs font-bold text-[color:var(--portal-text)] uppercase tracking-wider text-right w-3/12">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-dark-600">
+                <tbody className="divide-y divide-[color:var(--portal-border)]">
                   {paginatedDocuments.map((doc) => (
-                    <tr key={doc.id} className="hover:bg-gray-50 dark:hover:bg-dark-700/50 transition-colors group">
+                    <tr key={doc.id} className="hover:bg-white/45 dark:hover:bg-white/[0.03] transition-colors group">
                       <td className="py-6 px-8">
                         <div className="flex items-start gap-4">
-                          <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
+                          <FileText className="w-5 h-5 text-[color:var(--portal-muted)] mt-0.5" />
                           <div>
-                            <p className="font-bold text-[#0f172a] dark:text-white text-sm mb-1">{getDisplayName(doc)}</p>
-                            <p className="text-xs text-gray-500 font-medium">Req: {formatDate(doc.created_at)}</p>
+                            <p className="font-bold text-[color:var(--portal-text)] text-sm mb-1">{getDisplayName(doc)}</p>
+                            <p className="text-xs text-[color:var(--portal-muted)] font-medium">Req: {formatDate(doc.created_at)}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-6 px-8 text-sm text-gray-600 dark:text-gray-400 font-medium">
+                      <td className="py-6 px-8 text-sm text-[color:var(--portal-muted)] font-medium">
                         {getAdvocateName(doc)}
                       </td>
                       <td className="py-6 px-8">
@@ -297,7 +304,7 @@ const ClientDocuments = () => {
                         <div className="flex items-center justify-end gap-3">
                           <button
                             onClick={() => handleOpenDetails(doc)}
-                            className="text-[#0f172a] dark:text-white dark:hover:text-black p-2 hover:bg-gray-100 rounded-full transition-colors flex items-center justify-center"
+                            className="text-[color:var(--portal-text)] p-2 hover:bg-white/60 dark:hover:bg-white/[0.08] rounded-full transition-colors flex items-center justify-center"
                             title="View details"
                           >
                             <Eye className="w-4 h-4" />
@@ -306,7 +313,7 @@ const ClientDocuments = () => {
                             <button
                               onClick={() => handleDownload(doc.id, doc.documentType?.slug || 'document')}
                               disabled={downloading === doc.id}
-                              className="text-[#d97706] hover:text-[#b45309] p-2 hover:bg-orange-50 rounded-full transition-colors flex items-center justify-center disabled:opacity-50"
+                              className="text-[color:var(--portal-gold)] hover:text-[#b45309] p-2 hover:bg-orange-50 dark:hover:bg-white/[0.06] rounded-full transition-colors flex items-center justify-center disabled:opacity-50"
                               title="Download PDF"
                             >
                               {downloading === doc.id ? (
@@ -320,7 +327,7 @@ const ClientDocuments = () => {
                               <MoreHorizontal className="w-5 h-5" />
                             </button>
                           )}
-                          <span className="text-sm font-semibold text-[#0f172a] dark:text-white ml-2">{formatPrice(doc.price)}</span>
+                          <span className="text-sm font-semibold text-[color:var(--portal-text)] ml-2">{formatPrice(doc.price)}</span>
                         </div>
                       </td>
                     </tr>
@@ -328,25 +335,25 @@ const ClientDocuments = () => {
                 </tbody>
               </table>
             </div>
-            <div className="flex items-center justify-between gap-4 px-8 py-5 border-t border-gray-200 dark:border-dark-600 bg-gray-50/50 dark:bg-dark-800/50 flex-wrap">
-              <p className="text-sm text-gray-500 font-medium">
+            <div className="flex items-center justify-between gap-4 px-8 py-5 border-t border-[color:var(--portal-border)] bg-white/35 dark:bg-black/15 flex-wrap">
+              <p className="text-sm text-[color:var(--portal-muted)] font-medium">
                 Showing {startIndex + 1} - {Math.min(startIndex + itemsPerPage, documents.length)} of {documents.length} documents
               </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 rounded-sm border border-gray-200 dark:border-dark-600 text-sm font-semibold text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors"
+                  className="portal-btn-ghost px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
-                <span className="px-4 py-2 text-sm font-semibold text-[#0f172a] dark:text-white">
+                <span className="px-4 py-2 text-sm font-semibold text-[color:var(--portal-text)]">
                   {currentPage} / {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 rounded-sm border border-gray-200 dark:border-dark-600 text-sm font-semibold text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors"
+                  className="portal-btn-ghost px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -355,14 +362,14 @@ const ClientDocuments = () => {
           </>
         ) : (
           <div className="text-center py-20 px-6">
-            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-6" />
-            <h3 className="font-serif text-xl font-bold text-[#0f172a] dark:text-white mb-2">Vault Empty</h3>
-            <p className="text-gray-500 mb-8 max-w-md mx-auto text-sm font-medium">
+            <FileText className="w-12 h-12 text-[color:var(--portal-muted)]/60 mx-auto mb-6" />
+            <h3 className="font-serif text-xl font-bold text-[color:var(--portal-text)] mb-2">Vault Empty</h3>
+            <p className="text-[color:var(--portal-muted)] mb-8 max-w-md mx-auto text-sm font-medium">
               Access premium templates for contracts, NDAs, and international legal frameworks to populate your secure vault.
             </p>
             <button
               onClick={handleGenerateDocument}
-              className="bg-[#0f172a] hover:bg-black text-white py-3 px-8 transition-colors rounded-sm shadow-md font-semibold text-sm mx-auto flex items-center gap-2"
+              className="portal-btn-primary py-3 px-8 mx-auto flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Generate First Document
@@ -377,23 +384,23 @@ const ClientDocuments = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-transparent flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 20, opacity: 0 }}
-              className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 shadow-2xl rounded-sm"
+              className="portal-card-elevated w-full max-w-3xl max-h-[90vh] overflow-y-auto"
             >
-              <div className="p-6 border-b border-gray-200 dark:border-dark-600 flex items-start justify-between gap-4 sticky top-0 bg-white dark:bg-dark-800 z-10">
+              <div className="p-6 border-b border-[color:var(--portal-border)] flex items-start justify-between gap-4 sticky top-0 bg-[color:var(--portal-surface-elevated)] z-10">
                 <div>
-                  <p className="text-xs font-bold tracking-widest uppercase text-gray-500 mb-2">Request Details</p>
-                  <h3 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white">{getDisplayName(selectedDocument)}</h3>
-                  <p className="text-sm text-gray-500 mt-2">Lawyer: {selectedDocument.lawyerProfile?.user?.name || 'Unassigned'}</p>
+                  <p className="text-xs font-bold tracking-widest uppercase text-[color:var(--portal-muted)] mb-2">Request Details</p>
+                  <h3 className="font-serif text-2xl font-bold text-[color:var(--portal-text)]">{getDisplayName(selectedDocument)}</h3>
+                  <p className="text-sm text-[color:var(--portal-muted)] mt-2">Lawyer: {getAdvocateName(selectedDocument)}</p>
                 </div>
                 <button
                   onClick={() => setSelectedDocument(null)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-[color:var(--portal-muted)] hover:text-[color:var(--portal-text)] transition-colors"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -444,14 +451,14 @@ const ClientDocuments = () => {
                                 value={submissionValues[fieldKey] || ''}
                                 onChange={(e) => handleFieldChange(fieldKey, e.target.value)}
                                 rows="4"
-                                className="w-full bg-slate-50 dark:bg-dark-900 border border-gray-300 dark:border-dark-600 text-[#0f172a] dark:text-white px-4 py-3 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#0f172a] dark:focus:ring-[#D4AF37] text-sm"
+                                className="w-full bg-slate-50 dark:bg-dark-900 border border-gray-300 dark:border-dark-600 text-[#0f172a] dark:text-white px-4 py-3 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#0f172a] dark:focus:ring-[#D4AF37] text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
                               />
                             ) : (
                               <input
                                 type={type === 'date' ? 'date' : type === 'number' ? 'number' : type === 'email' ? 'email' : 'text'}
                                 value={submissionValues[fieldKey] || ''}
                                 onChange={(e) => handleFieldChange(fieldKey, e.target.value)}
-                                className="w-full bg-slate-50 dark:bg-dark-900 border border-gray-300 dark:border-dark-600 text-[#0f172a] dark:text-white px-4 py-3 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#0f172a] dark:focus:ring-[#D4AF37] text-sm"
+                                className="w-full bg-slate-50 dark:bg-dark-900 border border-gray-300 dark:border-dark-600 text-[#0f172a] dark:text-white px-4 py-3 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#0f172a] dark:focus:ring-[#D4AF37] text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
                               />
                             )}
                           </div>
@@ -512,30 +519,30 @@ const ClientDocuments = () => {
                   )}
 
                   {showPaymentPanel && (
-                    <div className="w-full p-4 bg-[#0f172a] text-white rounded-sm shadow-md">
+                    <div className="w-full p-5 bg-[color:var(--portal-surface-elevated)] border border-[color:var(--portal-border)] rounded-2xl shadow-[0_14px_30px_rgba(15,23,42,0.12)]">
                       <div className="flex justify-between items-center mb-3">
                         <div>
-                          <p className="text-xs uppercase tracking-widest text-gray-200">Service</p>
-                          <p className="font-bold text-lg">Document Preparation Fee</p>
+                          <p className="text-xs uppercase tracking-widest text-[color:var(--portal-muted)]">Service</p>
+                          <p className="font-bold text-lg text-[color:var(--portal-text)]">Document Preparation Fee</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-gray-200">Amount</p>
-                          <p className="text-2xl font-serif font-bold">₹{Number(paymentAmount || 0).toLocaleString('en-IN')}</p>
+                          <p className="text-xs text-[color:var(--portal-muted)]">Amount</p>
+                          <p className="text-2xl font-serif font-bold text-[color:var(--portal-text)]">₹{Number(paymentAmount || 0).toLocaleString('en-IN')}</p>
                         </div>
                       </div>
 
                       <div className="mb-3">
-                        <label className="block text-xs font-bold text-gray-200 uppercase tracking-widest mb-2">Enter Amount (must match quoted fee)</label>
+                        <label className="block text-xs font-bold text-[color:var(--portal-muted)] uppercase tracking-widest mb-2">Enter Amount (must match quoted fee)</label>
                         <input
                           type="number"
                           value={paymentAmount}
                           onChange={(e) => setPaymentAmount(e.target.value)}
-                          className="w-full p-3 rounded-sm text-[#0f172a]"
+                          className="w-full p-3 rounded-xl border border-[color:var(--portal-border)] bg-white/85 dark:bg-dark-900 text-[color:var(--portal-text)] dark:text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--portal-gold)]"
                         />
                       </div>
 
                       <div className="mb-3">
-                        <label className="block text-xs font-bold text-gray-200 uppercase tracking-widest mb-2">Payment Method</label>
+                        <label className="block text-xs font-bold text-[color:var(--portal-muted)] uppercase tracking-widest mb-2">Payment Method</label>
                         <div className="grid grid-cols-3 gap-2">
                           {[
                             { id: 'card', label: 'Card' },
@@ -545,7 +552,10 @@ const ClientDocuments = () => {
                             <button
                               key={m.id}
                               onClick={() => setPaymentMethod(m.id)}
-                              className={`py-2 rounded-sm ${paymentMethod === m.id ? 'bg-[#D4AF37] text-[#0f172a] font-bold' : 'bg-white text-[#0f172a]'}`}
+                              className={`py-2.5 rounded-xl border transition-colors ${paymentMethod === m.id
+                                ? 'bg-[color:var(--portal-gold)]/25 text-[color:var(--portal-text)] dark:text-white border-[color:var(--portal-border-strong)] font-bold'
+                                : 'bg-white/80 dark:bg-dark-900 text-[color:var(--portal-text)] dark:text-white border-[color:var(--portal-border)] hover:border-[color:var(--portal-border-strong)]'
+                                }`}
                             >
                               {m.label}
                             </button>
@@ -556,14 +566,14 @@ const ClientDocuments = () => {
                       <div className="flex gap-3">
                         <button
                           onClick={() => setShowPaymentPanel(false)}
-                          className="flex-1 py-3 bg-white text-[#0f172a] font-semibold rounded-sm"
+                          className="flex-1 py-3 bg-white/85 dark:bg-dark-900 text-[color:var(--portal-text)] dark:text-white border border-[color:var(--portal-border)] font-semibold rounded-xl"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={handleConfirmPayment}
                           disabled={payForDocument.isPending}
-                          className="flex-1 py-3 bg-[#D4AF37] text-[#0f172a] font-semibold rounded-sm"
+                          className="flex-1 py-3 bg-[color:var(--portal-gold)] text-[#1a2237] font-semibold rounded-xl disabled:opacity-60"
                         >
                           {payForDocument.isPending ? 'Processing...' : `Pay ₹${Number(paymentAmount || 0).toLocaleString('en-IN')}`}
                         </button>

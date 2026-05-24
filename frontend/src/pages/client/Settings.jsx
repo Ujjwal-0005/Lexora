@@ -22,7 +22,8 @@ const ClientSettings = () => {
     newPassword: '',
     confirmPassword: '',
   })
-  const [loading, setLoading] = useState(false)
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [passwordLoading, setPasswordLoading] = useState(false)
   const [awaitingSetPasswordOtp, setAwaitingSetPasswordOtp] = useState(false)
   const [setPasswordOtp, setSetPasswordOtp] = useState('')
   const [deleting, setDeleting] = useState(false)
@@ -49,14 +50,14 @@ const ClientSettings = () => {
   }, [user?.notification_preferences])
 
   const handleProfileUpdate = async (e) => {
-    e.preventDefault()
+    e?.preventDefault?.()
 
     if (!formData.name?.trim()) {
       toast.error('Name is required')
       return
     }
 
-    setLoading(true)
+    setProfileLoading(true)
     try {
       const payload = {
         name: formData.name.trim(),
@@ -76,7 +77,7 @@ const ClientSettings = () => {
         : (error.response?.data?.message || 'Failed to update profile')
       toast.error(message)
     } finally {
-      setLoading(false)
+      setProfileLoading(false)
     }
   }
 
@@ -103,7 +104,7 @@ const ClientSettings = () => {
   }
 
   const handlePasswordUpdate = async (e) => {
-    e.preventDefault()
+    e?.preventDefault?.()
 
     // If social user, call set-password endpoint
     if (isSocialUser) {
@@ -145,7 +146,7 @@ const ClientSettings = () => {
       return
     }
 
-    setLoading(true)
+    setPasswordLoading(true)
     try {
       await api.post('/auth/change-password', {
         current_password: formData.currentPassword,
@@ -159,7 +160,7 @@ const ClientSettings = () => {
       const message = error.response?.data?.message || 'Failed to update password'
       toast.error(message)
     } finally {
-      setLoading(false)
+      setPasswordLoading(false)
     }
   }
 
@@ -196,7 +197,7 @@ const ClientSettings = () => {
         return
       }
 
-      setLoading(true)
+      setPasswordLoading(true)
       try {
         const resp = await api.post('/auth/set-password', {})
         if (resp.data?.otp_sent) {
@@ -209,7 +210,7 @@ const ClientSettings = () => {
         const message = error.response?.data?.message || 'Failed to initiate set-password'
         toast.error(message)
       } finally {
-        setLoading(false)
+        setPasswordLoading(false)
       }
 
       return
@@ -221,7 +222,7 @@ const ClientSettings = () => {
       return
     }
 
-    setLoading(true)
+    setPasswordLoading(true)
     try {
       await api.post('/auth/set-password', {
         otp: setPasswordOtp,
@@ -238,7 +239,7 @@ const ClientSettings = () => {
       const message = error.response?.data?.message || 'Failed to set password'
       toast.error(message)
     } finally {
-      setLoading(false)
+      setPasswordLoading(false)
     }
   }
 
@@ -322,72 +323,72 @@ const ClientSettings = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-10 pb-20">
+    <div className="portal-page portal-appear max-w-5xl space-y-10">
       <div>
-        <h2 className="text-sm font-semibold tracking-widest text-gray-500 uppercase mb-2">Preferences</h2>
-        <h1 className="text-3xl font-serif font-bold text-[#0f172a] dark:text-white">Account Settings</h1>
+        <h2 className="portal-page-kicker mb-2">Preferences</h2>
+        <h1 className="portal-page-title">Account Settings</h1>
       </div>
 
       {/* Profile Settings */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm shadow-sm p-8"
+        className="portal-card p-8"
       >
-        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-gray-100 dark:border-dark-600">
-          <div className="w-12 h-12 rounded-sm bg-[#0f172a] flex items-center justify-center">
+        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-[color:var(--portal-border)]">
+          <div className="w-12 h-12 rounded-xl bg-[linear-gradient(145deg,#172743,#2e446e)] flex items-center justify-center">
             <User className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white">Profile Information</h2>
-            <p className="text-sm text-gray-500 font-medium">Update your personal and contact details</p>
+            <h2 className="font-serif font-bold text-xl text-[color:var(--portal-text)]">Profile Information</h2>
+            <p className="text-sm text-[color:var(--portal-muted)] font-medium">Update your personal and contact details</p>
           </div>
         </div>
 
         <form onSubmit={handleProfileUpdate} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <label className="block text-sm font-semibold text-[color:var(--portal-text)] mb-2">Full Name</label>
+              <div className="flex items-center gap-3">
+                <User className="pointer-events-none w-4 h-4 shrink-0 text-[color:var(--portal-muted)]" />
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="input pl-12 !rounded-sm bg-gray-50 border-gray-200 focus:border-[#0f172a] focus:ring-[#0f172a]"
+                  className="portal-input flex-1 min-w-0"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <label className="block text-sm font-semibold text-[color:var(--portal-text)] mb-2">Email Address</label>
+              <div className="flex items-center gap-3">
+                <Mail className="pointer-events-none w-4 h-4 shrink-0 text-[color:var(--portal-muted)]" />
                 <input
                   type="email"
                   value={formData.email}
                   disabled
-                  className="input pl-12 !rounded-sm bg-gray-100 border-gray-200 text-gray-500 dark:bg-dark-700 cursor-not-allowed"
+                  className="portal-input flex-1 min-w-0 bg-gray-100/80 dark:bg-black/30 text-[color:var(--portal-muted)] cursor-not-allowed"
                 />
               </div>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Phone Number</label>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <label className="block text-sm font-semibold text-[color:var(--portal-text)] mb-2">Phone Number</label>
+              <div className="flex items-center gap-3">
+                <Phone className="pointer-events-none w-4 h-4 shrink-0 text-[color:var(--portal-muted)]" />
                 <input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="input pl-12 !rounded-sm bg-gray-50 border-gray-200 focus:border-[#0f172a] focus:ring-[#0f172a]"
+                  className="portal-input flex-1 min-w-0"
                   placeholder="+91 98765 43210"
                 />
               </div>
             </div>
           </div>
 
-          <button type="submit" disabled={loading} className="bg-[#0f172a] text-white hover:bg-black disabled:opacity-50 py-3 px-6 rounded-sm shadow-md font-semibold text-sm flex items-center gap-2 transition-colors">
+          <button type="button" onClick={handleProfileUpdate} disabled={profileLoading} className="portal-btn-primary disabled:opacity-50 py-3 px-6 font-semibold text-sm flex items-center gap-2">
             <Save className="w-4 h-4" />
-            {loading ? 'Saving...' : 'Save Profile Changes'}
+            {profileLoading ? 'Saving...' : 'Save Profile Changes'}
           </button>
         </form>
       </motion.div>
@@ -397,15 +398,15 @@ const ClientSettings = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm shadow-sm p-8"
+        className="portal-card p-8"
       >
-        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-gray-100 dark:border-dark-600">
-          <div className="w-12 h-12 rounded-sm bg-[#fef3c7] flex items-center justify-center">
+        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-[color:var(--portal-border)]">
+          <div className="w-12 h-12 rounded-xl bg-[linear-gradient(140deg,#f4dfb3,#d9b064)] flex items-center justify-center">
             <Lock className="w-6 h-6 text-[#92400e]" />
           </div>
           <div>
-            <h2 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white">{isSocialUser ? 'Set Password' : 'Security & Password'}</h2>
-            <p className="text-sm text-gray-500 font-medium">{isSocialUser ? 'You signed in via Google. Set a password to enable password sign-in.' : 'Ensure your account uses a strong password'}</p>
+            <h2 className="font-serif font-bold text-xl text-[color:var(--portal-text)]">{isSocialUser ? 'Set Password' : 'Security & Password'}</h2>
+            <p className="text-sm text-[color:var(--portal-muted)] font-medium">{isSocialUser ? 'You signed in via Google. Set a password to enable password sign-in.' : 'Ensure your account uses a strong password'}</p>
           </div>
         </div>
 
@@ -413,42 +414,46 @@ const ClientSettings = () => {
           <div className="grid md:grid-cols-2 gap-6">
             {!isSocialUser && (
               <div>
-                <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Current Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.currentPassword}
-                    onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
-                    className="input pl-12 pr-12 !rounded-sm bg-gray-50 border-gray-200 focus:border-[#0f172a] focus:ring-[#0f172a]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
+                <label className="block text-sm font-semibold text-[color:var(--portal-text)] mb-2">Current Password</label>
+                <div className="flex items-center gap-3">
+                  <Lock className="pointer-events-none w-4 h-4 shrink-0 text-[color:var(--portal-muted)]" />
+                  <div className="relative flex-1 min-w-0">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={formData.currentPassword}
+                      onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                      className="portal-input w-full pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[color:var(--portal-muted)] hover:text-[color:var(--portal-text)]"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">New Password</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type={showNewPassword ? 'text' : 'password'}
-                  value={formData.newPassword}
-                  onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
-                  className="input pl-12 pr-12 !rounded-sm bg-gray-50 border-gray-200 focus:border-[#0f172a] focus:ring-[#0f172a]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
+              <label className="block text-sm font-semibold text-[color:var(--portal-text)] mb-2">New Password</label>
+              <div className="flex items-center gap-3">
+                <Lock className="pointer-events-none w-4 h-4 shrink-0 text-[color:var(--portal-muted)]" />
+                <div className="relative flex-1 min-w-0">
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={formData.newPassword}
+                    onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                    className="portal-input w-full pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[color:var(--portal-muted)] hover:text-[color:var(--portal-text)]"
+                  >
+                    {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
 
               {/* Password strength meter */}
@@ -465,10 +470,10 @@ const ClientSettings = () => {
                 return (
                   <div className="mt-3 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-gray-400">Password strength</span>
+                      <span className="text-xs font-medium text-[color:var(--portal-muted)]">Password strength</span>
                       <span className={`text-xs font-semibold ${current?.textColor}`}>{current?.label}</span>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-dark-700 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-gray-200/80 dark:bg-black/35 rounded-full h-2 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${(strength / 5) * 100}%` }}
@@ -480,7 +485,7 @@ const ClientSettings = () => {
                       {rules.map((r) => (
                         <div key={r.key} className="flex items-center gap-2">
                           <div className={`w-3 h-3 rounded-full ${r.ok ? current?.color : 'bg-gray-200 dark:bg-dark-700'}`} />
-                          <span className={`text-xs ${r.ok ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400'}`}>{r.label}</span>
+                          <span className={`text-xs ${r.ok ? 'text-[color:var(--portal-muted)]' : 'text-[color:var(--portal-muted)]/70'}`}>{r.label}</span>
                         </div>
                       ))}
                     </div>
@@ -490,29 +495,41 @@ const ClientSettings = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a] dark:text-gray-300 mb-2">Confirm Password</label>
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className="input !rounded-sm bg-gray-50 border-gray-200"
-              />
+              <label className="block text-sm font-semibold text-[color:var(--portal-text)] mb-2">Confirm Password</label>
+              <div className="flex items-center gap-3">
+                <Lock className="pointer-events-none w-4 h-4 shrink-0 text-[color:var(--portal-muted)]" />
+                <div className="relative flex-1 min-w-0">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    className="portal-input w-full pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[color:var(--portal-muted)] hover:text-[color:var(--portal-text)]"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          <button type="submit" disabled={loading} className="bg-[#0f172a] text-white hover:bg-black disabled:opacity-50 py-3 px-6 rounded-sm shadow-md font-semibold text-sm flex items-center gap-2 transition-colors">
-            {loading ? 'Updating...' : 'Update Password'}
+          <button type="button" onClick={handlePasswordUpdate} disabled={passwordLoading} className="portal-btn-primary disabled:opacity-50 py-3 px-6 font-semibold text-sm flex items-center gap-2">
+            {passwordLoading ? 'Updating...' : 'Update Password'}
           </button>
         </form>
         {/* If awaiting OTP show the OTP input */}
         {awaitingSetPasswordOtp && (
-          <div className="mt-4 p-4 border border-gray-100 dark:border-dark-600 rounded-sm bg-gray-50 dark:bg-dark-700">
+          <div className="mt-4 p-4 border border-[color:var(--portal-border)] rounded-xl bg-white/45 dark:bg-black/25">
             <label className="block text-sm font-semibold mb-2">Enter OTP sent to your email</label>
             <div className="flex gap-2 items-center">
-              <input type="text" value={setPasswordOtp} onChange={(e) => setSetPasswordOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} className="input w-40 font-mono text-lg text-center" placeholder="000000" />
-              <button onClick={() => setAwaitingSetPasswordOtp(false)} className="py-2 px-3 border rounded-sm">Cancel</button>
-              <button onClick={handleSetPassword} disabled={loading} className="py-2 px-3 bg-[#0f172a] text-white rounded-sm">{loading ? 'Processing...' : 'Confirm & Set Password'}</button>
-              <button onClick={async () => {
+              <input type="text" value={setPasswordOtp} onChange={(e) => setSetPasswordOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} className="portal-input w-40 font-mono text-lg text-center" placeholder="000000" />
+              <button type="button" onClick={() => setAwaitingSetPasswordOtp(false)} className="portal-btn-ghost py-2 px-3">Cancel</button>
+              <button type="button" onClick={handleSetPassword} disabled={passwordLoading} className="portal-btn-primary py-2 px-3">{passwordLoading ? 'Processing...' : 'Confirm & Set Password'}</button>
+              <button type="button" onClick={async () => {
                 try {
                   const resp = await api.post('/auth/set-password', {})
                   if (resp.data?.otp_sent) {
@@ -521,7 +538,7 @@ const ClientSettings = () => {
                     toast.error('Unable to resend OTP')
                   }
                 } catch (err) { toast.error(err.response?.data?.message || 'Unable to resend OTP') }
-              }} className="py-2 px-3 border rounded-sm">Resend</button>
+              }} className="portal-btn-ghost py-2 px-3">Resend</button>
             </div>
           </div>
         )}
@@ -532,30 +549,30 @@ const ClientSettings = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm shadow-sm p-8"
+        className="portal-card p-8"
       >
         <div className="flex items-start gap-4 mb-6">
-          <div className="w-12 h-12 rounded-sm bg-red-100 dark:bg-red-900/10 flex items-center justify-center mt-1">
+          <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center mt-1">
             <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
           </div>
           <div className="flex-1">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white">Delete Account</h2>
-                <p className="text-sm text-gray-500">Permanently remove your account and all associated data.</p>
+                <h2 className="font-serif font-bold text-xl text-[color:var(--portal-text)]">Delete Account</h2>
+                <p className="text-sm text-[color:var(--portal-muted)]">Permanently remove your account and all associated data.</p>
               </div>
-              <div className="text-sm text-gray-500">Account: <span className="font-medium text-gray-700">{user?.email}</span></div>
+              <div className="text-sm text-[color:var(--portal-muted)]">Account: <span className="font-medium text-[color:var(--portal-text)]">{user?.email}</span></div>
             </div>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
-                <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-sm p-4">
+                <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-xl p-4">
                   <p className="text-sm text-red-800 dark:text-red-300 font-medium">Important</p>
                   <p className="text-xs text-red-700 dark:text-red-300 mt-2">This will permanently delete your profile, consultations, documents, messages, ratings and all related data. This action cannot be undone.</p>
                 </div>
 
                 {/* Expanded confirmation area */}
-                <div className="mt-4 p-4 border border-gray-100 dark:border-dark-600 rounded-sm bg-gray-50 dark:bg-dark-700">
+                <div className="mt-4 p-4 border border-[color:var(--portal-border)] rounded-xl bg-white/45 dark:bg-black/20">
                   {!showDeleteModal && (
                     <div className="space-y-3">
                       <p className="text-sm text-gray-700 dark:text-gray-300">To proceed, click the button below. You will be asked to confirm with a password or a one-time code depending on how you signed up.</p>
@@ -563,7 +580,7 @@ const ClientSettings = () => {
                         <button
                           onClick={handleDeleteAccount}
                           disabled={deleting}
-                          className={`py-2 px-4 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-sm font-semibold flex items-center gap-2 ${deleting ? 'cursor-wait' : ''}`}
+                          className={`py-2 px-4 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-xl font-semibold flex items-center gap-2 ${deleting ? 'cursor-wait' : ''}`}
                         >
                           {deleting ? (
                             <>
@@ -581,8 +598,9 @@ const ClientSettings = () => {
                           )}
                         </button>
                         <button
+                          type="button"
                           onClick={() => navigate('/client/documents')}
-                          className="py-2 px-4 border rounded-sm text-sm text-gray-700 dark:text-gray-300"
+                          className="portal-btn-ghost py-2 px-4 text-sm"
                         >
                           Export Data
                         </button>
@@ -593,31 +611,32 @@ const ClientSettings = () => {
                   {showDeleteModal && (
                     <div className="mt-2 space-y-3">
                       {/* Show method */}
-                      <p className="text-sm text-gray-600">Confirmation method: <span className="font-medium">{deleteMode === 'password' ? 'Password' : 'Email OTP'}</span></p>
+                      <p className="text-sm text-[color:var(--portal-muted)]">Confirmation method: <span className="font-medium">{deleteMode === 'password' ? 'Password' : 'Email OTP'}</span></p>
 
                       {deleteMode === 'password' ? (
                         <div className="space-y-2">
-                          <label className="text-sm text-gray-700">Current Password</label>
+                          <label className="text-sm text-[color:var(--portal-text)]">Current Password</label>
                           <input
                             type="password"
                             value={deletePassword}
                             onChange={(e) => setDeletePassword(e.target.value)}
-                            className="input w-full bg-white dark:bg-dark-700 border-gray-200"
+                            className="portal-input w-full"
                             placeholder="Enter current password"
                           />
                         </div>
                       ) : (
                         <div className="space-y-2">
-                          <label className="text-sm text-gray-700">Enter OTP</label>
+                          <label className="text-sm text-[color:var(--portal-text)]">Enter OTP</label>
                           <div className="flex gap-2">
                             <input
                               type="text"
                               value={deleteOtp}
                               onChange={(e) => setDeleteOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                              className="input flex-1 bg-white dark:bg-dark-700 border-gray-200 font-mono text-lg text-center"
+                              className="portal-input flex-1 font-mono text-lg text-center"
                               placeholder="000000"
                             />
                             <button
+                              type="button"
                               onClick={async () => {
                                 try {
                                   await api.delete('/auth/delete', { data: {}, headers: { 'X-Skip-Auth-Logout': '1' } })
@@ -626,14 +645,14 @@ const ClientSettings = () => {
                                   toast.error(err.response?.data?.message || 'Unable to resend OTP')
                                 }
                               }}
-                              className="py-2 px-3 border rounded-sm text-sm"
+                              className="portal-btn-ghost py-2 px-3 text-sm"
                             >Resend</button>
                           </div>
                         </div>
                       )}
 
                       <div className="pt-2">
-                        <label className="text-sm text-gray-700">Type <span className="font-semibold">DELETE</span> to confirm</label>
+                        <label className="text-sm text-[color:var(--portal-text)]">Type <span className="font-semibold">DELETE</span> to confirm</label>
                         <input
                           type="text"
                           value={typeof window !== 'undefined' ? window.localStorage.getItem('delete-confirm') || '' : ''}
@@ -641,20 +660,21 @@ const ClientSettings = () => {
                             if (typeof window !== 'undefined') window.localStorage.setItem('delete-confirm', e.target.value)
                           }}
                           placeholder="Type DELETE to enable"
-                          className="input w-full bg-white dark:bg-dark-700 border-gray-200 mt-1"
+                          className="portal-input w-full mt-1"
                         />
                       </div>
 
                       <div className="flex items-center justify-end gap-3 pt-2">
-                        <button onClick={() => { setShowDeleteModal(false); setDeletePassword(''); setDeleteOtp(''); if (typeof window !== 'undefined') window.localStorage.removeItem('delete-confirm') }} className="py-2 px-4 border rounded-sm">Cancel</button>
+                        <button type="button" onClick={() => { setShowDeleteModal(false); setDeletePassword(''); setDeleteOtp(''); if (typeof window !== 'undefined') window.localStorage.removeItem('delete-confirm') }} className="portal-btn-ghost py-2 px-4">Cancel</button>
                         <button
+                          type="button"
                           onClick={async () => {
                             const confirmText = typeof window !== 'undefined' ? window.localStorage.getItem('delete-confirm') || '' : ''
                             if (confirmText !== 'DELETE') { toast.error('Type DELETE to confirm'); return }
                             await confirmDelete()
                           }}
                           disabled={deleting}
-                          className="py-2 px-4 bg-red-600 text-white rounded-sm disabled:opacity-50"
+                          className="py-2 px-4 bg-red-600 text-white rounded-xl disabled:opacity-50"
                         >{deleting ? 'Processing...' : 'Confirm Delete'}</button>
                       </div>
                     </div>
@@ -663,9 +683,9 @@ const ClientSettings = () => {
               </div>
 
               <div className="md:col-span-1">
-                <div className="bg-gray-50 dark:bg-dark-700 border border-gray-100 dark:border-dark-600 rounded-sm p-4">
-                  <p className="text-sm font-semibold">Before you delete</p>
-                  <ul className="text-xs mt-2 space-y-2 list-disc ml-4 text-gray-600">
+                <div className="bg-white/45 dark:bg-black/20 border border-[color:var(--portal-border)] rounded-xl p-4">
+                  <p className="text-sm font-semibold text-[color:var(--portal-text)]">Before you delete</p>
+                  <ul className="text-xs mt-2 space-y-2 list-disc ml-4 text-[color:var(--portal-muted)]">
                     <li>Export any documents you need.</li>
                     <li>Notify contacts if required.</li>
                     <li>Deleting is permanent.</li>

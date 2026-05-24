@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import {
   Calendar,
@@ -124,7 +125,7 @@ const ClientDashboard = () => {
       case 'completed':
         return <span className="bg-green-200/50 text-green-700 px-3 py-1 text-xs font-bold uppercase tracking-wider">Completed</span>
       case 'pending':
-        return <span className="bg-[#fef3c7] text-[#92400e] px-3 py-1 text-xs font-bold uppercase tracking-wider">Awaiting Signature</span>
+        return <span className="bg-[#fef3c7] text-[#92400e] px-3 py-1 text-xs font-bold uppercase tracking-wider">Awaiting Confirmation</span>
       case 'draft':
         return <span className="bg-[#0f172a] text-white px-3 py-1 text-xs font-bold uppercase tracking-wider">Draft</span>
       case 'confirmed':
@@ -135,60 +136,61 @@ const ClientDashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 pb-20">
+    <div className="portal-page portal-appear space-y-10">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="portal-card-elevated p-7 md:p-9 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="text-sm font-semibold tracking-widest text-gray-500 uppercase mb-2">Client Dashboard</h2>
-          <h1 className="text-3xl font-serif font-bold text-[#0f172a] dark:text-white">
+          <h2 className="portal-page-kicker mb-2">Client Dashboard</h2>
+          <h1 className="portal-page-title">
             Welcome back, {user?.name?.split(' ')[0] || 'Client'}
           </h1>
+          <p className="mt-3 text-sm text-[color:var(--portal-muted)]">Your private legal command view for active matters and strategic updates.</p>
         </div>
         <div className="flex items-center gap-6">
           <div className="relative" ref={notificationRef}>
             <button
               type="button"
               onClick={() => setShowNotifications((v) => !v)}
-              className="relative p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+              className="relative p-2 text-[color:var(--portal-muted)] hover:text-[color:var(--portal-text)] transition-colors"
               aria-label="Notifications"
             >
               <Bell className="w-5 h-5" />
               {(unreadCount || 0) > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#0f172a] dark:bg-white text-white dark:text-[#0f172a] text-[10px] font-bold flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[color:var(--portal-gold)] text-[#172038] text-[10px] font-bold flex items-center justify-center">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-3 w-[360px] max-h-[420px] overflow-y-auto bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 rounded-sm shadow-xl z-50">
-                <div className="px-4 py-3 border-b border-gray-100 dark:border-dark-600 flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-[#0f172a] dark:text-white">Notifications</h4>
-                  <span className="text-xs text-gray-500">{unreadMessages.length} unread</span>
+              <div className="portal-card absolute right-0 mt-3 w-[360px] max-h-[420px] overflow-y-auto z-50">
+                <div className="px-4 py-3 border-b border-[color:var(--portal-border)] flex items-center justify-between">
+                  <h4 className="text-sm font-bold text-[color:var(--portal-text)]">Notifications</h4>
+                  <span className="text-xs text-[color:var(--portal-muted)]">{unreadMessages.length} unread</span>
                 </div>
 
                 {unreadMessages.length === 0 ? (
-                  <div className="px-4 py-6 text-sm text-gray-500">No new messages from your lawyers.</div>
+                  <div className="px-4 py-6 text-sm text-[color:var(--portal-muted)]">No new messages from your lawyers.</div>
                 ) : (
                   unreadMessages.map((message) => (
                     <button
                       key={message.id}
                       type="button"
                       onClick={() => openChatFromNotification(message)}
-                      className="w-full text-left px-4 py-4 border-b border-gray-100 dark:border-dark-600 hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
+                      className="w-full text-left px-4 py-4 border-b border-[color:var(--portal-border)] hover:bg-white/50 dark:hover:bg-white/[0.04] transition-colors"
                     >
                       <div className="flex items-start justify-between gap-3 mb-1">
-                        <p className="text-sm font-semibold text-[#0f172a] dark:text-white">
+                        <p className="text-sm font-semibold text-[color:var(--portal-text)]">
                           {message.sender?.name || 'Assigned Lawyer'}
                         </p>
-                        <span className="text-[10px] font-bold text-[#0f172a] dark:text-white bg-gray-100 dark:bg-dark-600 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-bold text-[color:var(--portal-text)] bg-white/70 dark:bg-white/[0.08] px-2 py-0.5 rounded-full">
                           New
                         </span>
                       </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
+                      <p className="text-xs text-[color:var(--portal-muted)] line-clamp-2">
                         {message.message || 'Sent you a message'}
                       </p>
-                      <p className="text-[11px] text-gray-400 mt-2">
+                      <p className="text-[11px] text-[color:var(--portal-muted)]/80 mt-2">
                         {message.created_at ? getRelativeTime(message.created_at) : 'Just now'}
                       </p>
                     </button>
@@ -199,10 +201,10 @@ const ClientDashboard = () => {
           </div>
           <div className="flex items-center gap-3 text-right">
             <div className="hidden md:block">
-              <p className="text-sm font-semibold text-[#0f172a] dark:text-white">{user?.name || 'Sterling & Associates'}</p>
-              <p className="text-xs text-gray-500">Tier: Premium Sovereign</p>
+              <p className="text-sm font-semibold text-[color:var(--portal-text)]">{user?.name || 'Sterling & Associates'}</p>
+              <p className="text-xs text-[color:var(--portal-muted)]">Tier: Premium Sovereign</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 overflow-hidden">
+            <div className="w-10 h-10 rounded-full bg-gray-200 border border-[color:var(--portal-border)] overflow-hidden">
               <img src={`https://ui-avatars.com/api/?name=${user?.name || 'S'}&background=0f172a&color=fff`} alt="Profile" className="w-full h-full object-cover" />
             </div>
           </div>
@@ -213,36 +215,36 @@ const ClientDashboard = () => {
         {/* Left Column (Quick Actions & Portfolio) */}
         <div className="lg:col-span-2 space-y-8">
           <div>
-            <h3 className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-4">Quick Actions</h3>
+            <h3 className="portal-page-kicker mb-4">Quick Actions</h3>
             <div className="grid sm:grid-cols-2 gap-6">
               {/* Action Card 1 */}
-              <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 shadow-sm hover:shadow-md transition-shadow group flex flex-col justify-between">
+              <div className="portal-card p-8 hover:-translate-y-0.5 transition-all duration-300 group flex flex-col justify-between">
                 <div>
-                  <div className="w-12 h-12 bg-[#0f172a] flex items-center justify-center mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-[linear-gradient(140deg,#141f36,#2b3d63)] flex items-center justify-center mb-6 shadow-lg">
                     <Scale className="w-6 h-6 text-white" />
                   </div>
-                  <h4 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white mb-3">Start New Consultation</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+                  <h4 className="font-serif font-bold text-xl text-[color:var(--portal-text)] mb-3">Start New Consultation</h4>
+                  <p className="text-sm text-[color:var(--portal-muted)] mb-8 leading-relaxed">
                     Connect with a senior partner for immediate legal guidance and strategic planning.
                   </p>
                 </div>
-                <Link to="/lawyers" className="text-sm text-gray-500 group-hover:text-[#0f172a] dark:group-hover:text-white flex items-center gap-2 transition-colors mt-auto">
+                <Link to="/lawyers" className="text-sm text-[color:var(--portal-muted)] group-hover:text-[color:var(--portal-text)] flex items-center gap-2 transition-colors mt-auto">
                   Initiate Secure Session <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
 
               {/* Action Card 2 */}
-              <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8 shadow-sm hover:shadow-md transition-shadow group flex flex-col justify-between">
+              <div className="portal-card p-8 hover:-translate-y-0.5 transition-all duration-300 group flex flex-col justify-between">
                 <div>
-                  <div className="w-12 h-12 bg-[#fef3c7] flex items-center justify-center mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-[linear-gradient(140deg,#f5dfb0,#d8ad59)] flex items-center justify-center mb-6 shadow-lg">
                     <FileText className="w-6 h-6 text-[#92400e]" />
                   </div>
-                  <h4 className="font-serif font-bold text-xl text-[#0f172a] dark:text-white mb-3">Draft New Document</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+                  <h4 className="font-serif font-bold text-xl text-[color:var(--portal-text)] mb-3">Draft New Document</h4>
+                  <p className="text-sm text-[color:var(--portal-muted)] mb-8 leading-relaxed">
                     Access our premium templates for contracts, NDAs, and international legal frameworks.
                   </p>
                 </div>
-                <Link to="/client/documents" className="text-sm text-gray-500 group-hover:text-[#0f172a] dark:group-hover:text-white flex items-center gap-2 transition-colors mt-auto">
+                <Link to="/client/documents" className="text-sm text-[color:var(--portal-muted)] group-hover:text-[color:var(--portal-text)] flex items-center gap-2 transition-colors mt-auto">
                   Open Vault Templates <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -250,24 +252,24 @@ const ClientDashboard = () => {
           </div>
 
           {/* Portfolio Progression */}
-          <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 p-8">
+          <div className="portal-card p-8">
             <div className="flex justify-between items-center mb-8">
-              <h4 className="font-serif font-bold text-lg text-[#0f172a] dark:text-white">Portfolio Progression</h4>
+              <h4 className="font-serif font-bold text-lg text-[color:var(--portal-text)]">Portfolio Progression</h4>
 
             </div>
 
             <div className="grid grid-cols-3 gap-6 mb-6">
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Active Cases</p>
-                <p className="font-serif font-bold text-2xl text-[#0f172a] dark:text-white">{activeCases}</p>
+                <p className="text-xs font-semibold text-[color:var(--portal-muted)] uppercase tracking-wider mb-2">Active Cases</p>
+                <p className="font-serif font-bold text-2xl text-[color:var(--portal-text)]">{activeCases}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Pending Review</p>
-                <p className="font-serif font-bold text-2xl text-[#0f172a] dark:text-white">{pendingReviewDocs}</p>
+                <p className="text-xs font-semibold text-[color:var(--portal-muted)] uppercase tracking-wider mb-2">Pending Review</p>
+                <p className="font-serif font-bold text-2xl text-[color:var(--portal-text)]">{pendingReviewDocs}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Total Hours</p>
-                <p className="font-serif font-bold text-2xl text-[#0f172a] dark:text-white">{totalHours}</p>
+                <p className="text-xs font-semibold text-[color:var(--portal-muted)] uppercase tracking-wider mb-2">Total Hours</p>
+                <p className="font-serif font-bold text-2xl text-[color:var(--portal-text)]">{totalHours}</p>
               </div>
             </div>
 
@@ -278,9 +280,9 @@ const ClientDashboard = () => {
         {/* Right Column (Upcoming Schedule) */}
         <div>
           {/* Rating widget removed per UX: moved to sidebar modal */}
-          <h3 className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-4">Upcoming Schedule</h3>
+          <h3 className="portal-page-kicker mb-4">Upcoming Schedule</h3>
 
-          <div className="bg-[#0f172a] text-white p-8 shadow-xl h-full">
+          <div className="portal-card-elevated p-8 h-full text-[color:var(--portal-text)]">
             {isLoading ? (
               <div className="flex justify-center py-10"><Loader /></div>
             ) : (upcomingConsultations && upcomingConsultations.length > 0) ? (
@@ -289,7 +291,7 @@ const ClientDashboard = () => {
                 const meetingUrl = consultation.meeting_link || consultation.meeting_url || consultation.join_url || consultation.video_link
                 return (
                   <div key={consultation.id} className="h-full flex flex-col">
-                    <span className="inline-block bg-white/10 text-[#d97706] text-xs font-bold px-4 py-1.5 mb-8 tracking-wider uppercase border border-white/10 w-max">
+                    <span className="portal-chip mb-8 w-max">
                       Next Meeting
                     </span>
 
@@ -297,21 +299,21 @@ const ClientDashboard = () => {
                     <h4 className="font-serif text-lg font-semibold mb-2 leading-snug">{consultation.subject || 'Consultation'}</h4>
                     {(consultation.description || consultation.meeting_description || consultation.notes || consultation.client_note) && (
                       <div className="mb-6">
-                        <p className="font-serif text-2xl font-bold leading-tight text-white">{(consultation.description || consultation.meeting_description || consultation.notes || consultation.client_note)}</p>
+                        <p className="font-serif text-2xl font-bold leading-tight">{(consultation.description || consultation.meeting_description || consultation.notes || consultation.client_note)}</p>
                       </div>
                     )}
 
                     <div className="space-y-5 mb-12">
-                      <div className="flex items-center gap-4 text-gray-300 text-sm">
-                        <Calendar className="w-5 h-5 text-gray-400" />
+                      <div className="flex items-center gap-4 text-[color:var(--portal-muted)] text-sm">
+                        <Calendar className="w-5 h-5 text-[color:var(--portal-muted)]" />
                         {formatDate(consultation.scheduled_at)}
                       </div>
-                      <div className="flex items-center gap-4 text-gray-300 text-sm">
-                        <Clock className="w-5 h-5 text-gray-400" />
+                      <div className="flex items-center gap-4 text-[color:var(--portal-muted)] text-sm">
+                        <Clock className="w-5 h-5 text-[color:var(--portal-muted)]" />
                         {formatTime(consultation.scheduled_at)}
                       </div>
-                      <div className="flex items-center gap-4 text-gray-300 text-sm">
-                        <Scale className="w-5 h-5 text-gray-400" />
+                      <div className="flex items-center gap-4 text-[color:var(--portal-muted)] text-sm">
+                        <Scale className="w-5 h-5 text-[color:var(--portal-muted)]" />
                         {consultation.lawyer_profile?.user?.name || consultation.lawyer_name || 'Assigned Lawyer'}
                       </div>
                     </div>
@@ -322,7 +324,7 @@ const ClientDashboard = () => {
                           href={meetingUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-full bg-[#d97706] hover:bg-[#b45309] text-white font-bold py-4 px-4 flex items-center justify-center gap-2 transition-colors rounded-sm shadow-md"
+                          className="portal-btn-primary w-full py-4 px-4 flex items-center justify-center gap-2 rounded-xl"
                         >
                           <Video className="w-5 h-5" />
                           Join Secure Meeting
@@ -330,7 +332,7 @@ const ClientDashboard = () => {
                       ) : (
                         <button
                           disabled
-                          className="w-full bg-[#9a3412] opacity-80 cursor-not-allowed text-white font-bold py-4 px-4 flex items-center justify-center gap-2 transition-colors rounded-sm shadow-md"
+                          className="w-full bg-[#9a3412] opacity-80 cursor-not-allowed text-white font-bold py-4 px-4 flex items-center justify-center gap-2 transition-colors rounded-xl shadow-md"
                         >
                           <Video className="w-5 h-5" />
                           Meeting link not available
@@ -342,18 +344,18 @@ const ClientDashboard = () => {
               })()
             ) : (
               <div className="h-full flex flex-col">
-                <span className="inline-block bg-white/10 text-[#d97706] text-xs font-bold px-4 py-1.5 mb-8 tracking-wider uppercase border border-white/10 w-max">
+                <span className="portal-chip mb-8 w-max">
                   Next Meeting
                 </span>
 
                 <h4 className="font-serif text-2xl font-bold mb-8 leading-snug">No upcoming consultations</h4>
 
                 <div className="space-y-5 mb-12">
-                  <p className="text-gray-300">You have no scheduled consultations. Schedule a meeting with one of our lawyers to get started.</p>
+                  <p className="text-[color:var(--portal-muted)]">You have no scheduled consultations. Schedule a meeting with one of our lawyers to get started.</p>
                 </div>
 
                 <div className="mt-auto">
-                  <Link to="/lawyers" className="w-full bg-[#d97706] hover:bg-[#b45309] text-white font-bold py-4 px-4 flex items-center justify-center gap-2 transition-colors rounded-sm shadow-md">
+                  <Link to="/lawyers" className="portal-btn-primary w-full py-4 px-4 flex items-center justify-center gap-2 rounded-xl">
                     <Video className="w-5 h-5" />
                     Schedule a Consultation
                   </Link>
@@ -366,31 +368,31 @@ const ClientDashboard = () => {
 
       {/* Recent Activity Table (Documents + Consultations) */}
       <div>
-        <h3 className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-4">Recent Activity</h3>
-        <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-600 overflow-hidden shadow-sm">
+        <h3 className="portal-page-kicker mb-4">Recent Activity</h3>
+        <div className="portal-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-dark-600">
-                  <th className="py-5 px-8 text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider w-5/12">Activity</th>
-                  <th className="py-5 px-8 text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider w-2/12">Date</th>
-                  <th className="py-5 px-8 text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider w-3/12">Status</th>
-                  <th className="py-5 px-8 text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider text-right w-2/12">Actions</th>
+                <tr className="border-b border-[color:var(--portal-border)]">
+                  <th className="py-5 px-8 text-xs font-bold text-[color:var(--portal-text)] uppercase tracking-wider w-5/12">Activity</th>
+                  <th className="py-5 px-8 text-xs font-bold text-[color:var(--portal-text)] uppercase tracking-wider w-2/12">Date</th>
+                  <th className="py-5 px-8 text-xs font-bold text-[color:var(--portal-text)] uppercase tracking-wider w-3/12">Status</th>
+                  <th className="py-5 px-8 text-xs font-bold text-[color:var(--portal-text)] uppercase tracking-wider text-right w-2/12">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-dark-600">
+              <tbody className="divide-y divide-[color:var(--portal-border)]">
                 {paginatedActivityItems.map(item => (
-                  <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-dark-700/50 transition-colors">
+                  <tr key={item.id} className="hover:bg-white/45 dark:hover:bg-white/[0.03] transition-colors">
                     <td className="py-6 px-8">
                       <div className="flex items-start gap-4">
-                        <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
+                        <FileText className="w-5 h-5 text-[color:var(--portal-muted)] mt-0.5" />
                         <div>
-                          <p className="font-bold text-[#0f172a] dark:text-white text-sm mb-1">{item.title}</p>
-                          <p className="text-xs text-gray-500">{item.subtitle}</p>
+                          <p className="font-bold text-[color:var(--portal-text)] text-sm mb-1">{item.title}</p>
+                          <p className="text-xs text-[color:var(--portal-muted)]">{item.subtitle}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-6 px-8 text-sm  text-gray-600 dark:text-gray-400 font-medium">{formatDate(item.date)}</td>
+                    <td className="py-6 px-8 text-sm text-[color:var(--portal-muted)] font-medium">{formatDate(item.date)}</td>
                     <td className="py-6 px-8">{getStatusBadge(item.status)}</td>
                     <td className="py-6 px-8 text-right">
                       <div className="flex items-center justify-end gap-3">
@@ -399,7 +401,7 @@ const ClientDashboard = () => {
                             const docStatus = item.raw?.status
                             const canDownload = docStatus === 'completed' || docStatus === 'complete'
                             return canDownload ? (
-                              <Link to={`/client/documents`} className="text-[#d97706] hover:text-[#b45309] p-2 hover:bg-orange-50 rounded-full transition-colors">
+                              <Link to={`/client/documents`} className="text-[color:var(--portal-gold)] hover:text-[#b45309] p-2 hover:bg-orange-50 dark:hover:bg-white/[0.06] rounded-full transition-colors">
                                 <Download className="w-4 h-4" />
                               </Link>
                             ) : (
@@ -415,7 +417,7 @@ const ClientDashboard = () => {
                             const hasPassed = sched && sched < now
                             const cannotJoin = ['completed', 'cancelled'].includes(status) || hasPassed
                             return !cannotJoin ? (
-                              <Link to={`/client/consultations`} className="text-[#d97706] hover:text-[#b45309] text-sm font-semibold flex items-center justify-end gap-2 ml-auto hover:bg-orange-50 px-3 py-1.5 rounded-md transition-colors">
+                              <Link to={`/client/consultations`} className="text-[color:var(--portal-gold)] hover:text-[#b45309] text-sm font-semibold flex items-center justify-end gap-2 ml-auto hover:bg-orange-50 dark:hover:bg-white/[0.06] px-3 py-1.5 rounded-md transition-colors">
                                 <Video className="w-3.5 h-3.5" /> Join
                               </Link>
                             ) : (
@@ -433,25 +435,25 @@ const ClientDashboard = () => {
             </table>
           </div>
           {recentActivityItems.length > 0 && (
-            <div className="flex items-center justify-between gap-4 px-8 py-5 border-t border-gray-200 dark:border-dark-600 bg-gray-50/50 dark:bg-dark-800/50 flex-wrap">
-              <p className="text-sm text-gray-500 font-medium">
+            <div className="flex items-center justify-between gap-4 px-8 py-5 border-t border-[color:var(--portal-border)] bg-white/35 dark:bg-black/15 flex-wrap">
+              <p className="text-sm text-[color:var(--portal-muted)] font-medium">
                 Showing {activityStartIndex + 1} - {Math.min(activityStartIndex + activityItemsPerPage, recentActivityItems.length)} of {recentActivityItems.length} activities
               </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setActivityPage((page) => Math.max(1, page - 1))}
                   disabled={activityPage === 1}
-                  className="px-4 py-2 rounded-sm border border-gray-200 dark:border-dark-600 text-sm font-semibold text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors"
+                  className="portal-btn-ghost px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
-                <span className="px-4 py-2 text-sm font-semibold text-[#0f172a] dark:text-white">
+                <span className="px-4 py-2 text-sm font-semibold text-[color:var(--portal-text)]">
                   {activityPage} / {totalActivityPages}
                 </span>
                 <button
                   onClick={() => setActivityPage((page) => Math.min(totalActivityPages, page + 1))}
                   disabled={activityPage === totalActivityPages}
-                  className="px-4 py-2 rounded-sm border border-gray-200 dark:border-dark-600 text-sm font-semibold text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors"
+                  className="portal-btn-ghost px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -462,35 +464,35 @@ const ClientDashboard = () => {
       </div>
 
       {/* Footer */}
-      <footer className="pt-12 mt-16 flex flex-col md:flex-row justify-between gap-12">
+      <footer className="portal-card p-8 pt-10 mt-16 flex flex-col md:flex-row justify-between gap-12">
         <div className="max-w-md">
-          <h4 className="font-serif font-bold text-[#0f172a] dark:text-white mb-4 text-lg">Lexora</h4>
-          <p className="text-sm text-gray-500 leading-relaxed font-medium">
+          <h4 className="font-serif font-bold text-[color:var(--portal-text)] mb-4 text-lg">Lexora</h4>
+          <p className="text-sm text-[color:var(--portal-muted)] leading-relaxed font-medium">
             Institutional Authority & Digital Speed. We provide the world's elite with unparalleled legal frameworks and secure sovereign counsel.
           </p>
         </div>
         <div className="flex gap-20">
           <div>
-            <h5 className="text-xs font-bold text-[#0f172a] dark:text-white uppercase tracking-wider mb-6">Legal</h5>
-            <ul className="space-y-4 text-sm font-medium text-gray-500">
+            <h5 className="text-xs font-bold text-[color:var(--portal-text)] uppercase tracking-wider mb-6">Legal</h5>
+            <ul className="space-y-4 text-sm font-medium text-[color:var(--portal-muted)]">
               <li>
-                <Link to="/privacy" className="hover:text-[#0f172a] dark:hover:text-white transition-colors">Terms of Service</Link></li>
+                <Link to="/privacy" className="hover:text-[color:var(--portal-text)] transition-colors">Terms of Service</Link></li>
               <li>
-                <Link to="/privacy" className="hover:text-[#0f172a] dark:hover:text-white transition-colors">Privacy Policy</Link></li>
+                <Link to="/privacy" className="hover:text-[color:var(--portal-text)] transition-colors">Privacy Policy</Link></li>
               <li>
-                <Link to="/privacy" className="hover:text-[#0f172a] dark:hover:text-white transition-colors">Regulatory Disclosure</Link></li>
+                <Link to="/privacy" className="hover:text-[color:var(--portal-text)] transition-colors">Regulatory Disclosure</Link></li>
             </ul>
           </div>
           <div>
-            <h5 className="text-xs font-bold text-[#0f172a] dark:text-white uppercase tracking-wider mb-6">Account</h5>
-            <ul className="space-y-4 text-sm font-medium text-gray-500">
-              <li><Link to="/privacy" className="hover:text-[#0f172a] dark:hover:text-white transition-colors">Trust Badges</Link></li>
-              <li><Link to="/help" className="hover:text-[#0f172a] dark:hover:text-white transition-colors">Contact Support</Link></li>
+            <h5 className="text-xs font-bold text-[color:var(--portal-text)] uppercase tracking-wider mb-6">Account</h5>
+            <ul className="space-y-4 text-sm font-medium text-[color:var(--portal-muted)]">
+              <li><Link to="/privacy" className="hover:text-[color:var(--portal-text)] transition-colors">Trust Badges</Link></li>
+              <li><Link to="/help" className="hover:text-[color:var(--portal-text)] transition-colors">Contact Support</Link></li>
             </ul>
           </div>
         </div>
       </footer>
-      <div className="pt-8 pb-4 flex flex-col md:flex-row justify-between items-center text-xs font-medium text-gray-400 border-t border-gray-100 dark:border-dark-600">
+      <div className="pt-8 pb-4 flex flex-col md:flex-row justify-between items-center text-xs font-medium text-[color:var(--portal-muted)] border-t border-[color:var(--portal-border)]">
         <p className="italic">© 2026 Lexora. All Rights Reserved. Institutional Authority & Digital Speed.</p>
         <div className="flex gap-6 mt-4 md:mt-0">
           <Scale className="w-4 h-4 opacity-40 hover:opacity-100 transition-opacity cursor-pointer" />
@@ -499,13 +501,14 @@ const ClientDashboard = () => {
         </div>
       </div>
 
-      {selectedConsultation && (
+      {selectedConsultation && typeof document !== 'undefined' && createPortal(
         <ChatWidget
           consultation={selectedConsultation}
           openSignal={chatOpenSignal}
           minimizeToLauncher={false}
           onClose={() => setSelectedConsultation(null)}
-        />
+        />,
+        document.body
       )}
     </div>
   )

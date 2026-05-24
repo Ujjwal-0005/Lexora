@@ -92,11 +92,11 @@ const CustomDocumentRequestWizard = () => {
     }
 
     return (
-        <div className="max-w-6xl mx-auto space-y-10 pb-20">
-            <div className="flex flex-col gap-6 border-b border-gray-200 dark:border-dark-700 pb-6">
+        <div className="portal-page portal-appear max-w-6xl mx-auto space-y-10 pb-20">
+            <div className="portal-card-elevated p-7 md:p-9 flex flex-col gap-6">
                 <button
                     onClick={() => navigate('/documents/browse')}
-                    className="inline-flex items-center gap-3 text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-[#0f172a] dark:hover:text-[#D4AF37] transition-colors w-fit"
+                    className="inline-flex items-center gap-3 text-xs font-bold tracking-widest uppercase text-[color:var(--portal-muted)] hover:text-[color:var(--portal-text)] transition-colors w-fit"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Back to Library
@@ -104,26 +104,26 @@ const CustomDocumentRequestWizard = () => {
 
                 <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr] items-end">
                     <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#c0841a] mb-3">Custom Request</p>
-                        <h1 className="font-serif text-4xl md:text-5xl font-bold text-[#0f172a] dark:text-white leading-tight">
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-[color:var(--portal-gold)] mb-3">Custom Request</p>
+                        <h1 className="portal-page-title leading-tight">
                             Request a lawyer-built document
                         </h1>
-                        <p className="mt-4 text-sm font-medium tracking-wide text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed">
+                        <p className="mt-4 text-sm font-medium tracking-wide text-[color:var(--portal-muted)] max-w-2xl leading-relaxed">
                             Name the document, choose the lawyer, and submit the request. The lawyer will review it, quote the fee, ask for the required data, and upload the final PDF when finished.
                         </p>
                     </div>
 
-                    <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 p-5 rounded-sm shadow-sm">
+                    <div className="portal-card p-5">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="w-11 h-11 bg-[#0f172a] text-[#D4AF37] rounded-sm flex items-center justify-center">
+                            <div className="w-11 h-11 bg-[linear-gradient(145deg,#13213d,#2b4169)] text-[color:var(--portal-gold)] rounded-xl flex items-center justify-center">
                                 <Sparkles className="w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Custom Workflow</p>
-                                <p className="font-serif font-bold text-[#0f172a] dark:text-white">Request Intake</p>
+                                <p className="text-[10px] uppercase tracking-widest font-bold text-[color:var(--portal-muted)]">Custom Workflow</p>
+                                <p className="font-serif font-bold text-[color:var(--portal-text)]">Request Intake</p>
                             </div>
                         </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                        <p className="text-sm text-[color:var(--portal-muted)] leading-relaxed">
                             This route is for documents that do not fit a fixed template.
                         </p>
                     </div>
@@ -140,10 +140,10 @@ const CustomDocumentRequestWizard = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 shadow-xl p-8 rounded-sm space-y-8"
+                    className="portal-card p-8 space-y-8"
                 >
                     <div>
-                        <label className="block text-xs font-bold tracking-wider uppercase text-gray-500 dark:text-gray-400 mb-3">
+                        <label className="block text-xs font-bold tracking-wider uppercase text-[color:var(--portal-muted)] mb-3">
                             Document Name
                         </label>
                         <input
@@ -151,12 +151,12 @@ const CustomDocumentRequestWizard = () => {
                             value={formData.document_name}
                             onChange={handleChange}
                             placeholder="e.g. Rental Agreement Draft"
-                            className="w-full bg-slate-50 dark:bg-dark-900 border border-gray-300 dark:border-dark-600 text-[#0f172a] dark:text-white px-5 py-4 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#0f172a] dark:focus:ring-[#D4AF37] transition-all shadow-inner text-sm"
+                            className="portal-input w-full px-5 py-4 text-sm"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold tracking-wider uppercase text-gray-500 dark:text-gray-400 mb-3">
+                        <label className="block text-xs font-bold tracking-wider uppercase text-[color:var(--portal-muted)] mb-3">
                             Notes for the Lawyer
                         </label>
                         <textarea
@@ -165,19 +165,19 @@ const CustomDocumentRequestWizard = () => {
                             onChange={handleChange}
                             placeholder="Add a short description of what you need and any special instructions"
                             rows="5"
-                            className="w-full bg-slate-50 dark:bg-dark-900 border border-gray-300 dark:border-dark-600 text-[#0f172a] dark:text-white px-5 py-4 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#0f172a] dark:focus:ring-[#D4AF37] transition-all resize-none shadow-inner text-sm"
+                            className="portal-input w-full px-5 py-4 resize-none text-sm"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold tracking-wider uppercase text-gray-500 dark:text-gray-400 mb-3">
+                        <label className="block text-xs font-bold tracking-wider uppercase text-[color:var(--portal-muted)] mb-3">
                             Select Lawyer
                         </label>
                         <select
                             name="lawyer_profile_id"
                             value={formData.lawyer_profile_id}
                             onChange={handleChange}
-                            className="w-full bg-slate-50 dark:bg-dark-900 border border-gray-300 dark:border-dark-600 text-[#0f172a] dark:text-white px-5 py-4 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#0f172a] dark:focus:ring-[#D4AF37] transition-all shadow-inner text-sm"
+                            className="portal-input w-full px-5 py-4 text-sm"
                         >
                             <option value="">Choose a lawyer</option>
                             {lawyers.map((lawyer) => (
@@ -192,14 +192,14 @@ const CustomDocumentRequestWizard = () => {
                         <button
                             type="button"
                             onClick={() => navigate('/documents/browse')}
-                            className="px-6 py-3 border border-gray-300 dark:border-dark-600 text-gray-700 dark:text-gray-300 font-semibold text-sm rounded-sm hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
+                            className="portal-btn-ghost px-6 py-3 font-semibold text-sm"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="px-6 py-3 bg-[#0f172a] text-white font-semibold text-sm rounded-sm hover:bg-black transition-colors shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="portal-btn-primary px-6 py-3 font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserCheck className="w-4 h-4" />}
                             {submitting ? 'Sending Request...' : 'Send Custom Request'}
@@ -213,40 +213,40 @@ const CustomDocumentRequestWizard = () => {
                     transition={{ delay: 0.05 }}
                     className="space-y-6"
                 >
-                    <div className="bg-[#0f172a] text-white p-6 rounded-sm shadow-xl border-l-4 border-[#D4AF37]">
-                        <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-3">Selected Lawyer</p>
+                    <div className="portal-card-elevated p-6 rounded-2xl border-l-4 border-[color:var(--portal-gold)]">
+                        <p className="text-[10px] uppercase tracking-widest text-[color:var(--portal-muted)] font-bold mb-3">Selected Lawyer</p>
                         {selectedLawyer ? (
                             <div className="space-y-4">
                                 <div>
-                                    <p className="font-serif text-2xl font-bold text-[#D4AF37]">{selectedLawyer.user?.name}</p>
-                                    <p className="text-sm text-gray-300 mt-1">{selectedLawyer.designation || 'Lawyer'}</p>
+                                    <p className="font-serif text-2xl font-bold text-[color:var(--portal-gold)]">{selectedLawyer.user?.name}</p>
+                                    <p className="text-sm text-[color:var(--portal-muted)] mt-1">{selectedLawyer.designation || 'Lawyer'}</p>
                                 </div>
-                                <div className="flex items-center gap-3 text-sm text-gray-300">
+                                <div className="flex items-center gap-3 text-sm text-[color:var(--portal-muted)]">
                                     <Building2 className="w-4 h-4" />
                                     <span>Profile ID {selectedLawyer.id}</span>
                                 </div>
-                                <div className="flex items-center gap-3 text-sm text-gray-300">
+                                <div className="flex items-center gap-3 text-sm text-[color:var(--portal-muted)]">
                                     <Mail className="w-4 h-4" />
                                     <span>{selectedLawyer.user?.email}</span>
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-sm text-gray-300">Choose any verified lawyer to send your request directly.</p>
+                            <p className="text-sm text-[color:var(--portal-muted)]">Choose any verified lawyer to send your request directly.</p>
                         )}
                     </div>
 
-                    <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 shadow-sm p-6 rounded-sm">
-                        <h2 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white mb-4">What happens next</h2>
-                        <div className="space-y-4 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <div className="portal-card p-6">
+                        <h2 className="font-serif text-2xl font-bold text-[color:var(--portal-text)] mb-4">What happens next</h2>
+                        <div className="space-y-4 text-sm text-[color:var(--portal-muted)] leading-relaxed">
                             <p>1. The lawyer receives your request and decides whether to accept it.</p>
                             <p>2. If accepted, the lawyer sends the exact fields they need and the document fee.</p>
                             <p>3. You fill the requested key-value data, pay the quoted amount, and wait for the final PDF.</p>
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 shadow-sm p-6 rounded-sm">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Reminder</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <div className="portal-card p-6">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-[color:var(--portal-muted)] mb-3">Reminder</h3>
+                        <p className="text-sm text-[color:var(--portal-muted)] leading-relaxed">
                             This request is saved immediately to your document vault, so you can track acceptance, field requests, payment, and the final upload from the client portal.
                         </p>
                     </div>

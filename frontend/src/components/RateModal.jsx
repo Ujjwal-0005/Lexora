@@ -7,6 +7,7 @@ import { useAuthStore } from '../store/authStore'
 export default function RateModal({ open, onClose }) {
     const { isAdmin, isLawyer, isClient } = useAuthStore()
     const adminView = isAdmin()
+    const clientView = isClient()
     const ratingEnabled = isLawyer() || isClient()
 
     const { data: summary } = useQuery({
@@ -37,28 +38,34 @@ export default function RateModal({ open, onClose }) {
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/80" onClick={onClose} />
+            <div className={`absolute inset-0 ${clientView ? 'bg-black/25' : 'bg-black/80'}`} onClick={onClose} />
 
-            <div className="relative z-[61] w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-white dark:bg-dark-800">
+            <div className={`relative z-[61] w-full max-w-4xl rounded-2xl overflow-hidden ${clientView
+                ? 'portal-card-elevated border border-[color:var(--portal-border)] shadow-[0_24px_60px_rgba(15,23,42,0.18)]'
+                : 'shadow-2xl bg-white dark:bg-dark-800'
+                }`}>
                 {/* Header */}
-                <div className="flex items-center justify-between gap-4 p-6 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-800">
+                <div className={`flex items-center justify-between gap-4 p-6 ${clientView
+                    ? 'bg-[linear-gradient(140deg,#121f39_0%,#1f335a_55%,#152846_100%)] border-b border-[color:var(--portal-border)]'
+                    : 'bg-gradient-to-r from-amber-700 via-amber-600 to-amber-800'
+                    }`}>
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center shadow-sm">
-                            <Star className="w-6 h-6 text-white" />
+                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center shadow-sm ${clientView ? 'bg-white/10 border border-white/20' : 'bg-white/20'}`}>
+                            <Star className={`w-6 h-6 ${clientView ? 'text-[color:var(--portal-gold)]' : 'text-white'}`} />
                         </div>
                         <div>
                             <h3 className="text-2xl font-serif font-bold text-white">Rattings</h3>
-                            <p className="text-sm text-white/90">Platform feedback & distribution</p>
+                            <p className={`text-sm ${clientView ? 'text-white/70' : 'text-white/90'}`}>Platform feedback & distribution</p>
                         </div>
                     </div>
 
-                    <button onClick={onClose} className="text-white hover:opacity-90 p-2 rounded-full bg-white/10">
+                    <button onClick={onClose} className={`text-white hover:opacity-90 p-2 rounded-full ${clientView ? 'bg-white/8 border border-white/15' : 'bg-white/10'}`}>
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
                 {/* Body */}
-                <div className="bg-white dark:bg-dark-800 p-6">
+                <div className={`${clientView ? 'bg-[color:var(--portal-surface-elevated)] p-6' : 'bg-white dark:bg-dark-800 p-6'}`}>
                     {adminView ? (
                         <div className="grid lg:grid-cols-2 gap-6 items-start">
                             <div className="card p-6">
@@ -108,10 +115,10 @@ export default function RateModal({ open, onClose }) {
                         </div>
                     ) : ratingEnabled ? (
                         <div className="max-w-3xl mx-auto">
-                            <div className="card p-6">
+                            <div className={clientView ? 'portal-card p-6 border border-[color:var(--portal-border)]' : 'card p-6'}>
                                 <RatingWidget />
                             </div>
-                            <p className="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
+                            <p className={`mt-4 text-xs text-center ${clientView ? 'text-[color:var(--portal-muted)]' : 'text-gray-500 dark:text-gray-400'}`}>
                                 Your rating helps improve the platform. No extra insights are shown here.
                             </p>
                         </div>
@@ -122,7 +129,7 @@ export default function RateModal({ open, onClose }) {
                     )}
 
                     <div className="mt-6 flex justify-end">
-                        <button onClick={onClose} className="px-5 py-2 rounded-lg bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 dark:hover:bg-dark-600">Close</button>
+                        <button onClick={onClose} className={clientView ? 'portal-btn-ghost px-5 py-2 rounded-lg' : 'px-5 py-2 rounded-lg bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 dark:hover:bg-dark-600'}>Close</button>
                     </div>
                 </div>
             </div>

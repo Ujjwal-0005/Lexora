@@ -945,23 +945,27 @@ const Register = () => {
                                                     })}
                                                 </div>
 
-                                                <div className="mt-4 grid grid-cols-[1fr_120px_auto] gap-3">
+                                                <div className="mt-4 space-y-3">
                                                     <input
                                                         type="text"
                                                         value={customDocName}
                                                         onChange={(e) => setCustomDocName(e.target.value)}
                                                         placeholder="Custom document name"
-                                                        className="border border-gray-300 dark:border-dark-600 px-3 py-2 text-sm bg-white dark:bg-dark-800"
+                                                        className="w-full border border-gray-300 dark:border-dark-600 px-3 py-3 text-sm bg-white dark:bg-dark-800 focus:outline-none focus:border-[#0f1e30] dark:focus:border-white transition-colors"
                                                     />
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        value={customDocFee}
-                                                        onChange={(e) => setCustomDocFee(e.target.value)}
-                                                        placeholder="Fee"
-                                                        className="border border-gray-300 dark:border-dark-600 px-3 py-2 text-sm bg-white dark:bg-dark-800"
-                                                    />
-                                                    <button type="button" onClick={addCustomDocument} className="px-4 bg-[#0f1e30] text-white text-sm font-semibold">Add</button>
+                                                    <div className="flex flex-col sm:flex-row gap-3">
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            value={customDocFee}
+                                                            onChange={(e) => setCustomDocFee(e.target.value)}
+                                                            placeholder="Fee"
+                                                            className="w-full sm:flex-1 border border-gray-300 dark:border-dark-600 px-3 py-3 text-sm bg-white dark:bg-dark-800 focus:outline-none focus:border-[#0f1e30] dark:focus:border-white transition-colors"
+                                                        />
+                                                        <button type="button" onClick={addCustomDocument} className="w-full sm:w-[120px] shrink-0 px-5 py-3 bg-[#0f1e30] text-white text-sm font-semibold rounded-sm whitespace-nowrap">
+                                                            Add
+                                                        </button>
+                                                    </div>
                                                 </div>
 
                                                 {customDocuments.length > 0 && (

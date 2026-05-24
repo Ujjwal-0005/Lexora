@@ -94,7 +94,7 @@
     <div class="container">
         <div class="card">
             <div class="header">
-                <div class="logo">Lexorat</div>
+                <div class="logo">Lexora</div>
                 <h1 class="title">Email Verification</h1>
                 <p class="subtitle">Complete your registration</p>
             </div>
