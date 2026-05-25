@@ -78,38 +78,37 @@ const AdminUsers = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 pb-20 font-sans">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-200 dark:border-dark-600 pb-8">
-        <div className="max-w-2xl">
-          <h1 className="font-serif text-4xl font-bold text-[#0f172a] dark:text-white mb-3">User Management</h1>
-          <p className="text-gray-500 font-medium leading-relaxed">
-            Administrative control center for all platform identities. Modify access levels, review status, and maintain the integrity of the user base.
-          </p>
-        </div>
+    <div className="admin-page space-y-8">
+      <div className="admin-page-header">
+        <p className="admin-page-kicker">Identity Governance</p>
+        <h1 className="admin-page-title mb-3">User Management</h1>
+        <p className="admin-page-subtitle">
+          Administrative control center for all platform identities. Modify access levels, review status, and maintain the integrity of the user base.
+        </p>
       </div>
 
       {/* Table Section */}
-      <div className="bg-white dark:bg-dark-800 shadow-sm border border-gray-200 dark:border-dark-600">
-        <div className="p-8 border-b border-gray-200 dark:border-dark-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h2 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white">Active Users Directory</h2>
+      <div className="admin-panel">
+        <div className="admin-panel-header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h2 className="admin-panel-title">Active Users Directory</h2>
 
           <div className="flex flex-wrap gap-4 w-full sm:w-auto">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--admin-muted)]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search database..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-dark-700 border border-transparent focus:border-gray-300 dark:focus:border-dark-500 rounded-sm text-sm focus:outline-none transition-colors"
+                className="admin-input !pl-11"
               />
             </div>
             <div className="relative min-w-[150px]">
-              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--admin-muted)]" />
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full pl-10 pr-8 py-2 bg-gray-50 dark:bg-dark-700 border border-transparent focus:border-gray-300 dark:focus:border-dark-500 rounded-sm text-sm focus:outline-none transition-colors appearance-none"
+                className="admin-select !pl-11 pr-8 appearance-none"
               >
                 <option value="">All Roles</option>
                 <option value="client">Clients</option>
@@ -123,18 +122,18 @@ const AdminUsers = () => {
         {isLoading ? (
           <div className="py-20"><Loader /></div>
         ) : users?.data?.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
+          <div className="overflow-x-auto admin-panel-body pt-0 px-0 pb-0">
+            <table className="admin-data-table text-left">
               <thead>
-                <tr className="bg-gray-50 dark:bg-dark-800 border-b border-gray-200 dark:border-dark-600">
-                  <th className="py-4 px-8 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest w-[30%]">IDENTITY</th>
-                  <th className="py-4 px-8 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest w-[25%]">AUTHORIZATION</th>
-                  <th className="py-4 px-8 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest w-[20%]">COMPLIANCE</th>
-                  <th className="py-4 px-8 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest w-[15%]">INDUCTED</th>
-                  <th className="py-4 px-8 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest text-right">ACTIONS</th>
+                <tr>
+                  <th className="w-[30%]">Identity</th>
+                  <th className="w-[25%]">Authorization</th>
+                  <th className="w-[20%]">Compliance</th>
+                  <th className="w-[15%]">Inducted</th>
+                  <th className="text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-dark-600">
+              <tbody>
                 {(() => {
                   const startIdx = (usersPage - 1) * RECORDS_PER_PAGE
                   const endIdx = startIdx + RECORDS_PER_PAGE
@@ -146,51 +145,51 @@ const AdminUsers = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: index * 0.03 }}
-                      className="hover:bg-gray-50 dark:hover:bg-dark-700/50 transition-colors"
+                      className="transition-colors"
                     >
-                      <td className="py-5 px-8">
+                      <td>
                         <div className="flex items-center gap-4">
-                          <div className="w-9 h-9 rounded-sm bg-[#0f172a] text-white flex items-center justify-center flex-shrink-0 shadow-inner">
-                            <span className="font-serif font-bold text-sm">
+                          <div className="w-9 h-9 rounded-xl bg-[linear-gradient(145deg,var(--admin-accent),var(--admin-accent-soft))] text-white flex items-center justify-center flex-shrink-0 shadow-inner">
+                            <span className="font-bold text-sm">
                               {user.name?.charAt(0)}
                             </span>
                           </div>
                           <div>
-                            <p className="font-bold text-[#0f172a] dark:text-white text-sm">{user.name}</p>
-                            <p className="text-xs text-gray-500">{user.email}</p>
+                            <p className="font-semibold text-[color:var(--admin-text)] text-sm">{user.name}</p>
+                            <p className="text-xs text-[color:var(--admin-muted)]">{user.email}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-5 px-8">
-                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                      <td>
+                        <div className="flex items-center gap-2 text-[color:var(--admin-text)]">
                           {getRoleIcon(user.role)}
                           <span className="text-[11px] font-bold uppercase tracking-wider">{getRoleLabel(user.role)}</span>
                         </div>
                       </td>
-                      <td className="py-5 px-8">
+                      <td>
                         {user.role === 'lawyer' ? (
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-[10px] font-bold uppercase tracking-wider ${user.is_verified_by_admin
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-[#fef3c7] text-[#92400e] dark:bg-yellow-900/30 dark:text-yellow-500'
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${user.is_verified_by_admin
+                            ? 'text-emerald-600 border-emerald-300 bg-emerald-100/60 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-300'
+                            : 'text-amber-700 border-amber-300 bg-amber-100/70 dark:bg-amber-500/15 dark:border-amber-400/30 dark:text-amber-300'
                             }`}>
                             {user.is_verified_by_admin ? <CheckCircle2 className="w-3 h-3" /> : null}
                             {user.is_verified_by_admin ? 'Verified' : 'Pending Audit'}
                           </span>
                         ) : (
-                          <span className="text-xs text-gray-400 font-medium">N/A</span>
+                          <span className="text-xs text-[color:var(--admin-muted)] font-medium">N/A</span>
                         )}
                       </td>
-                      <td className="py-5 px-8 text-xs text-gray-500 font-medium">
+                      <td className="text-xs text-[color:var(--admin-muted)] font-medium">
                         {formatDate(user.created_at)}
                       </td>
-                      <td className="py-5 px-8 text-right">
+                      <td className="text-right">
                         <div className="flex items-center justify-end gap-3">
                           <button
                             onClick={() => {
                               setSelectedUser(user)
                               setShowEditModal(true)
                             }}
-                            className="text-gray-400 hover:text-[#0f172a] transition-colors p-1"
+                            className="text-[color:var(--admin-muted)] hover:text-[color:var(--admin-text)] transition-colors p-1"
                             title="Edit Profile"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -201,7 +200,7 @@ const AdminUsers = () => {
                                 deleteUser.mutate(user.id)
                               }
                             }}
-                            className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                            className="text-[color:var(--admin-muted)] hover:text-red-500 transition-colors p-1"
                             title="Revoke Access"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -215,25 +214,25 @@ const AdminUsers = () => {
             </table>
 
             {/* Footer with Pagination */}
-            <div className="p-6 bg-gray-50 dark:bg-dark-800 border-t border-gray-200 dark:border-dark-600 flex items-center justify-between">
-              <p className="text-[11px] text-gray-500 font-medium">
+            <div className="p-6 border-t border-[color:var(--admin-border)] flex items-center justify-between" style={{ background: 'var(--admin-surface)' }}>
+              <p className="text-[11px] text-[color:var(--admin-muted)] font-medium">
                 Showing {Math.min((usersPage - 1) * RECORDS_PER_PAGE + 1, users.data.length)} - {Math.min(usersPage * RECORDS_PER_PAGE, users.data.length)} of {users.data.length} records
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setUsersPage(Math.max(1, usersPage - 1))}
                   disabled={usersPage === 1}
-                  className="p-1.5 bg-white border border-gray-300 dark:border-dark-600 rounded-sm hover:bg-gray-50 dark:hover:bg-dark-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-400 transition-colors"
+                  className="admin-btn-ghost p-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="px-3 py-1.5 text-xs font-bold text-gray-700 dark:text-gray-300">
+                <span className="px-3 py-1.5 text-xs font-bold text-[color:var(--admin-text)]">
                   {usersPage} / {Math.ceil(users.data.length / RECORDS_PER_PAGE)}
                 </span>
                 <button
                   onClick={() => setUsersPage(Math.min(Math.ceil(users.data.length / RECORDS_PER_PAGE), usersPage + 1))}
                   disabled={usersPage === Math.ceil(users.data.length / RECORDS_PER_PAGE)}
-                  className="p-1.5 bg-white border border-gray-300 dark:border-dark-600 rounded-sm hover:bg-gray-50 dark:hover:bg-dark-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-400 transition-colors"
+                  className="admin-btn-ghost p-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -241,10 +240,10 @@ const AdminUsers = () => {
             </div>
           </div>
         ) : (
-          <div className="text-center py-24 px-6">
-            <User className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="font-serif text-xl font-bold text-[#0f172a] dark:text-white mb-2">No Records Found</h3>
-            <p className="text-gray-500 font-medium text-sm">No users match your current filter parameters.</p>
+          <div className="admin-empty-state">
+            <User className="w-12 h-12 text-[color:var(--admin-muted)] mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-[color:var(--admin-text)] mb-2">No Records Found</h3>
+            <p className="text-[color:var(--admin-muted)] font-medium text-sm">No users match your current filter parameters.</p>
           </div>
         )}
       </div>
@@ -256,49 +255,49 @@ const AdminUsers = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+            className="fixed inset-0 admin-modal-backdrop z-50 flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-dark-800 rounded-sm max-w-md w-full p-8 shadow-2xl"
+              className="admin-modal-panel max-w-md w-full p-8"
             >
               <div className="flex justify-between items-start mb-8">
                 <div>
-                  <h2 className="font-serif text-2xl font-bold text-[#0f172a] dark:text-white">Modify Identity</h2>
-                  <p className="text-sm text-gray-500 uppercase tracking-widest mt-1 font-bold">Admin Override</p>
+                  <h2 className="text-2xl font-bold text-[color:var(--admin-text)]">Modify Identity</h2>
+                  <p className="text-sm text-[color:var(--admin-muted)] uppercase tracking-widest mt-1 font-bold">Admin Override</p>
                 </div>
-                <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <button onClick={() => setShowEditModal(false)} className="text-[color:var(--admin-muted)] hover:text-[color:var(--admin-text)] transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-5 mb-8">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Full Legal Name</label>
+                  <label className="block text-[10px] font-bold text-[color:var(--admin-muted)] uppercase tracking-widest mb-1.5">Full Legal Name</label>
                   <input
                     type="text"
                     defaultValue={selectedUser.name}
                     id="edit-name"
-                    className="w-full p-3 border border-gray-300 dark:border-dark-600 rounded-sm bg-white dark:bg-dark-700 focus:outline-none focus:border-[#0f172a] transition-colors"
+                    className="admin-input"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">System Email (Immutable)</label>
+                  <label className="block text-[10px] font-bold text-[color:var(--admin-muted)] uppercase tracking-widest mb-1.5">System Email (Immutable)</label>
                   <input
                     type="email"
                     defaultValue={selectedUser.email}
                     disabled
-                    className="w-full p-3 border border-gray-200 dark:border-dark-600 rounded-sm bg-gray-50 dark:bg-dark-700 text-gray-500 focus:outline-none"
+                    className="admin-input opacity-70"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Authorization Role</label>
+                  <label className="block text-[10px] font-bold text-[color:var(--admin-muted)] uppercase tracking-widest mb-1.5">Authorization Role</label>
                   <select
                     defaultValue={selectedUser.role}
                     id="edit-role"
-                    className="w-full p-3 border border-gray-300 dark:border-dark-600 rounded-sm bg-white dark:bg-dark-700 focus:outline-none focus:border-[#0f172a] transition-colors"
+                    className="admin-select"
                   >
                     <option value="client">Client</option>
                     <option value="lawyer">Lawyer</option>
@@ -306,7 +305,7 @@ const AdminUsers = () => {
                   </select>
                 </div>
                 {selectedUser.role === 'lawyer' && (
-                  <div className="p-4 bg-gray-50 dark:bg-dark-700 border border-gray-200 dark:border-dark-600 rounded-sm mt-2">
+                  <div className="p-4 border border-[color:var(--admin-border)] rounded-xl mt-2" style={{ background: 'var(--admin-surface)' }}>
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="checkbox"
@@ -315,18 +314,18 @@ const AdminUsers = () => {
                         className="w-4 h-4 rounded-sm border-gray-300 text-[#0f172a] focus:ring-[#0f172a]"
                       />
                       <div>
-                        <span className="block text-sm font-bold text-[#0f172a] dark:text-white">Admin Verified Status</span>
-                        <span className="block text-[10px] text-gray-500 uppercase tracking-widest mt-0.5">Grants full platform access</span>
+                        <span className="block text-sm font-bold text-[color:var(--admin-text)]">Admin Verified Status</span>
+                        <span className="block text-[10px] text-[color:var(--admin-muted)] uppercase tracking-widest mt-0.5">Grants full platform access</span>
                       </div>
                     </label>
                   </div>
                 )}
               </div>
 
-              <div className="flex gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-dark-600">
+              <div className="flex gap-4 mt-8 pt-6 border-t border-[color:var(--admin-border)]">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="flex-1 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-sm transition-colors"
+                  className="flex-1 py-3 admin-btn-ghost"
                 >
                   Cancel
                 </button>
@@ -342,7 +341,7 @@ const AdminUsers = () => {
                     })
                   }}
                   disabled={updateUser.isPending}
-                  className="flex-1 bg-[#0f172a] hover:bg-black text-white font-bold text-sm py-3 rounded-sm transition-colors shadow-sm disabled:opacity-50"
+                  className="flex-1 admin-btn-primary text-sm py-3 disabled:opacity-50"
                 >
                   {updateUser.isPending ? 'Committing...' : 'Commit Changes'}
                 </button>

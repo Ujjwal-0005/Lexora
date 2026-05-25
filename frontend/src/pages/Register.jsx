@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, EyeOff, User, Scale, ShieldCheck, Sparkles, Plus, Trash2, ArrowRight, Lock } from 'lucide-react'
+import { Eye, EyeOff, User, Scale, ShieldCheck, Plus, Trash2, ArrowRight, Lock, BadgeCheck } from 'lucide-react'
 import { useRegister } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
 import { useFilterStore } from '../store/filterStore'
@@ -478,155 +478,82 @@ const Register = () => {
 
     const currentStrength = strengthLevels.find((s) => strength >= s.min && strength <= s.max)
 
-    const registerHeroPanelStyle = darkMode
-        ? {
-            background: 'linear-gradient(135deg, #0a1218 0%, #1a3a5a 25%, #2d5a7f 50%, #1a3a4f 75%, #0a0f1a 100%)',
-        }
-        : {
-            background: 'linear-gradient(135deg, #0d1a2e 0%, #1a3a5f 25%, #2d5a8f 50%, #1a3a5f 75%, #0a1628 100%)',
-        }
-
     return (
-        <div
-            className="min-h-screen flex items-center justify-center py-12 px-4 pt-[112px] relative overflow-hidden font-sans transition-colors duration-300"
-            style={{
-                background: darkMode
-                    ? 'linear-gradient(135deg, #030810 0%, #0a1220 15%, #1a2a4a 35%, #2a4a7a 50%, #1a2a5a 65%, #0a1220 85%, #030810 100%)'
-                    : 'linear-gradient(135deg, #f5f8fc 0%, #f0f4f9 12%, #e8eef7 32%, #dfe8f4 50%, #e8eef7 68%, #f0f4f9 88%, #f5f8fc 100%)',
-            }}
-        >
-            {/* Background Decoration - Extraordinary */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {/* Multiple animated gradient orbs */}
-                <div className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl opacity-30 dark:opacity-20" style={{
-                    background: darkMode
-                        ? 'radial-gradient(circle, rgba(100,200,255,0.3) 0%, transparent 70%)'
-                        : 'radial-gradient(circle, rgba(168,212,248,0.4) 0%, transparent 70%)',
-                }} />
-                <div className="absolute -bottom-1/3 -right-1/3 w-full h-full rounded-full blur-3xl opacity-40 dark:opacity-25" style={{
-                    background: darkMode
-                        ? 'radial-gradient(circle, rgba(255,192,61,0.25) 0%, transparent 70%)'
-                        : 'radial-gradient(circle, rgba(248,168,212,0.35) 0%, transparent 70%)',
-                }} />
-                <div className="absolute top-1/4 right-0 w-96 h-96 rounded-full blur-3xl opacity-20 dark:opacity-15" style={{
-                    background: darkMode
-                        ? 'radial-gradient(circle, rgba(168,100,255,0.2) 0%, transparent 70%)'
-                        : 'radial-gradient(circle, rgba(212,168,248,0.3) 0%, transparent 70%)',
-                }} />
-            </div>
-            {/* Fine overlay pattern */}
-            <div className="absolute inset-0 pointer-events-none" style={{
-                backgroundImage: `linear-gradient(0deg, transparent 24%, rgba(255,255,255,.05) 25%, rgba(255,255,255,.05) 26%, transparent 27%, transparent 74%, rgba(255,255,255,.05) 75%, rgba(255,255,255,.05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255,255,255,.05) 25%, rgba(255,255,255,.05) 26%, transparent 27%, transparent 74%, rgba(255,255,255,.05) 75%, rgba(255,255,255,.05) 76%, transparent 77%, transparent)`,
-                backgroundSize: darkMode ? '50px 50px' : '60px 60px',
-                opacity: darkMode ? 0.05 : 0.03,
-            }} />
+        <div className="auth-premium-shell auth-premium-register min-h-screen pt-[112px]">
+            <div className="auth-premium-atmosphere " />
 
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full max-w-[950px] flex flex-col md:flex-row bg-white/95 dark:bg-[rgba(20,30,50,0.4)] shadow-[0_40px_120px_rgba(0,0,0,0.15)] dark:shadow-[0_40px_120px_rgba(0,0,0,0.5)] relative z-10 overflow-hidden max-h-[90vh] border border-white/50 dark:border-white/10 rounded-3xl backdrop-blur-xl"
+                className="auth-premium-frame auth-premium-frame-wide"
             >
-                {/* Left Panel - Extraordinary */}
-                <div className="hidden md:flex md:w-[45%] relative overflow-hidden flex-col justify-between p-12 lg:p-14" style={registerHeroPanelStyle}>
-                    {/* Multi-layer dramatic effects */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_25%,rgba(255,192,61,0.35),transparent_35%),radial-gradient(circle_at_85%_20%,rgba(100,220,255,0.3),transparent_32%),radial-gradient(circle_at_25%_80%,rgba(168,100,255,0.25),transparent_40%)] pointer-events-none" />
-                    <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(5,15,35,0.5)_0%,rgba(15,40,70,0.6)_50%,rgba(10,55,80,0.7)_100%)] pointer-events-none" />
-                    <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[#ffc966]/30 blur-3xl pointer-events-none opacity-90" />
-                    <div className="absolute -bottom-24 -left-40 w-full h-96 rounded-full bg-[#64c8ff]/25 blur-3xl pointer-events-none opacity-80" />
-                    <div className="absolute top-1/4 -right-48 w-96 h-96 rounded-full bg-[#a864ff]/20 blur-3xl pointer-events-none opacity-60" />
-                    <div className="absolute inset-0 opacity-[0.06] pointer-events-none bg-[linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.12)_1px,transparent_1px)] bg-[size:40px_40px]" />
-
-                    <div className="relative z-10 mt-2 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full border border-white/40 bg-gradient-to-br from-white/25 to-white/10 backdrop-blur-md flex items-center justify-center text-white shadow-[0_8px_32px_rgba(255,192,61,0.25)]">
-                            <Sparkles size={18} strokeWidth={2} />
-                        </div>
-                        <h1 className="text-[0.72rem] font-bold tracking-[0.28em] text-white/95 uppercase">
-                            Lexora Onboarding
-                        </h1>
+                <aside className="auth-premium-aside">
+                    <div className="auth-premium-brandline">
+                        <span className="auth-premium-badge">Premium Client Onboarding</span>
+                        <h1>Create Your Protected Legal Account</h1>
+                        <p>Start your relationship with a private, high-trust consultation platform built for sensitive legal matters.</p>
                     </div>
 
-                    <div className="relative z-10 max-w-[300px]">
-                        <h2 className="font-display text-5xl lg:text-[2.5rem] font-bold text-white mb-4 tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
-                            Join the vault.
-                        </h2>
-                        <p className="text-white/90 text-[0.98rem] leading-relaxed max-w-[280px] font-light">
-                            Build your verified legal identity with secure access to premium services.
-                        </p>
-                    </div>
-
-                    <div className="relative z-10 rounded-2xl border border-white/25 bg-gradient-to-br from-white/12 to-white/5 backdrop-blur-xl px-6 py-5 shadow-[0_16px_40px_rgba(0,0,0,0.2)] hover:border-white/35 transition-all duration-300">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/20 to-white/10 border border-white/40 flex items-center justify-center text-white shrink-0 shadow-[0_4px_16px_rgba(255,192,61,0.15)]">
-                                <Lock size={18} strokeWidth={2} />
-                            </div>
+                    <div className="auth-premium-trustlist">
+                        <div className="auth-premium-trustitem">
+                            <ShieldCheck className="w-4 h-4" />
                             <div>
-                                <p className="text-white font-semibold text-sm">Secure Registration</p>
-                                <p className="text-white/75 text-xs mt-0.5">Your profile data is encrypted and verified.</p>
+                                <p>Trusted account creation</p>
+                                <span>Structured intake with secure profile verification.</span>
+                            </div>
+                        </div>
+                        <div className="auth-premium-trustitem">
+                            <BadgeCheck className="w-4 h-4" />
+                            <div>
+                                <p>Professional-grade standards</p>
+                                <span>Purpose-built for private legal consultation workflows.</span>
                             </div>
                         </div>
                     </div>
-                </div>
+                </aside>
 
-                {/* Right Panel - Form Section - Extraordinary */}
-                <div className="w-full md:w-[55%] flex flex-col justify-start items-center p-8 lg:p-12 xl:p-16 relative bg-gradient-to-br from-[#fafbfc]/90 via-[#f8f4ef]/85 to-[#f5f0ea]/90 dark:from-[rgba(20,30,50,0.3)] dark:via-[rgba(20,35,55,0.25)] dark:to-[rgba(15,25,45,0.3)] overflow-y-auto scrollbar-hide min-h-[90vh]">
-                    {/* Premium background effects */}
-                    <div className="absolute inset-0 pointer-events-none">
-                        <div className="absolute top-0 right-0 w-full h-96 bg-gradient-to-l from-[#ffc966]/12 via-transparent to-transparent rounded-full blur-3xl opacity-60 dark:opacity-40" />
-                        <div className="absolute bottom-0 left-0 w-full h-96 bg-gradient-to-t from-[#64c8ff]/10 via-transparent to-transparent rounded-full blur-3xl opacity-50 dark:opacity-30" />
-                        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-[#a864ff]/8 rounded-full blur-3xl opacity-40 dark:opacity-25" />
-                    </div>
-                    <div className="w-full max-w-[420px] relative z-10 bg-white/60 dark:bg-white/5 rounded-2xl p-8 lg:p-10 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
-                        <div className="mb-12 relative">
-                            <div className="inline-block mb-3">
-                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#ffc966]/20 to-[#64c8ff]/20 border border-[#ffc966]/30 dark:border-[#ffc966]/40">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#ffc966] animate-pulse"></div>
-                                    <span className="text-[0.7rem] font-bold text-[#a1804a] dark:text-[#ffc966] tracking-widest uppercase">Elite Access</span>
-                                </div>
-                            </div>
-                            <h2 className="font-display text-[2.3rem] font-bold text-[#0a0f19] dark:text-white mb-3 tracking-tight drop-shadow-[0_2px_6px_rgba(0,0,0,0.1)]">
-                                Build Your Identity
-                            </h2>
-                            <p className="text-[0.87rem] text-gray-600 dark:text-gray-300 font-light leading-relaxed">
-                                Create your verified legal profile and join the digital vault.
-                            </p>
+                <section className="auth-premium-main auth-premium-main-scroll">
+                    <div className="auth-premium-card auth-premium-card-wide">
+                        <div className="auth-premium-card-head">
+                            <p className="auth-premium-kicker">Secure Registration</p>
+                            <h2>Create Account</h2>
+                            <p>Complete your details to enter a confidential consultation environment designed for trust and precision.</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="w-full space-y-6">
+                        <form onSubmit={handleSubmit} className="auth-premium-form w-full space-y-6">
                             <div className="grid grid-cols-2 gap-4 mb-8">
                                 <button
                                     type="button"
                                     onClick={() => setRole('client')}
-                                    className={`relative group p-5 border-2 flex flex-col items-center justify-center gap-3 transition-all duration-300 rounded-xl overflow-hidden ${role === 'client'
-                                        ? 'border-[#ffc966] bg-gradient-to-br from-[#ffc966]/15 to-[#64c8ff]/5 dark:from-[#ffc966]/20 dark:to-[#64c8ff]/10 shadow-[0_10px_30px_rgba(255,201,102,0.2)]'
-                                        : 'border-gray-200 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:border-[#ffc966]/50 dark:hover:border-[#ffc966]/40'
+                                    className={`auth-premium-role-option ${role === 'client'
+                                        ? 'auth-premium-role-option-active'
+                                        : ''
                                         }`}
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#ffc966]/0 via-white/0 to-[#ffc966]/0 opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
-                                    <div className={`text-[#0a0f19] dark:text-white transition-all ${role === 'client' ? 'scale-110' : ''}`}>
+                                    <div className={`auth-premium-role-icon ${role === 'client' ? 'scale-110' : ''}`}>
                                         <User size={28} strokeWidth={1.5} />
                                     </div>
                                     <div className="text-center relative z-10">
-                                        <span className="block text-[0.5rem] font-bold tracking-[0.15em] text-gray-500 dark:text-gray-400 uppercase mb-1">I am a</span>
-                                        <span className="block font-display font-bold text-[0.95rem] text-[#0a0f19] dark:text-white">Client</span>
+                                        <span className="block text-[0.56rem] font-bold tracking-[0.15em] text-[color:var(--auth-muted)] uppercase mb-1">I am a</span>
+                                        <span className="block font-semibold text-[0.95rem] text-[color:var(--auth-text)]">Client</span>
                                     </div>
                                 </button>
 
                                 <button
                                     type="button"
                                     onClick={() => setRole('lawyer')}
-                                    className={`relative group p-5 border-2 flex flex-col items-center justify-center gap-3 transition-all duration-300 rounded-xl overflow-hidden ${role === 'lawyer'
-                                        ? 'border-[#ffc966] bg-gradient-to-br from-[#ffc966]/15 to-[#64c8ff]/5 dark:from-[#ffc966]/20 dark:to-[#64c8ff]/10 shadow-[0_10px_30px_rgba(255,201,102,0.2)]'
-                                        : 'border-gray-200 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:border-[#ffc966]/50 dark:hover:border-[#ffc966]/40'
+                                    className={`auth-premium-role-option ${role === 'lawyer'
+                                        ? 'auth-premium-role-option-active'
+                                        : ''
                                         }`}
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#ffc966]/0 via-white/0 to-[#ffc966]/0 opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
-                                    <div className={`text-[#0a0f19] dark:text-white transition-all ${role === 'lawyer' ? 'scale-110' : ''}`}>
+                                    <div className={`auth-premium-role-icon ${role === 'lawyer' ? 'scale-110' : ''}`}>
                                         <Scale size={28} strokeWidth={1.5} />
                                     </div>
                                     <div className="text-center relative z-10">
-                                        <span className="block text-[0.5rem] font-bold tracking-[0.15em] text-gray-500 dark:text-gray-400 uppercase mb-1">I am a</span>
-                                        <span className="block font-display font-bold text-[0.95rem] text-[#0a0f19] dark:text-white">Professional</span>
+                                        <span className="block text-[0.56rem] font-bold tracking-[0.15em] text-[color:var(--auth-muted)] uppercase mb-1">I am a</span>
+                                        <span className="block font-semibold text-[0.95rem] text-[color:var(--auth-text)]">Professional</span>
                                     </div>
                                 </button>
                             </div>
@@ -654,7 +581,7 @@ const Register = () => {
 
                                 {!googleLawyerToken && <div className="grid grid-cols-2 gap-5">
                                     <div className="mb-6 relative">
-                                        <label className="block text-[0.65rem] font-bold text-gray-500 dark:text-gray-400 tracking-widest uppercase mb-1">Password</label>
+                                        <label className="block text-[0.65rem] font-bold tracking-widest uppercase mb-1 text-[color:var(--auth-muted)]">Password</label>
                                         <div className="relative">
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
@@ -663,11 +590,10 @@ const Register = () => {
                                                 value={formData.password}
                                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                                 placeholder="•••••••••••••••"
-                                                className="w-full bg-transparent border-0 border-b border-gray-300 dark:border-dark-600 px-0 py-2 text-sm text-[#111827] dark:text-white focus:ring-0 focus:border-[#ffc966] dark:focus:border-[#ffc966] transition-colors placeholder-gray-300 dark:placeholder-gray-500 outline-none"
-                                                style={{ boxShadow: 'none' }}
+                                                className="auth-premium-input w-full"
                                             />
                                             <div
-                                                className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer transition-colors"
+                                                className="auth-premium-icon-btn absolute right-3 top-1/2 -translate-y-1/2"
                                                 onClick={() => setShowPassword(!showPassword)}
                                             >
                                                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -987,36 +913,26 @@ const Register = () => {
                             <button
                                 type="submit"
                                 disabled={register.isPending || !role}
-                                className="w-full relative group py-[16px] px-6 rounded-xl font-bold tracking-[0.16em] uppercase text-[0.75rem] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 overflow-hidden"
-                                style={{
-                                    background: !darkMode
-                                        ? 'linear-gradient(135deg, #0a0f19 0%, #1a2a3a 50%, #0a0f19 100%)'
-                                        : 'linear-gradient(135deg, #ffc966 0%, #ffb84d 50%, #ffc966 100%)',
-                                    color: !darkMode ? '#ffc966' : '#0a0f19',
-                                    boxShadow: darkMode
-                                        ? '0 20px 60px rgba(255, 201, 102, 0.3)'
-                                        : '0 20px 60px rgba(0, 0, 0, 0.2)',
-                                }}
+                                className="auth-premium-btn-primary w-full"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-full group-hover:translate-x-full" style={{ animation: 'none' }} />
                                 {register.isPending ? <Loader size="sm" /> : (
                                     <>
-                                        Initialize Access <ArrowRight size={16} strokeWidth={2.5} />
+                                        Create Protected Account <ArrowRight size={16} strokeWidth={2.5} />
                                     </>
                                 )}
                             </button>
 
-                            <div className="flex items-center gap-3 my-1">
-                                <div className="h-px flex-1 bg-gray-200 dark:bg-white/15" />
-                                <span className="text-[0.62rem] tracking-[0.2em] font-semibold text-gray-500 dark:text-gray-400 uppercase">Or continue with</span>
-                                <div className="h-px flex-1 bg-gray-200 dark:bg-white/15" />
+                            <div className="auth-premium-separator">
+                                <div className="h-px flex-1" />
+                                <span>Or continue with</span>
+                                <div className="h-px flex-1" />
                             </div>
 
                             <button
                                 type="button"
                                 onClick={handleGoogleSignIn}
                                 disabled={isGoogleSubmitting || !role || isGoogleLawyerLoading || !!googleLawyerToken}
-                                className="w-full py-[13px] px-5 rounded-xl border border-gray-300/80 dark:border-white/20 bg-white/70 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 text-[#0a0f19] dark:text-white transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-3 font-semibold text-[0.78rem] tracking-wide"
+                                className="auth-premium-btn-secondary w-full"
                             >
                                 <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
                                     <path fill="#EA4335" d="M12 10.2v3.9h5.4c-.24 1.26-.96 2.33-2.04 3.05l3.3 2.57c1.92-1.77 3.03-4.38 3.03-7.49 0-.72-.06-1.41-.2-2.08H12z" />
@@ -1024,55 +940,47 @@ const Register = () => {
                                     <path fill="#4A90E2" d="M6.53 13.94A6.01 6.01 0 016.22 12c0-.67.11-1.33.31-1.94L3.12 7.42A10 10 0 002 12c0 1.61.39 3.14 1.12 4.58l3.41-2.64z" />
                                     <path fill="#FBBC05" d="M12 6.03c1.47 0 2.79.5 3.83 1.49l2.87-2.87C16.95 3.02 14.69 2 12 2A9.99 9.99 0 003.12 7.42l3.41 2.64c.77-2.31 2.93-4.03 5.47-4.03z" />
                                 </svg>
-                                {isGoogleSubmitting ? 'Connecting to Google...' : 'Sign Up With Google'}
+                                {isGoogleSubmitting ? 'Connecting to Google...' : 'Sign Up with Google'}
                             </button>
 
                             {!role && (
-                                <p className="text-[0.72rem] text-amber-700 dark:text-amber-300 text-center">
+                                <p className="text-[0.72rem] text-center text-[color:var(--auth-muted)]">
                                     Select Client or Professional first to continue.
                                 </p>
                             )}
 
                             {role === 'lawyer' && !googleLawyerToken && (
-                                <p className="text-[0.72rem] text-amber-700 dark:text-amber-300 text-center">
+                                <p className="text-[0.72rem] text-center text-[color:var(--auth-muted)]">
                                     Professional with Google requires one more step: continue with Google, then complete all required profile fields.
                                 </p>
                             )}
 
                             {googleLawyerToken && (
-                                <p className="text-[0.72rem] text-emerald-700 dark:text-emerald-300 text-center">
+                                <p className="text-[0.72rem] text-center text-emerald-600 dark:text-emerald-300">
                                     Google account linked. Name and email are prefilled; complete the remaining professional details.
                                 </p>
                             )}
                         </form>
 
-                        <div className="mt-8 text-center pt-8 border-t border-gray-300/40 dark:border-white/15">
-                            <span className="text-[0.75rem] text-gray-600 dark:text-gray-400 font-light">Already registered? </span>
-                            <Link to="/login" className="text-[0.75rem] font-bold text-[#ffc966] hover:text-[#ffb84d] dark:hover:text-[#ffd480] transition-colors duration-200 uppercase tracking-wider ml-1">
-                                Sign in now
+                        <div className="mt-8 text-center auth-premium-footnote pt-8">
+                            <span>Already registered? </span>
+                            <Link to="/login" className="auth-premium-link font-semibold ml-1">
+                                Sign in
                             </Link>
                         </div>
 
-                        <div className="mt-8 flex items-center justify-center gap-10 border-t border-gray-300/40 dark:border-white/15 pt-8">
-                            <div className="flex flex-col items-center gap-2 group cursor-pointer">
-                                <div className="p-2 rounded-lg bg-gradient-to-br from-[#ffc966]/10 to-[#64c8ff]/10 group-hover:from-[#ffc966]/20 group-hover:to-[#64c8ff]/20 transition-all">
-                                    <ShieldCheck size={18} className="text-gray-600 dark:text-gray-300 group-hover:text-[#ffc966] dark:group-hover:text-[#ffc966] transition-colors" />
-                                </div>
-                                <span className="text-[0.55rem] font-bold text-gray-600 dark:text-gray-400 tracking-widest uppercase group-hover:text-[#a1804a] dark:group-hover:text-[#ffc966] transition-colors">
-                                    Verified Identity
-                                </span>
+                        <div className="auth-premium-assurance">
+                            <div className="auth-premium-assurance-item">
+                                <ShieldCheck size={16} />
+                                <span>Verified identity</span>
                             </div>
-                            <div className="flex flex-col items-center gap-2 group cursor-pointer">
-                                <div className="p-2 rounded-lg bg-gradient-to-br from-[#ffc966]/10 to-[#64c8ff]/10 group-hover:from-[#ffc966]/20 group-hover:to-[#64c8ff]/20 transition-all">
-                                    <Lock size={18} className="text-gray-600 dark:text-gray-300 group-hover:text-[#64c8ff] dark:group-hover:text-[#64c8ff] transition-colors" />
-                                </div>
-                                <span className="text-[0.55rem] font-bold text-gray-600 dark:text-gray-400 tracking-widest uppercase group-hover:text-[#a1804a] dark:group-hover:text-[#64c8ff] transition-colors">
-                                    Encrypted Data
-                                </span>
+                            <div className="auth-premium-assurance-item">
+                                <Lock size={16} />
+                                <span>Encrypted records</span>
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
             </motion.div>
         </div>
     )
