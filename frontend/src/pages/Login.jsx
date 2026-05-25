@@ -10,10 +10,11 @@ import StyledInput from '../components/StyledInput'
 
 const Login = () => {
   const navigate = useNavigate()
-  const { setAuth } = useAuthStore()
+  const { setAuth, rememberMe: storedRememberMe } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
+  const [rememberSession, setRememberSession] = useState(storedRememberMe)
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -28,7 +29,7 @@ const Login = () => {
       const result = response.data
 
       if (result.user && result.token) {
-        setAuth(result.user, result.token)
+        setAuth(result.user, result.token, rememberSession)
         toast.success('Welcome back!')
 
         // Redirect based on role
@@ -80,7 +81,7 @@ const Login = () => {
 
 
   return (
-    <div className="auth-premium-shell auth-premium-login min-h-screen pt-[112px]">
+    <div className="auth-premium-shell auth-premium-login min-h-screen pt-[100px]">
       <div className="auth-premium-atmosphere" />
 
       <motion.div
@@ -150,6 +151,8 @@ const Login = () => {
                 <label className="flex items-center gap-3 cursor-pointer auth-premium-check">
                   <input
                     type="checkbox"
+                    checked={rememberSession}
+                    onChange={(e) => setRememberSession(e.target.checked)}
                     className="w-4 h-4 rounded border-[color:var(--auth-border)] text-[color:var(--auth-accent)] focus:ring-[color:var(--auth-accent)] focus:ring-2"
                   />
                   <span className="text-[0.8rem] font-medium text-[color:var(--auth-muted)]">

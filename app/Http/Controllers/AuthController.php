@@ -338,11 +338,22 @@ class AuthController extends Controller
         $email = mb_strtolower(trim((string) $googleUser->getEmail()));
         $user = User::where('email', $email)->first();
 
-        if ($intent === 'register' && $role === 'lawyer') {
-            if ($user) {
-                return redirect()->away($frontendUrl . '/auth/google/callback?error=account_exists');
-            }
+        if ($intent === 'register' && $user) {
+            $isMatchingLawyerSignup = $role === 'lawyer' && $user->role === 'lawyer';
 
+            if (! $isMatchingLawyerSignup) {
+                $params = http_build_query([
+                    'error' => 'account_exists',
+                    'email' => $email,
+                    'selected_role' => $role,
+                    'existing_role' => $user->role,
+                ]);
+
+                return redirect()->away($frontendUrl . '/auth/google/callback?' . $params);
+            }
+        }
+
+        if ($intent === 'register' && $role === 'lawyer' && ! $user) {
             $registrationToken = (string) Str::uuid();
             Cache::put('google_lawyer_registration:' . $registrationToken, [
                 'name' => $googleUser->getName() ?: 'Google User',

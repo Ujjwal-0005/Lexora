@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import api from '../api/axios'
 
 export const useLawyers = (filters = {}) => {
-  const { specialization, regionId, minRating, maxFee, search, sortBy, sortOrder, availability } = filters
+  const { specialization, regionId, minRating, maxFee, search, sortBy, sortOrder, availability, page } = filters
 
   return useQuery({
     queryKey: ['lawyers', filters],
@@ -22,6 +22,8 @@ export const useLawyers = (filters = {}) => {
       if (sortBy) params.append('sort_by', sortBy)
       if (sortOrder) params.append('sort_order', sortOrder)
       if (availability) params.append('availability', availability)
+      if (page) params.append('page', page)
+      params.append('per_page', '12')
 
       const response = await api.get(`/lawyers?${params.toString()}`)
       return response.data

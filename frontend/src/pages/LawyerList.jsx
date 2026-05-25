@@ -81,6 +81,23 @@ const getRoleBadge = (designation, years) => {
   return ROLE_MAP['partner']
 }
 
+const getPracticeAreas = (profile) => {
+  if (!Array.isArray(profile.core_competencies) || profile.core_competencies.length === 0) {
+    return []
+  }
+
+  const unique = []
+
+  profile.core_competencies.forEach((name, index) => {
+    const value = String(name || '').trim()
+    if (!value) return
+    if (unique.some((item) => item.name.toLowerCase() === value.toLowerCase())) return
+    unique.push({ id: `cc-${index}`, name: value })
+  })
+
+  return unique.slice(0, 3)
+}
+
 /* ─────────────────────────────────────────
    STAR ROW
 ───────────────────────────────────────── */
@@ -111,15 +128,7 @@ const LawyerCard = ({ lawyer, index = 0 }) => {
   const profile = lawyer
   const badge = getRoleBadge(profile.designation, profile.years_of_experience || 0)
   const isAvailable = profile.is_available !== false
-  // Tags: prefer explicit specializations, then core_competencies, then document_expertise names
-  let specs = []
-  if (profile.specializations && profile.specializations.length > 0) {
-    specs = profile.specializations.slice(0, 3)
-  } else if (Array.isArray(profile.core_competencies) && profile.core_competencies.length > 0) {
-    specs = profile.core_competencies.slice(0, 3).map((name, i) => ({ id: `cc-${i}`, name }))
-  } else if (Array.isArray(profile.document_expertise) && profile.document_expertise.length > 0) {
-    specs = profile.document_expertise.slice(0, 3).map((d, i) => ({ id: `doc-${i}`, name: d.name || d }))
-  }
+  const specs = getPracticeAreas(profile)
 
   const bio = profile.bio || profile.description || ''
   const rating = profile.average_rating
@@ -297,8 +306,19 @@ const LawyerList = () => {
             id="lawyer-search"
             type="text"
             value={searchQuery}
-            onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1) }}
-            placeholder="Search by name..."
+            onChange={e => {
+              const value = e.target.value
+              setSearchQuery(value)
+              setCurrentPage(1)
+
+              if (value.trim()) {
+                setSpecialization([])
+                setRegionId('')
+                setMinRating(0)
+                setAvailability('')
+              }
+            }}
+            placeholder="Search by name, region, or core competency..."
             className="dd-search-input"
           />
         </motion.div>

@@ -3624,7 +3624,7 @@ body::-webkit-scrollbar,
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1rem 3rem;
+  padding: 100px 1rem 3rem;
   overflow: hidden;
   background:
     radial-gradient(circle at 8% 0%, rgba(201, 171, 120, 0.2) 0%, transparent 30%),
@@ -3645,6 +3645,7 @@ body::-webkit-scrollbar,
   --auth-accent-strong: #e0bb7a;
   --auth-shadow-sm: 0 20px 54px rgba(0, 0, 0, 0.34);
   --auth-shadow-lg: 0 36px 96px rgba(0, 0, 0, 0.5);
+  padding: 100px 1rem 3rem;
   background:
     radial-gradient(circle at 10% -8%, rgba(198, 154, 70, 0.18) 0%, transparent 36%),
     radial-gradient(circle at 96% 10%, rgba(84, 113, 169, 0.2) 0%, transparent 32%),

@@ -479,7 +479,7 @@ const Register = () => {
     const currentStrength = strengthLevels.find((s) => strength >= s.min && strength <= s.max)
 
     return (
-        <div className="auth-premium-shell auth-premium-register min-h-screen pt-[112px]">
+        <div className="auth-premium-shell auth-premium-register min-h-screen pt-[100px]">
             <div className="auth-premium-atmosphere " />
 
             <motion.div

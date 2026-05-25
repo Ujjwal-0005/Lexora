@@ -1,5 +1,44 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
+
+const AUTH_STORAGE_KEY = 'legalconnect-auth'
+
+const authStorage = {
+  getItem: (name) => {
+    if (typeof window === 'undefined') {
+      return null
+    }
+
+    return window.localStorage.getItem(name) || window.sessionStorage.getItem(name)
+  },
+  setItem: (name, value) => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    let rememberMe = true
+    try {
+      const parsed = JSON.parse(value)
+      rememberMe = parsed?.state?.rememberMe !== false
+    } catch {
+      rememberMe = true
+    }
+
+    const primaryStorage = rememberMe ? window.localStorage : window.sessionStorage
+    const secondaryStorage = rememberMe ? window.sessionStorage : window.localStorage
+
+    primaryStorage.setItem(name, value)
+    secondaryStorage.removeItem(name)
+  },
+  removeItem: (name) => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    window.localStorage.removeItem(name)
+    window.sessionStorage.removeItem(name)
+  },
+}
 
 export const useAuthStore = create(
   persist(
@@ -8,9 +47,10 @@ export const useAuthStore = create(
       token: null,
       isAuthenticated: false,
       pendingRegistration: null,
+      rememberMe: true,
 
-      setAuth: (user, token) => {
-        set({ user, token, isAuthenticated: true })
+      setAuth: (user, token, rememberMe = true) => {
+        set({ user, token, isAuthenticated: true, rememberMe })
       },
 
       setPendingRegistration: (payload) => {
@@ -26,7 +66,7 @@ export const useAuthStore = create(
       },
 
       logout: () => {
-        set({ user: null, token: null, isAuthenticated: false })
+        set({ user: null, token: null, isAuthenticated: false, rememberMe: true })
       },
 
       isAdmin: () => get().user?.role === 'admin',
@@ -34,7 +74,14 @@ export const useAuthStore = create(
       isClient: () => get().user?.role === 'client',
     }),
     {
-      name: 'legalconnect-auth',
+      name: AUTH_STORAGE_KEY,
+      storage: createJSONStorage(() => authStorage),
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
+        rememberMe: state.rememberMe,
+      }),
     }
   )
 )

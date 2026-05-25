@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             DocumentTypeSeeder::class,
             AdminUserSeeder::class,
             TestUsersSeeder::class,
+            AddFakeLawyersSeeder::class,
         ]);
     }
 }

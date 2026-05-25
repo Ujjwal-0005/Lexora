@@ -53,6 +53,27 @@ const LawyerDashboard = () => {
     d => ['completed', 'delivered'].includes(d.status)
   ) || []
 
+  const recentActivityItems = [
+    ...(documents || []).map((document) => ({
+      id: `doc-${document.id}`,
+      type: 'document',
+      title: document.document_type_name || document.documentType?.name || document.document_name || 'Document Request',
+      subtitle: document.client?.name ? `Requested by ${document.client.name}` : 'Document activity',
+      date: document.updated_at || document.created_at,
+      status: document.status,
+      raw: document,
+    })),
+    ...(consultations?.data || []).map((consultation) => ({
+      id: `con-${consultation.id}`,
+      type: 'consultation',
+      title: `Consultation with ${consultation.client?.name || 'Client'}`,
+      subtitle: consultation.subject || consultation.description || consultation.notes || 'Consultation activity',
+      date: consultation.updated_at || consultation.scheduled_at || consultation.created_at,
+      status: consultation.status,
+      raw: consultation,
+    })),
+  ].sort((a, b) => new Date(b.date) - new Date(a.date))
+
   const consultationEarnings = completedConsultations.reduce((sum, c) => sum + (Number(c.fee) || 0), 0)
   const documentEarnings = completedDocuments.reduce((sum, d) => {
     const price = Number(d.price)
@@ -167,7 +188,43 @@ const LawyerDashboard = () => {
   const nextSessionTime = nextSessionParts[1] || 'Time to be assigned'
   const urgency = nextConsultation ? getSessionUrgency(nextConsultation.scheduled_at) : null
 
-  const getActivityPresentation = (status) => {
+  const getActivityPresentation = (type, status) => {
+    if (type === 'document') {
+      if (['completed', 'delivered'].includes(status)) {
+        return {
+          iconWrap: 'border-emerald-200 bg-emerald-50 dark:border-emerald-400/30 dark:bg-emerald-500/10',
+          iconColor: 'text-emerald-700 dark:text-emerald-300',
+          chip: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-500/10 dark:text-emerald-300',
+          title: 'Document Completed',
+        }
+      }
+
+      if (['review', 'in_progress', 'paid', 'accepted', 'client_info_submitted'].includes(status)) {
+        return {
+          iconWrap: 'border-[#d6c8a8] bg-[#fff8e7] dark:border-[#fbbf24]/30 dark:bg-[#fbbf24]/12',
+          iconColor: 'text-[#9a3412] dark:text-[#fbbf24]',
+          chip: 'border-[#e7dcc6] bg-[#fff8e7] text-[#92400e] dark:border-[#fbbf24]/30 dark:bg-[#fbbf24]/12 dark:text-[#fbbf24]',
+          title: 'Document In Progress',
+        }
+      }
+
+      if (status === 'rejected') {
+        return {
+          iconWrap: 'border-rose-200 bg-rose-50 dark:border-rose-400/30 dark:bg-rose-500/10',
+          iconColor: 'text-rose-700 dark:text-rose-300',
+          chip: 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/30 dark:bg-rose-500/10 dark:text-rose-300',
+          title: 'Document Rejected',
+        }
+      }
+
+      return {
+        iconWrap: 'border-slate-200 bg-slate-50 dark:border-dark-500 dark:bg-dark-700',
+        iconColor: 'text-slate-500 dark:text-slate-300',
+        chip: 'border-slate-200 bg-slate-50 text-slate-600 dark:border-dark-500 dark:bg-dark-700 dark:text-slate-300',
+        title: 'Document Requested',
+      }
+    }
+
     if (status === 'completed') {
       return {
         iconWrap: 'border-emerald-200 bg-emerald-50 dark:border-emerald-400/30 dark:bg-emerald-500/10',
@@ -276,7 +333,7 @@ const LawyerDashboard = () => {
                 <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#b45309] dark:text-[#fbbf24] mb-2">Activity Intelligence</p>
                 <h2 className="font-serif text-[31px] font-bold text-[#111827] dark:text-white leading-none">Recent Activity</h2>
                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">
-                  Executive-grade timeline of your latest consultation movement.
+                  Executive-grade timeline of your latest consultation and document movement.
                 </p>
               </div>
               <Link to="/lawyer/consultations" className="inline-flex items-center gap-2 rounded-full border border-[#e7dcc6] bg-white/80 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-[#9a3412] shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#d6c8a8] hover:bg-[#fff8e7] dark:border-dark-500 dark:bg-dark-700/80 dark:text-[#fbbf24] dark:hover:border-[#fbbf24]/30 dark:hover:bg-dark-700">
@@ -287,15 +344,21 @@ const LawyerDashboard = () => {
 
             {isLoading ? (
               <div className="relative z-10 py-12"><Loader /></div>
-            ) : consultations?.data?.length > 0 ? (
+            ) : recentActivityItems.length > 0 ? (
               <div className="relative z-10 space-y-4">
-                {consultations.data.slice(0, 4).map((consultation, idx) => {
-                  const activity = getActivityPresentation(consultation.status)
-                  const ActivityIcon = consultation.status === 'completed' ? CheckCircle2 : consultation.status === 'confirmed' ? Calendar : Clock
+                {recentActivityItems.slice(0, 4).map((item, idx) => {
+                  const activity = getActivityPresentation(item.type, item.status)
+                  const ActivityIcon = item.type === 'document'
+                    ? FileText
+                    : item.status === 'completed'
+                      ? CheckCircle2
+                      : item.status === 'confirmed'
+                        ? Calendar
+                        : Clock
 
                   return (
                     <div
-                      key={consultation.id}
+                      key={item.id}
                       className="group/item relative rounded-2xl border border-[#e5e7eb] bg-white/78 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d6c8a8] hover:shadow-[0_16px_30px_rgba(15,23,42,0.10)] dark:border-dark-600 dark:bg-dark-800/78 dark:hover:border-[#fbbf24]/20 dark:hover:bg-dark-700/85 dark:hover:shadow-[0_16px_30px_rgba(0,0,0,0.24)]"
                     >
                       {idx !== 3 && (
@@ -312,23 +375,26 @@ const LawyerDashboard = () => {
                         <div className="flex-1 min-w-0">
                           <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
                             <h4 className="font-serif text-[19px] font-bold text-[#111827] dark:text-white leading-tight">
-                              Consultation with {consultation.client?.name || 'Client'}
+                              {item.title}
                             </h4>
                             <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-400 whitespace-nowrap">
-                              {formatDateTime(consultation.scheduled_at)}
+                              {formatDateTime(item.date)}
                             </span>
                           </div>
 
                           <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                            {activity.title}. Client booked a {consultation.duration}-minute session with a professional fee of {formatPrice(consultation.fee)}.
+                            {item.type === 'document'
+                              ? `${activity.title}. ${item.subtitle}${item.raw?.price ? ` • Fee ${formatPrice(item.raw.price)}` : ''}`
+                              : `${activity.title}. Client booked a ${item.raw?.duration}-minute session with a professional fee of ${formatPrice(item.raw?.fee)}`
+                            }
                           </p>
 
                           <div className="mt-3 flex flex-wrap items-center gap-2">
                             <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] ${activity.chip}`}>
-                              {consultation.status}
+                              {item.status}
                             </span>
                             <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-400">
-                              Case flow record
+                              {item.type === 'document' ? 'Document flow record' : 'Case flow record'}
                             </span>
                           </div>
                         </div>

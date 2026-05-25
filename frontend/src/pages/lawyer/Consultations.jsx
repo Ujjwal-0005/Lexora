@@ -20,6 +20,7 @@ import toast from 'react-hot-toast'
 const LawyerConsultations = () => {
   const [activeTab, setActiveTab] = useState('upcoming')
   const [selectedConsultation, setSelectedConsultation] = useState(null)
+  const [chatOpenSignal, setChatOpenSignal] = useState(0)
   const [meetingLink, setMeetingLink] = useState('')
   const [showMeetingModal, setShowMeetingModal] = useState(false)
   const [now, setNow] = useState(() => new Date())
@@ -32,19 +33,18 @@ const LawyerConsultations = () => {
     return () => window.clearInterval(timer)
   }, [])
 
-  const noShowGraceMs = 15 * 60 * 1000
-
   const filteredConsultations = consultations?.data?.filter((c) => {
     const scheduledTime = c.scheduled_at ? new Date(c.scheduled_at) : null
-    const isPastSlot = scheduledTime && scheduledTime < now
-    const isFutureSlot = scheduledTime && scheduledTime >= now
-    const isOverdueWithinGrace = scheduledTime && isPastSlot && (now.getTime() - scheduledTime.getTime() <= noShowGraceMs)
+    const durationMinutes = Number(c.duration ?? 30)
+    const endTime = scheduledTime ? new Date(scheduledTime.getTime() + durationMinutes * 60 * 1000) : null
+    const isWithinScheduledWindow = scheduledTime && endTime && now < endTime
+    const isPastScheduledWindow = scheduledTime && endTime && now >= endTime
 
     if (activeTab === 'upcoming') {
-      return ['pending', 'confirmed'].includes(c.status) && (isFutureSlot || isOverdueWithinGrace)
+      return ['pending', 'confirmed'].includes(c.status) && isWithinScheduledWindow
     }
     if (activeTab === 'past') {
-      return c.status === 'missed' || (isPastSlot && ['pending', 'confirmed'].includes(c.status) && !isOverdueWithinGrace)
+      return c.status === 'missed' || (['pending', 'confirmed'].includes(c.status) && isPastScheduledWindow)
     }
     if (activeTab === 'completed') return c.status === 'completed'
     if (activeTab === 'cancelled') return c.status === 'cancelled'
@@ -108,16 +108,9 @@ const LawyerConsultations = () => {
     }
   }
 
-  const handleNoShow = async (id) => {
-    try {
-      await updateStatus.mutateAsync({
-        id,
-        status: 'missed',
-      })
-      toast.success('Consultation moved to past as no-show')
-    } catch (error) {
-      toast.error('Failed to mark no-show')
-    }
+  const handleOpenChat = (consultation) => {
+    setSelectedConsultation(consultation)
+    setChatOpenSignal((signal) => signal + 1)
   }
 
   const isReadonlyTab = ['past', 'completed', 'cancelled', 'all'].includes(activeTab)
@@ -239,18 +232,8 @@ const LawyerConsultations = () => {
                   </>
                 )}
 
-                {!isReadonlyTab && ['pending', 'confirmed'].includes(consultation.status) && new Date(consultation.scheduled_at) < now && (
-                  <button
-                    onClick={() => handleNoShow(consultation.id)}
-                    className="flex items-center gap-2 px-6 py-2.5 border border-amber-200 text-amber-700 hover:bg-amber-50 font-semibold text-sm transition-colors rounded-sm"
-                  >
-                    <XCircle className="w-4 h-4" />
-                    User not connected
-                  </button>
-                )}
-
                 <button
-                  onClick={() => setSelectedConsultation(consultation)}
+                  onClick={() => handleOpenChat(consultation)}
                   className="flex items-center gap-2 px-6 py-2.5 border border-gray-300 dark:border-dark-500 text-gray-700 dark:text-gray-300 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors rounded-sm"
                 >
                   <MessageSquare className="w-4 h-4" />
@@ -341,6 +324,7 @@ const LawyerConsultations = () => {
       {selectedConsultation && (
         <ChatWidget
           consultation={selectedConsultation}
+          openSignal={chatOpenSignal}
           onClose={() => setSelectedConsultation(null)}
         />
       )}

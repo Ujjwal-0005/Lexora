@@ -57,9 +57,21 @@ class LawyerController extends Controller
 
         // Search by name
         if ($request->has('search')) {
-            $search = $request->search;
-            $query->whereHas('user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
+            $search = trim((string) $request->search);
+            $searchTerm = '%' . mb_strtolower($search) . '%';
+            $query->where(function ($searchQuery) use ($search, $searchTerm) {
+                $searchQuery->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('regions', function ($q) use ($search) {
+                    $q->where('city', 'like', "%{$search}%");
+                })
+                ->orWhereHas('specializations', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('slug', 'like', "%{$search}%");
+                })
+                ->orWhereRaw("LOWER(JSON_UNQUOTE(JSON_EXTRACT(core_competencies, '$'))) LIKE ?", [$searchTerm])
+                ->orWhereRaw("LOWER(JSON_UNQUOTE(JSON_EXTRACT(cities, '$'))) LIKE ?", [$searchTerm]);
             });
         }
 
@@ -112,6 +124,13 @@ class LawyerController extends Controller
             ->whereBetween('scheduled_at', [$windowStart, $windowEnd])
             ->get();
 
+        // Only active/upcoming consultations should block slots.
+        // If a consultation end-time is already in the past, release that slot.
+        $blockingConsultations = $consultations->filter(function ($consultation) {
+            $endTime = $consultation->scheduled_at->copy()->addMinutes($consultation->duration ?? 30);
+            return $endTime->gt(now());
+        });
+
         for ($i = 0; $i < 7; $i++) {
             $date = $startDate->copy()->addDays($i);
             $dateString = $date->format('Y-m-d');
@@ -126,7 +145,7 @@ class LawyerController extends Controller
                 $slotEnd = $slotStart->copy()->addMinutes($requestedDuration);
 
                 // Determine if any existing consultation overlaps this potential slot
-                $isOverlapping = $consultations->contains(function ($c) use ($slotStart, $slotEnd) {
+                $isOverlapping = $blockingConsultations->contains(function ($c) use ($slotStart, $slotEnd) {
                     $cStart = $c->scheduled_at;
                     $cEnd = $cStart->copy()->addMinutes($c->duration ?? 30);
 

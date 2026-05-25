@@ -13,6 +13,9 @@ const api = axios.create({
 // Request interceptor to attach token
 api.interceptors.request.use(
   (config) => {
+    const requestUrl = config.url || ''
+    const isPublicDiscoveryRequest = requestUrl.startsWith('/lawyers') || requestUrl.startsWith('/document-types')
+
     if (config.data instanceof FormData) {
       config.headers = { ...config.headers }
       delete config.headers['Content-Type']
@@ -22,7 +25,7 @@ api.interceptors.request.use(
       delete config.headers.patch?.['Content-Type']
     }
     const token = useAuthStore.getState().token
-    if (token) {
+    if (token && !isPublicDiscoveryRequest) {
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
