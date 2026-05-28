@@ -12,8 +12,11 @@ import {
     Sparkles,
     Users
 } from 'lucide-react'
+import { useAuthStore } from '../store/authStore'
 
 const Company = () => {
+    const { isAuthenticated } = useAuthStore()
+
     const stats = [
         { value: '10K+', label: 'Clients served' },
         { value: '500+', label: 'Verified lawyers' },
@@ -75,34 +78,37 @@ const Company = () => {
         },
     ]
 
+    const supportPath = isAuthenticated ? '/help' : '/login'
+
     return (
         <div className="lp-premium-page min-h-screen bg-[#f8f9fa] dark:bg-[#050816] text-[#0f172a] dark:text-white transition-colors duration-300">
-            <section className="relative overflow-hidden border-b border-gray-200 dark:border-[#22314d]">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#10192b] to-[#050816]" />
-                <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_top_right,rgba(161,128,74,0.35),transparent_36%),radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_22%)]" />
+            <section className="relative overflow-hidden border-b border-gray-200 bg-white dark:border-[#22314d] dark:bg-transparent">
+                <div className="absolute inset-0 bg-[linear-gradient(135deg,#ffffff_0%,#f7f2e8_48%,#efe7da_100%)] dark:bg-gradient-to-br dark:from-[#0f172a] dark:via-[#10192b] dark:to-[#050816]" />
+                <div className="absolute inset-0 opacity-100 bg-[radial-gradient(circle_at_top_right,rgba(161,128,74,0.16),transparent_34%),radial-gradient(circle_at_20%_20%,rgba(15,23,42,0.05),transparent_22%)] dark:opacity-40 dark:bg-[radial-gradient(circle_at_top_right,rgba(161,128,74,0.35),transparent_36%),radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_22%)]" />
+                <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#d9c29a] to-transparent dark:via-[#22314d]" />
 
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="lp-page-hero max-w-3xl"
+                        className="lp-page-hero max-w-3xl rounded-3xl border border-white/50 bg-white/80 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-sm dark:border-white/10 dark:bg-transparent dark:p-0 dark:shadow-none"
                     >
-                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/8 border border-white/10 text-[#d7b77a] text-xs font-semibold tracking-[0.2em] uppercase mb-6">
+                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-[#e2d4b6] text-[#8b6a36] text-xs font-semibold tracking-[0.2em] uppercase mb-6 shadow-sm dark:bg-white/8 dark:border-white/10 dark:text-[#d7b77a]">
                             <Landmark className="w-4 h-4" /> Company
                         </span>
-                        <h1 className="font-serif text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
+                        <h1 className="font-serif text-4xl md:text-6xl font-bold text-[#0f172a] leading-tight mb-6 dark:text-white">
                             About Lexora, our careers, and what the press is saying.
                         </h1>
-                        <p className="text-gray-300 text-base md:text-lg leading-relaxed max-w-2xl">
+                        <p className="text-slate-700 text-base md:text-lg leading-relaxed max-w-2xl dark:text-gray-300">
                             Lexora combines premium legal access with a modern digital experience. This page brings together who we are, how we hire, and the latest media coverage in one place.
                         </p>
                         <div className="flex flex-wrap gap-4 mt-8">
-                            <Link to="#about" className="inline-flex items-center gap-2 px-5 py-3 rounded-sm bg-[#a1804a] text-white text-sm font-semibold hover:bg-[#8f703d] transition-colors">
+                            <Link to="#about" className="inline-flex items-center gap-2 px-5 py-3 rounded-sm bg-[#a1804a] text-white text-sm font-semibold shadow-sm hover:bg-[#8f703d] transition-colors">
                                 About Us
                                 <ArrowRight className="w-4 h-4" />
                             </Link>
-                            <Link to="#careers" className="inline-flex items-center gap-2 px-5 py-3 rounded-sm border border-white/15 text-white text-sm font-semibold hover:bg-white/10 transition-colors">
+                            <Link to="#careers" className="inline-flex items-center gap-2 px-5 py-3 rounded-sm border border-[#d9c6a2] bg-white text-sm font-semibold text-[#0f172a] shadow-sm hover:bg-[#fbf7ef] transition-colors dark:border-white/15 dark:bg-transparent dark:text-white dark:hover:bg-white/10">
                                 View Careers
                             </Link>
                         </div>
@@ -265,7 +271,7 @@ const Company = () => {
                         <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
                             Whether you are exploring careers, press opportunities, or company information, we are here to help.
                         </p>
-                        <Link to="/help" className="inline-flex items-center gap-2 px-6 py-3 rounded-sm bg-[#a1804a] text-white text-sm font-semibold hover:bg-[#8f703d] transition-colors">
+                        <Link to={supportPath} className="inline-flex items-center gap-2 px-6 py-3 rounded-sm bg-[#a1804a] text-white text-sm font-semibold hover:bg-[#8f703d] transition-colors">
                             Contact Support
                             <ArrowRight className="w-4 h-4" />
                         </Link>

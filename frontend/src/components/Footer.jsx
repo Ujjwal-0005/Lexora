@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Scale, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram, ArrowRight } from 'lucide-react'
+import { useAuthStore } from '../store/authStore'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
+  const { isAuthenticated } = useAuthStore()
 
   const footerLinks = {
     services: [
@@ -16,7 +18,7 @@ const Footer = () => {
       { label: 'About Us', path: '/company#about' },
       { label: 'Careers', path: '/company#careers' },
       { label: 'Press & Media', path: '/company#press' },
-      { label: 'Contact Support', path: '/help' },
+      { label: 'Contact Support', path: isAuthenticated ? '/help' : '/login' },
     ],
     legal: [
       { label: 'Privacy Policy', path: '/privacy' },

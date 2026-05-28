@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { User, Mail, Phone, Lock, Bell, Shield, Save, Eye, EyeOff, AlertTriangle, Trash2 } from 'lucide-react'
+import { User, Mail, Phone, Lock, Bell, Save, Eye, EyeOff, AlertTriangle, Trash2 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import api from '../../api/axios'
 import toast from 'react-hot-toast'
@@ -38,6 +38,27 @@ const ClientSettings = () => {
     consultation_reminders: true,
     document_updates: true,
   })
+
+  const toggleNotification = (key) => {
+    setNotifications((prev) => {
+      if (key === 'email') {
+        const nextEmail = !prev.email
+        return {
+          ...prev,
+          email: nextEmail,
+          sms: nextEmail ? prev.sms : false,
+          consultation_reminders: nextEmail ? prev.consultation_reminders : false,
+          document_updates: nextEmail ? prev.document_updates : false,
+        }
+      }
+
+      return {
+        ...prev,
+        [key]: !prev[key],
+        email: true,
+      }
+    })
+  }
 
   useEffect(() => {
     const prefs = user?.notification_preferences || {}
@@ -391,6 +412,90 @@ const ClientSettings = () => {
             {profileLoading ? 'Saving...' : 'Save Profile Changes'}
           </button>
         </form>
+      </motion.div>
+
+      {/* Communication Preferences */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08 }}
+        className="portal-card p-8"
+      >
+        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-[color:var(--portal-border)]">
+          <div className="w-12 h-12 rounded-xl bg-[linear-gradient(145deg,#183d35,#2b6b5f)] flex items-center justify-center">
+            <Bell className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h2 className="font-serif font-bold text-xl text-[color:var(--portal-text)]">Communication Preferences</h2>
+            <p className="text-sm text-[color:var(--portal-muted)] font-medium">Choose which email updates you want to receive from the platform</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-4 rounded-xl border border-[color:var(--portal-border)] bg-white/55 dark:bg-black/20 px-4 py-4">
+            <div>
+              <p className="font-semibold text-[color:var(--portal-text)]">All email notifications</p>
+              <p className="text-sm text-[color:var(--portal-muted)]">Master switch for consultation and document emails</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => toggleNotification('email')}
+              className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${notifications.email ? 'bg-[#1a3b5d]' : 'bg-gray-300 dark:bg-gray-600'}`}
+              aria-pressed={notifications.email}
+            >
+              <span className={`inline-block h-6 w-6 transform rounded-full bg-white shadow transition-transform ${notifications.email ? 'translate-x-7' : 'translate-x-1'}`} />
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => toggleNotification('consultation_reminders')}
+              disabled={!notifications.email}
+              className={`rounded-xl border p-4 text-left transition-all ${notifications.email ? 'border-[color:var(--portal-border)] bg-white/55 dark:bg-black/20 hover:border-[#1a3b5d]/40' : 'border-gray-200 bg-gray-100/70 opacity-60 cursor-not-allowed'}`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-semibold text-[color:var(--portal-text)]">Consultation reminders</p>
+                  <p className="text-sm text-[color:var(--portal-muted)]">Receive booking and confirmation emails for consultations</p>
+                </div>
+                <div className={`h-5 w-10 rounded-full p-1 transition-colors ${notifications.email && notifications.consultation_reminders ? 'bg-[#1a3b5d]' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                  <div className={`h-3 w-3 rounded-full bg-white transition-transform ${notifications.email && notifications.consultation_reminders ? 'translate-x-5' : 'translate-x-0'}`} />
+                </div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => toggleNotification('document_updates')}
+              disabled={!notifications.email}
+              className={`rounded-xl border p-4 text-left transition-all ${notifications.email ? 'border-[color:var(--portal-border)] bg-white/55 dark:bg-black/20 hover:border-[#1a3b5d]/40' : 'border-gray-200 bg-gray-100/70 opacity-60 cursor-not-allowed'}`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-semibold text-[color:var(--portal-text)]">Document updates</p>
+                  <p className="text-sm text-[color:var(--portal-muted)]">Get notified when your document request changes status</p>
+                </div>
+                <div className={`h-5 w-10 rounded-full p-1 transition-colors ${notifications.email && notifications.document_updates ? 'bg-[#1a3b5d]' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                  <div className={`h-3 w-3 rounded-full bg-white transition-transform ${notifications.email && notifications.document_updates ? 'translate-x-5' : 'translate-x-0'}`} />
+                </div>
+              </div>
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between gap-4 pt-2">
+            <p className="text-sm text-[color:var(--portal-muted)]">If email notifications are turned off, consultation and document updates are also disabled.</p>
+            <button
+              type="button"
+              onClick={saveNotifications}
+              disabled={savingNotifications}
+              className="portal-btn-primary disabled:opacity-50 py-3 px-6 font-semibold text-sm flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              {savingNotifications ? 'Saving...' : 'Save Notification Preferences'}
+            </button>
+          </div>
+        </div>
       </motion.div>
 
       {/* Password Settings */}

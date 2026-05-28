@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes
 // Dev-only: create a test user and return an auth token (local debugging)
+
+
 if (app()->environment('local')) {
     Route::get('/dev/create-test-user', function () {
         $email = 'dev@local.test';
